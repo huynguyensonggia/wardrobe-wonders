@@ -14,6 +14,8 @@ import {
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { ProductStatus } from '@/types';
 
+const ALL_VALUE = 'all';
+
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
@@ -51,9 +53,11 @@ export default function ProductsPage() {
   }, [filters]);
 
   const updateFilter = (key: keyof typeof filters, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    if (value) {
-      searchParams.set(key, value);
+    // Treat "all" as clearing the filter
+    const actualValue = value === ALL_VALUE ? '' : value;
+    setFilters(prev => ({ ...prev, [key]: actualValue }));
+    if (actualValue) {
+      searchParams.set(key, actualValue);
     } else {
       searchParams.delete(key);
     }
@@ -72,6 +76,9 @@ export default function ProductsPage() {
   };
 
   const hasActiveFilters = Object.values(filters).some(v => v);
+
+  // Helper to get select value (convert empty string to "all" for display)
+  const getSelectValue = (value: string) => value || ALL_VALUE;
 
   return (
     <div className="min-h-screen py-8">
@@ -111,14 +118,14 @@ export default function ProductsPage() {
             {/* Desktop Filters */}
             <div className="hidden lg:flex gap-2">
               <Select 
-                value={filters.category} 
+                value={getSelectValue(filters.category)} 
                 onValueChange={(v) => updateFilter('category', v)}
               >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Categories</SelectItem>
                   {mockCategories.map(cat => (
                     <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
                   ))}
@@ -126,14 +133,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.size} 
+                value={getSelectValue(filters.size)} 
                 onValueChange={(v) => updateFilter('size', v)}
               >
                 <SelectTrigger className="w-[120px]">
                   <SelectValue placeholder="Size" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Sizes</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Sizes</SelectItem>
                   {allSizes.map(size => (
                     <SelectItem key={size} value={size}>{size}</SelectItem>
                   ))}
@@ -141,14 +148,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.color} 
+                value={getSelectValue(filters.color)} 
                 onValueChange={(v) => updateFilter('color', v)}
               >
                 <SelectTrigger className="w-[120px]">
                   <SelectValue placeholder="Color" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Colors</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Colors</SelectItem>
                   {allColors.map(color => (
                     <SelectItem key={color} value={color}>{color}</SelectItem>
                   ))}
@@ -156,14 +163,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.status} 
+                value={getSelectValue(filters.status)} 
                 onValueChange={(v) => updateFilter('status', v as ProductStatus | '')}
               >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Availability" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Status</SelectItem>
                   <SelectItem value="AVAILABLE">Available</SelectItem>
                   <SelectItem value="RENTED">Rented</SelectItem>
                 </SelectContent>
@@ -184,14 +191,14 @@ export default function ProductsPage() {
           <div className="lg:hidden mb-8 p-4 bg-secondary rounded-lg animate-slide-down">
             <div className="grid grid-cols-2 gap-3">
               <Select 
-                value={filters.category} 
+                value={getSelectValue(filters.category)} 
                 onValueChange={(v) => updateFilter('category', v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Categories</SelectItem>
                   {mockCategories.map(cat => (
                     <SelectItem key={cat.id} value={cat.slug}>{cat.name}</SelectItem>
                   ))}
@@ -199,14 +206,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.size} 
+                value={getSelectValue(filters.size)} 
                 onValueChange={(v) => updateFilter('size', v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Size" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Sizes</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Sizes</SelectItem>
                   {allSizes.map(size => (
                     <SelectItem key={size} value={size}>{size}</SelectItem>
                   ))}
@@ -214,14 +221,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.color} 
+                value={getSelectValue(filters.color)} 
                 onValueChange={(v) => updateFilter('color', v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Color" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Colors</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Colors</SelectItem>
                   {allColors.map(color => (
                     <SelectItem key={color} value={color}>{color}</SelectItem>
                   ))}
@@ -229,14 +236,14 @@ export default function ProductsPage() {
               </Select>
 
               <Select 
-                value={filters.status} 
+                value={getSelectValue(filters.status)} 
                 onValueChange={(v) => updateFilter('status', v as ProductStatus | '')}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Availability" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value={ALL_VALUE}>All Status</SelectItem>
                   <SelectItem value="AVAILABLE">Available</SelectItem>
                   <SelectItem value="RENTED">Rented</SelectItem>
                 </SelectContent>
