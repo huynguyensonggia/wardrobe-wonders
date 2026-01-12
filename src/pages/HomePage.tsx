@@ -1,0 +1,190 @@
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ProductCard } from '@/components/products/ProductCard';
+import { mockProducts, mockCategories } from '@/data/mockData';
+import { ArrowRight, Sparkles, Shield, Truck, RefreshCw } from 'lucide-react';
+import heroImage from '@/assets/hero-fashion.jpg';
+
+export default function HomePage() {
+  const featuredProducts = mockProducts.filter(p => p.featured).slice(0, 4);
+
+  return (
+    <div className="min-h-screen">
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center">
+        <div className="absolute inset-0">
+          <img 
+            src={heroImage} 
+            alt="Elegant fashion" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-2xl">
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight animate-slide-up">
+              Rent Luxury,
+              <br />
+              <span className="text-gradient-gold">Own the Moment</span>
+            </h1>
+            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-lg animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Access designer fashion without the commitment. 
+              Sustainable, affordable, and always in style.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <Button variant="hero" size="xl" asChild>
+                <Link to="/products">
+                  Explore Collection
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </Button>
+              <Button variant="hero-outline" size="xl" asChild>
+                <Link to="/try-on">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  AI Try-On
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: Sparkles, title: 'AI Try-On', desc: 'See how pieces look on you before renting' },
+              { icon: Truck, title: 'Free Delivery', desc: 'Complimentary shipping on orders over $100' },
+              { icon: Shield, title: 'Fully Insured', desc: 'Wear worry-free with our damage protection' },
+              { icon: RefreshCw, title: 'Easy Returns', desc: 'Hassle-free returns with prepaid labels' },
+            ].map((feature, i) => (
+              <div key={i} className="text-center p-6 animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+                <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
+                  <feature.icon className="w-6 h-6 text-accent" />
+                </div>
+                <h3 className="font-display text-lg font-medium mb-2">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+              Shop by Category
+            </h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Discover curated collections for every occasion
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {mockCategories.slice(0, 4).map((category, i) => (
+              <Link 
+                key={category.id}
+                to={`/products?category=${category.slug}`}
+                className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-secondary hover-lift animate-scale-in"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="font-display text-xl text-primary-foreground font-medium">
+                    {category.name}
+                  </h3>
+                  <p className="text-sm text-primary-foreground/70 mt-1">
+                    {category.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-20 bg-gradient-hero">
+        <div className="container mx-auto px-4">
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+                Featured Pieces
+              </h2>
+              <p className="text-muted-foreground">
+                Hand-picked selections from our latest collection
+              </p>
+            </div>
+            <Button variant="outline" asChild className="hidden md:flex">
+              <Link to="/products">
+                View All
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            {featuredProducts.map((product, i) => (
+              <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 text-center md:hidden">
+            <Button variant="outline" asChild>
+              <Link to="/products">
+                View All Products
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* AI Try-On CTA */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gold/20 flex items-center justify-center">
+              <Sparkles className="w-8 h-8 text-gold" />
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold mb-4">
+              Try Before You Rent
+            </h2>
+            <p className="text-lg text-primary-foreground/70 mb-8 max-w-xl mx-auto">
+              Our AI-powered virtual try-on lets you see how any piece looks on you. 
+              Upload your photo and discover your perfect fit.
+            </p>
+            <Button variant="gold" size="xl" asChild>
+              <Link to="/try-on">
+                Try It Now
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonial */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <blockquote className="font-display text-2xl md:text-3xl italic leading-relaxed">
+              "Élégance has completely changed how I approach fashion. 
+              I can wear designer pieces to every event without breaking the bank."
+            </blockquote>
+            <div className="mt-6">
+              <p className="font-medium">Sarah Mitchell</p>
+              <p className="text-sm text-muted-foreground">Fashion Editor, Vogue</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
