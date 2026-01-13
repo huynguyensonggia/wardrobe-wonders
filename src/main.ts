@@ -1,0 +1,38 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Global validation pipe (rất tốt)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true, // chặn field thừa trong DTO
+    }),
+  );
+
+  // Global prefix cho toàn bộ API (bao gồm cả admin vì bạn đã thêm 'admin/' trong controller)
+  app.setGlobalPrefix('api');
+
+  // CORS cho frontend React/Vite
+  app.enableCors({
+    origin: ['http://localhost:5173'], // thêm domain production sau
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+
+  console.log(`Server is running on: http://localhost:${port}`);
+  console.log('API base: http://localhost:${port}/api');
+  console.log('Admin endpoints example: http://localhost:${port}/api/admin/products');
+}
+
+bootstrap().catch((err) => {
+  console.error('Bootstrap failed:', err);
+  process.exit(1);
+});
