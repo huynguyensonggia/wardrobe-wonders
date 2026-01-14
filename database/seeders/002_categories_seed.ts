@@ -30,9 +30,9 @@ export async function seedCategories(dataSource: DataSource) {
       vtonCategory: VtonCategory.DRESSES,
     },
     {
-      name: "Váy dự tiệc",
-      slug: "party-dress",
-      vtonCategory: VtonCategory.DRESSES,
+      name: "Blazer",
+      slug: "outerwear",
+      vtonCategory: VtonCategory.OUTERWEAR,
     },
   ];
 

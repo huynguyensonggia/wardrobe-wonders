@@ -1,29 +1,39 @@
-import { 
-  User, 
-  Product, 
-  Category, 
-  Rental, 
-  ApiResponse, 
-  PaginatedResponse, 
+import {
+  User,
+  Product,
+  Category,
+  Rental,
+  ApiResponse,
+  PaginatedResponse,
   ProductFilters,
   AdminStats,
-  TryOnResult 
+  TryOnResult
 } from '@/types';
+import type { BEProduct } from "@/types/backend";
+import { mapBEProductToMock } from "@/lib/mappers";
 
-const API_BASE = '/api'; // Replace with actual API URL
+const API_BASE = 'http://localhost:3000/api'; // Replace with actual API URL
 
 // Helper function for API calls
-async function fetchApi<T>(
-  endpoint: string, 
-  options?: RequestInit
-): Promise<T> {
+async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('auth_token');
-  
+
+  const isFormData = options.body instanceof FormData;
+
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
-    ...options?.headers,
+    ...(options.headers || {}),
   };
+
+  // ✅ chỉ set Content-Type JSON khi KHÔNG phải FormData
+  if (!isFormData) {
+    if (!('Content-Type' in (headers as any))) {
+      headers['Content-Type'] = 'application/json';
+    }
+  } else {
+    // ✅ FormData: tuyệt đối không set Content-Type
+    if ('Content-Type' in (headers as any)) delete (headers as any)['Content-Type'];
+  }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
@@ -41,13 +51,16 @@ async function fetchApi<T>(
 // Auth API
 export const authApi = {
   login: (email: string, password: string) =>
-    fetchApi<ApiResponse<{ user: User; token: string }>>('/auth/login', {
+    fetchApi<{
+      access_token: string;
+      user: User;
+    }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
 
   register: (data: { email: string; password: string; name: string }) =>
-    fetchApi<ApiResponse<{ user: User; token: string }>>('/auth/register', {
+    fetchApi<{ access_token: string; user: User }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -65,44 +78,46 @@ export const authApi = {
 
 // Products API
 export const productsApi = {
-  getAll: (filters?: ProductFilters, page = 1, pageSize = 12) => {
-    const params = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-      ...(filters && Object.fromEntries(
-        Object.entries(filters).filter(([, v]) => v !== undefined)
-      )),
-    });
-    return fetchApi<PaginatedResponse<Product>>(`/products?${params}`);
+  // PUBLIC
+  getAll: async (filters?: ProductFilters) => {
+    const params = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(filters ?? {}).filter(([, v]) => v !== undefined && v !== "")
+      ) as Record<string, string>
+    );
+
+    const qs = params.toString();
+    const beList = await fetchApi<BEProduct[]>(qs ? `/products?${qs}` : "/products");
+    return beList.map(mapBEProductToMock); // ✅ trả Product[] đúng theo UI mock
   },
 
-  getById: (id: string) => fetchApi<ApiResponse<Product>>(`/products/${id}`),
+  getById: async (id: string) => {
+    const be = await fetchApi<BEProduct>(`/products/${id}`);
+    return mapBEProductToMock(be);
+  },
 
-  getFeatured: () => fetchApi<ApiResponse<Product[]>>('/products/featured'),
-
+  // ADMIN
   create: (data: FormData) =>
-    fetchApi<ApiResponse<Product>>('/admin/products', {
-      method: 'POST',
+    fetchApi<Product>("/admin/products", {
+      method: "POST",
       body: data,
-      headers: {}, // Let browser set content-type for FormData
     }),
 
   update: (id: string, data: FormData) =>
-    fetchApi<ApiResponse<Product>>(`/admin/products/${id}`, {
-      method: 'PUT',
+    fetchApi<Product>(`/admin/products/${id}`, {
+      method: "PATCH",
       body: data,
-      headers: {},
     }),
 
   delete: (id: string) =>
-    fetchApi<ApiResponse<null>>(`/admin/products/${id}`, {
-      method: 'DELETE',
+    fetchApi<{ message: string } | { deleted: boolean }>(`/admin/products/${id}`, {
+      method: "DELETE",
     }),
 };
 
 // Categories API
 export const categoriesApi = {
-  getAll: () => fetchApi<ApiResponse<Category[]>>('/categories'),
+  getAll: () => fetchApi<Category[]>('/categories'),
 
   create: (data: Partial<Category>) =>
     fetchApi<ApiResponse<Category>>('/admin/categories', {
@@ -112,7 +127,7 @@ export const categoriesApi = {
 
   update: (id: string, data: Partial<Category>) =>
     fetchApi<ApiResponse<Category>>(`/admin/categories/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify(data),
     }),
 
@@ -167,7 +182,7 @@ export const tryOnApi = {
     formData.append('productId', productId);
 
     const token = localStorage.getItem('auth_token');
-    
+
     const response = await fetch(`${API_BASE}/try-on`, {
       method: 'POST',
       headers: {

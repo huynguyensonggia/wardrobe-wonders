@@ -8,6 +8,7 @@ import {
   OneToMany,
   JoinColumn,
   RelationId,
+  Index,
 } from "typeorm";
 
 import { Category } from "../../categories/entities/category.entity";
@@ -16,8 +17,9 @@ import { RentalItem } from "../../rentals/entities/rental-item.entity";
 
 import { ProductStatus } from "../enums/product-status.enum";
 import { ProductSize } from "../enums/product-size.enum";
-import { ProductType } from "../enums/product-type.enum";
+import { ProductOccasion } from "../enums/product-occasion.enum";
 
+@Index(["name", "categoryId", "occasion", "size", "color"], { unique: true })
 @Entity({ name: "products" })
 export class Product {
   @PrimaryGeneratedColumn()
@@ -28,6 +30,9 @@ export class Product {
   name: string;
 
   // ===== CATEGORY =====
+  @Column({ name: "category_id", type: "int" })
+  categoryId: number;
+
   @ManyToOne(() => Category, (category) => category.products, {
     nullable: false,
     onDelete: "RESTRICT",
@@ -36,16 +41,13 @@ export class Product {
   @JoinColumn({ name: "category_id" })
   category: Category;
 
-  @RelationId((product: Product) => product.category)
-  categoryId: number;
-
   // ===== PRODUCT ATTRIBUTES =====
   @Column({
-    name: "type",
+    name: "occasion",
     type: "enum",
-    enum: ProductType,
+    enum: ProductOccasion,
   })
-  type: ProductType;
+  occasion: ProductOccasion;
 
   @Column({ name: "rent_price_per_day", type: "int" })
   rentPricePerDay: number;

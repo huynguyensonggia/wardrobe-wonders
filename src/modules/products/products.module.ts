@@ -6,8 +6,14 @@ import { Category } from '../categories/entities/category.entity';
 import { ProductController } from './products.controller';
 import { ProductService } from './products.service';
 
+// ✅ thêm import CloudinaryModule (đúng path theo project của bạn)
+import { CloudinaryModule } from '../../common/cloudinary/cloudinary.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Category])],
+  imports: [
+    TypeOrmModule.forFeature([Product, Category]),
+    CloudinaryModule, // ✅ thêm dòng này
+  ],
   controllers: [ProductController],
   providers: [ProductService],
   exports: [ProductService],

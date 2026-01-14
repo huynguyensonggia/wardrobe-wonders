@@ -1,6 +1,5 @@
 import {
     Controller,
-    Get,
     Post,
     Patch,
     Delete,
@@ -17,21 +16,11 @@ import { RolesGuard } from '../../modules/auth/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 
-@Controller('categories') // → endpoint: /api/admin/categories
+@Controller('admin/categories') // → endpoint: /api/admin/categories
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminCategoriesController {
     constructor(private readonly categoriesService: CategoriesService) { }
-
-    @Get()
-    findAll(): Promise<Category[]> {
-        return this.categoriesService.findAll();
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string): Promise<Category> {
-        return this.categoriesService.findOne(Number(id));
-    }
 
     @Post()
     create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {

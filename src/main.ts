@@ -19,7 +19,7 @@ async function bootstrap() {
 
   // CORS cho frontend React/Vite
   app.enableCors({
-    origin: ['http://localhost:5173'], // thêm domain production sau
+    origin: ['http://localhost:8080'], // thêm domain production sau
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

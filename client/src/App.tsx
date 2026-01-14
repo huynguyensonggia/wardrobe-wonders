@@ -20,6 +20,7 @@ import Profile from "@/pages/dashboard/Profile";
 import Settings from "@/pages/dashboard/Settings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/NotFound";
+import AdminProducts from "@/pages/admin/AdminProducts";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +53,7 @@ const App = () => (
               
               {/* Admin Dashboard */}
               <Route path="/admin" element={<AdminDashboard />}>
-                <Route path="products" element={<div className="text-center py-8 text-muted-foreground">Product management coming soon</div>} />
+                <Route path="products" element={<AdminProducts />} />
                 <Route path="categories" element={<div className="text-center py-8 text-muted-foreground">Category management coming soon</div>} />
                 <Route path="rentals" element={<div className="text-center py-8 text-muted-foreground">Rental management coming soon</div>} />
               </Route>

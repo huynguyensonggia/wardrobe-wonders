@@ -9,7 +9,7 @@ export class CreateProductsTable1767687995110 implements MigrationInterface {
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(150) NOT NULL,
         category_id INT NOT NULL,
-        type ENUM('top','bottom','dress') NOT NULL,
+        occasion ENUM('party','wedding','casual') NOT NULL,
         rent_price_per_day INT NOT NULL,
         deposit INT NOT NULL,
         size ENUM('XS','S','M','L','XL') NOT NULL DEFAULT 'M',
