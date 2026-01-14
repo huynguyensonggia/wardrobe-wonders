@@ -8,8 +8,8 @@ export async function seedRentals(dataSource: DataSource) {
   const userRepo = dataSource.getRepository(User);
 
   // Tìm user
-  const user = await userRepo.findOne({ 
-    where: { email: "user@smartdress.com" } 
+  const user = await userRepo.findOne({
+    where: { email: "user@smartdress.com" },
   });
 
   if (!user) {
@@ -20,9 +20,9 @@ export async function seedRentals(dataSource: DataSource) {
   // Kiểm tra đã tồn tại rental cho user này chưa
   // (dùng quan hệ user thay vì userId)
   const exists = await rentalRepo.findOne({
-    where: { 
-      user: { id: user.id } 
-    }
+    where: {
+      user: { id: user.id },
+    },
   });
 
   if (exists) {
@@ -32,7 +32,7 @@ export async function seedRentals(dataSource: DataSource) {
 
   // Tạo rental mới - gán trực tiếp object user
   const rental = rentalRepo.create({
-    user,                           // ← Đây là cách đúng (quan hệ)
+    user, // ← Đây là cách đúng (quan hệ)
     // KHÔNG cần userId nữa vì TypeORM sẽ tự động điền foreign key
 
     status: RentalStatus.CREATED,

@@ -1,6 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { ValidationPipe } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,12 +15,12 @@ async function bootstrap() {
   );
 
   // Global prefix cho toàn bộ API (bao gồm cả admin vì bạn đã thêm 'admin/' trong controller)
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix("api");
 
   // CORS cho frontend React/Vite
   app.enableCors({
-    origin: ['http://localhost:8080'], // thêm domain production sau
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    origin: ["http://localhost:8080"], // thêm domain production sau
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
   });
 
@@ -28,11 +28,13 @@ async function bootstrap() {
   await app.listen(port);
 
   console.log(`Server is running on: http://localhost:${port}`);
-  console.log('API base: http://localhost:${port}/api');
-  console.log('Admin endpoints example: http://localhost:${port}/api/admin/products');
+  console.log("API base: http://localhost:${port}/api");
+  console.log(
+    "Admin endpoints example: http://localhost:${port}/api/admin/products",
+  );
 }
 
 bootstrap().catch((err) => {
-  console.error('Bootstrap failed:', err);
+  console.error("Bootstrap failed:", err);
   process.exit(1);
 });

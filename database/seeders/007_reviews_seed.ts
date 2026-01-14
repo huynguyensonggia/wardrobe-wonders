@@ -23,12 +23,16 @@ export async function seedReviews(dataSource: DataSource) {
 
   // Kiểm tra tồn tại dữ liệu cần thiết
   if (!user) {
-    console.log("⚠️ Không tìm thấy user nào trong database. Bỏ qua seed review.");
+    console.log(
+      "⚠️ Không tìm thấy user nào trong database. Bỏ qua seed review.",
+    );
     return;
   }
 
   if (!product) {
-    console.log("⚠️ Không tìm thấy product nào trong database. Bỏ qua seed review.");
+    console.log(
+      "⚠️ Không tìm thấy product nào trong database. Bỏ qua seed review.",
+    );
     return;
   }
 
@@ -42,17 +46,18 @@ export async function seedReviews(dataSource: DataSource) {
 
   if (exists) {
     console.log(
-      `⚠️ Đã tồn tại review cho User ID ${user.id} và Product ID ${product.id}. Bỏ qua.`
+      `⚠️ Đã tồn tại review cho User ID ${user.id} và Product ID ${product.id}. Bỏ qua.`,
     );
     return;
   }
 
   // 4. Tạo review mới
   const review = reviewRepo.create({
-    user,                       // TypeORM sẽ tự động map user_id
-    product,                    // TypeORM sẽ tự động map product_id
+    user, // TypeORM sẽ tự động map user_id
+    product, // TypeORM sẽ tự động map product_id
     rating: 5,
-    comment: "Váy đẹp, form chuẩn, rất hài lòng! Chất liệu tốt, giao hàng nhanh.",
+    comment:
+      "Váy đẹp, form chuẩn, rất hài lòng! Chất liệu tốt, giao hàng nhanh.",
   });
 
   // 5. Lưu và log kết quả

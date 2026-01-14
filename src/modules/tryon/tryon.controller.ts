@@ -63,8 +63,7 @@ export class TryonController {
     }
 
     // 2️⃣ chọn category (FE override nếu có)
-    const vtonCategory =
-      body.category ?? product.category.vtonCategory;
+    const vtonCategory = body.category ?? product.category.vtonCategory;
 
     const offsets = {
       top: 0,

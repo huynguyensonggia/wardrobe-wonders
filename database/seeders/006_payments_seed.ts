@@ -9,11 +9,13 @@ export async function seedPayments(dataSource: DataSource) {
   const rentalRepo = dataSource.getRepository(Rental);
 
   // ✅ FIX: dùng find + take
-  const rental = await rentalRepo.find({
-    order: { id: "ASC" },
-    relations: ["user"],
-    take: 1,
-  }).then(res => res[0]);
+  const rental = await rentalRepo
+    .find({
+      order: { id: "ASC" },
+      relations: ["user"],
+      take: 1,
+    })
+    .then((res) => res[0]);
 
   if (!rental || !rental.user) {
     console.log("⚠️ Không tìm thấy rental hoặc user để seed payment");

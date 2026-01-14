@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreatePaymentsTable1768016781834 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE payments (
@@ -45,5 +44,4 @@ export class CreatePaymentsTable1768016781834 implements MigrationInterface {
       DROP TABLE IF EXISTS payments;
     `);
   }
-
 }

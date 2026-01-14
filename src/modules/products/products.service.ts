@@ -2,16 +2,16 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
-import { Product } from './entities/product.entity';
-import { Category } from '../categories/entities/category.entity';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductStatus } from './enums/product-status.enum';
-import { CloudinaryService } from '../../common/cloudinary/cloudinary.service';
+import { Product } from "./entities/product.entity";
+import { Category } from "../categories/entities/category.entity";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+import { ProductStatus } from "./enums/product-status.enum";
+import { CloudinaryService } from "../../common/cloudinary/cloudinary.service";
 
 @Injectable()
 export class ProductService {
@@ -27,16 +27,16 @@ export class ProductService {
 
   async findAll(query?: { categoryId?: number; status?: ProductStatus }) {
     const qb = this.productRepo
-      .createQueryBuilder('p')
-      .leftJoinAndSelect('p.category', 'c')
-      .orderBy('p.id', 'DESC');
+      .createQueryBuilder("p")
+      .leftJoinAndSelect("p.category", "c")
+      .orderBy("p.id", "DESC");
 
     if (query?.categoryId) {
-      qb.andWhere('c.id = :categoryId', { categoryId: query.categoryId });
+      qb.andWhere("c.id = :categoryId", { categoryId: query.categoryId });
     }
 
     if (query?.status) {
-      qb.andWhere('p.status = :status', { status: query.status });
+      qb.andWhere("p.status = :status", { status: query.status });
     }
 
     return qb.getMany();
@@ -48,22 +48,23 @@ export class ProductService {
       relations: { category: true },
     });
 
-    if (!product) throw new NotFoundException(`Product with ID ${id} not found`);
+    if (!product)
+      throw new NotFoundException(`Product with ID ${id} not found`);
     return product;
   }
 
   // ===== helpers =====
   private normalizeName(name: string) {
-    return (name ?? '').trim();
+    return (name ?? "").trim();
   }
 
   private normalizeColor(color?: string) {
-    return (color ?? 'unknown').trim().toLowerCase();
+    return (color ?? "unknown").trim().toLowerCase();
   }
 
   private normalizeOccasion(occasion: any) {
     // enum hoặc string đều ok
-    return (occasion ?? '').toString().trim();
+    return (occasion ?? "").toString().trim();
   }
 
   /**
@@ -79,15 +80,15 @@ export class ProductService {
     excludeId?: number;
   }) {
     const qb = this.productRepo
-      .createQueryBuilder('p')
-      .where('p.name = :name', { name: params.name })
-      .andWhere('p.categoryId = :categoryId', { categoryId: params.categoryId })
-      .andWhere('p.occasion = :occasion', { occasion: params.occasion })
-      .andWhere('p.size = :size', { size: params.size })
-      .andWhere('p.color = :color', { color: params.color });
+      .createQueryBuilder("p")
+      .where("p.name = :name", { name: params.name })
+      .andWhere("p.categoryId = :categoryId", { categoryId: params.categoryId })
+      .andWhere("p.occasion = :occasion", { occasion: params.occasion })
+      .andWhere("p.size = :size", { size: params.size })
+      .andWhere("p.color = :color", { color: params.color });
 
     if (params.excludeId) {
-      qb.andWhere('p.id != :excludeId', { excludeId: params.excludeId });
+      qb.andWhere("p.id != :excludeId", { excludeId: params.excludeId });
     }
 
     const dup = await qb.getOne();
@@ -100,15 +101,18 @@ export class ProductService {
 
   async create(dto: CreateProductDto, file?: Express.Multer.File) {
     // 0) validate category
-    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-    if (!category) throw new BadRequestException('Invalid categoryId - Category not found');
+    const category = await this.categoryRepo.findOne({
+      where: { id: dto.categoryId },
+    });
+    if (!category)
+      throw new BadRequestException("Invalid categoryId - Category not found");
 
     // 1) normalize + validate
     const name = this.normalizeName(dto.name);
-    if (!name) throw new BadRequestException('name is required');
+    if (!name) throw new BadRequestException("name is required");
 
     const occasion = this.normalizeOccasion((dto as any).occasion);
-    if (!occasion) throw new BadRequestException('occasion is required');
+    if (!occasion) throw new BadRequestException("occasion is required");
 
     const color = this.normalizeColor(dto.color);
 
@@ -142,17 +146,23 @@ export class ProductService {
     try {
       // 4) upload image vào folder theo id
       if (file) {
-        const uploaded = await this.cloudinaryService.uploadBuffer(file.buffer, {
-          folder: `products/${saved.id}`,
-          publicId: 'main',
-          resourceType: 'image',
-        });
+        const uploaded = await this.cloudinaryService.uploadBuffer(
+          file.buffer,
+          {
+            folder: `products/${saved.id}`,
+            publicId: "main",
+            resourceType: "image",
+          },
+        );
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       } else if (dto.imageUrl) {
-        const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
-          folder: `products/${saved.id}`,
-          publicId: 'main',
-        });
+        const uploaded = await this.cloudinaryService.uploadFromUrl(
+          dto.imageUrl,
+          {
+            folder: `products/${saved.id}`,
+            publicId: "main",
+          },
+        );
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       }
 
@@ -161,7 +171,9 @@ export class ProductService {
       // upload fail -> xoá record vừa tạo (tránh rác)
       await this.productRepo.delete(saved.id);
       const msg = e instanceof Error ? e.message : String(e);
-      throw new BadRequestException(`Failed to create product with image: ${msg}`);
+      throw new BadRequestException(
+        `Failed to create product with image: ${msg}`,
+      );
     }
   }
 
@@ -170,20 +182,27 @@ export class ProductService {
 
     // 1) category đổi thì validate
     if (dto.categoryId !== undefined) {
-      const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-      if (!category) throw new BadRequestException('Invalid categoryId - Category not found');
+      const category = await this.categoryRepo.findOne({
+        where: { id: dto.categoryId },
+      });
+      if (!category)
+        throw new BadRequestException(
+          "Invalid categoryId - Category not found",
+        );
       product.category = category;
       product.categoryId = category.id;
     }
 
     // 2) normalize fields (nếu gửi)
-    const nextName = dto.name !== undefined ? this.normalizeName(dto.name) : product.name;
+    const nextName =
+      dto.name !== undefined ? this.normalizeName(dto.name) : product.name;
     const nextOccasion =
       (dto as any).occasion !== undefined
         ? this.normalizeOccasion((dto as any).occasion)
         : (product as any).occasion;
 
-    const nextColor = dto.color !== undefined ? this.normalizeColor(dto.color) : product.color;
+    const nextColor =
+      dto.color !== undefined ? this.normalizeColor(dto.color) : product.color;
 
     // 3) nếu các field key có thay đổi -> check duplicate (exclude chính nó)
     const categoryIdForDup =
@@ -211,8 +230,10 @@ export class ProductService {
 
     // 4) apply update (partial)
     if (dto.name !== undefined) product.name = nextName;
-    if ((dto as any).occasion !== undefined) (product as any).occasion = nextOccasion;
-    if (dto.rentPricePerDay !== undefined) product.rentPricePerDay = dto.rentPricePerDay;
+    if ((dto as any).occasion !== undefined)
+      (product as any).occasion = nextOccasion;
+    if (dto.rentPricePerDay !== undefined)
+      product.rentPricePerDay = dto.rentPricePerDay;
     if (dto.deposit !== undefined) product.deposit = dto.deposit;
     if (dto.size !== undefined) product.size = dto.size as any;
     if (dto.color !== undefined) product.color = nextColor;
@@ -225,7 +246,9 @@ export class ProductService {
       await this.productRepo.save(product);
       return this.findOne(id);
     } catch (error: any) {
-      throw new BadRequestException(`Failed to update product: ${error?.message ?? error}`);
+      throw new BadRequestException(
+        `Failed to update product: ${error?.message ?? error}`,
+      );
     }
   }
 

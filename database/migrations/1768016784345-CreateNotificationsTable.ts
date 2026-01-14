@@ -1,7 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
 export class CreateNotificationsTable1768016784345 implements MigrationInterface {
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE notifications (
@@ -49,5 +48,4 @@ export class CreateNotificationsTable1768016784345 implements MigrationInterface
       DROP TABLE IF EXISTS notifications;
     `);
   }
-
 }
