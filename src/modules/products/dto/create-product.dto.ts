@@ -1,27 +1,31 @@
+import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 import { ProductSize } from '../enums/product-size.enum';
 import { ProductStatus } from '../enums/product-status.enum';
-import { ProductType } from '../enums/product-type.enum'; // ← import thêm
+import { ProductOccasion } from '../enums/product-occasion.enum';
 
 export class CreateProductDto {
   @IsString()
   name: string;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   rentPricePerDay: number;
 
+  @Type(() => Number)
   @IsInt()
   @IsPositive()
   categoryId: number;
 
-  @IsEnum(ProductType)  // ← Bắt buộc, phải là "top", "bottom", hoặc "dress"
-  type: ProductType;
+  @IsEnum(ProductOccasion)
+  occasion: ProductOccasion;
 
   @IsOptional()
   @IsEnum(ProductStatus)
   status?: ProductStatus;
 
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   deposit: number;
@@ -34,6 +38,7 @@ export class CreateProductDto {
   color?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(0)
   quantity?: number;

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { User, AuthState } from '@/types';
+import { authApi } from '@/lib/api';
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -9,27 +10,6 @@ interface AuthContextType extends AuthState {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Mock users for demo
-const MOCK_USERS = [
-  {
-    id: '1',
-    email: 'user@demo.com',
-    password: 'demo123',
-    name: 'Sarah Johnson',
-    role: 'USER' as const,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    email: 'admin@demo.com',
-    password: 'admin123',
-    name: 'Admin User',
-    role: 'ADMIN' as const,
-    createdAt: new Date().toISOString(),
-  },
-];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({
@@ -43,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for existing token on mount
     const token = localStorage.getItem('auth_token');
     const savedUser = localStorage.getItem('auth_user');
-    
+
     if (token && savedUser) {
       try {
         const user = JSON.parse(savedUser);
@@ -64,53 +44,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const mockUser = MOCK_USERS.find(u => u.email === email && u.password === password);
-    
-    if (!mockUser) {
-      throw new Error('Invalid email or password');
-    }
+    const res = await authApi.login(email, password);
 
-    const { password: _, ...user } = mockUser;
-    const token = `mock_token_${Date.now()}`;
-    
-    localStorage.setItem('auth_token', token);
+    const { access_token, user } = res;
+
+    localStorage.setItem('auth_token', access_token);
     localStorage.setItem('auth_user', JSON.stringify(user));
-    
+
     setState({
       user,
-      token,
+      token: access_token,
       isAuthenticated: true,
       isLoading: false,
     });
   }, []);
 
-  const register = useCallback(async (email: string, password: string, name: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (MOCK_USERS.some(u => u.email === email)) {
-      throw new Error('Email already exists');
-    }
 
-    const user: User = {
-      id: `${Date.now()}`,
-      email,
-      name,
-      role: 'USER',
-      createdAt: new Date().toISOString(),
-    };
-    
-    const token = `mock_token_${Date.now()}`;
-    
-    localStorage.setItem('auth_token', token);
+  const register = useCallback(async (email: string, password: string, name: string) => {
+    const res = await authApi.register({ email, password, name });
+
+    const { access_token, user } = res;
+
+    localStorage.setItem('auth_token', access_token);
     localStorage.setItem('auth_user', JSON.stringify(user));
-    
+
     setState({
       user,
-      token,
+      token: access_token,
       isAuthenticated: true,
       isLoading: false,
     });

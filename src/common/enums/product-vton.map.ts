@@ -1,4 +1,4 @@
-import { ProductType } from "../../modules/products/enums/product-type.enum";
+import { ProductType } from "../../modules/products/enums/product-occasion.enum";
 import { VtonCategory } from "../../modules/categories/enums/vton-category.enum";
 
 /**

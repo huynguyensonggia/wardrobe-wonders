@@ -3,7 +3,7 @@ import { Product } from '@/modules/products/entities/product.entity';
 import { Category } from '@/modules/categories/entities/category.entity';
 import { ProductSize } from '@/modules/products/enums/product-size.enum';
 import { ProductStatus } from '@/modules/products/enums/product-status.enum';
-import { ProductType } from '@/modules/products/enums/product-type.enum';
+import { ProductOccasion } from '@/modules/products/enums/product-occasion.enum';
 
 export async function seedProducts(dataSource: DataSource) {
   const productRepo = dataSource.getRepository(Product);
@@ -16,7 +16,7 @@ export async function seedProducts(dataSource: DataSource) {
   }
 
   // ===== CATEGORY =====
-  const partyCategory = await categoryRepo.findOneBy({ slug: 'party-dress' });
+  const partyCategory = await categoryRepo.findOneBy({ slug: 'tops' });
   if (!partyCategory) throw new Error('❌ Category party-dress not found');
 
   // ===== PRODUCTS =====
@@ -24,7 +24,7 @@ export async function seedProducts(dataSource: DataSource) {
     productRepo.create({
       name: 'Đầm dạ hội đen',
       category: partyCategory,
-      type: ProductType.DRESS,           // ✅ QUAN TRỌNG
+      occasion: ProductOccasion.WEDDING,           // ✅ QUAN TRỌNG
       rentPricePerDay: 250000,
       deposit: 1000000,
       size: ProductSize.M,
@@ -38,7 +38,7 @@ export async function seedProducts(dataSource: DataSource) {
     productRepo.create({
       name: 'Đầm dự tiệc đỏ',
       category: partyCategory,
-      type: ProductType.DRESS,           // ✅ QUAN TRỌNG
+      occasion: ProductOccasion.PARTY,           // ✅ QUAN TRỌNG
       rentPricePerDay: 220000,
       deposit: 900000,
       size: ProductSize.S,
