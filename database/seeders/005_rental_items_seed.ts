@@ -41,7 +41,7 @@ export async function seedRentalItems(dataSource: DataSource) {
   const days = 3;
 
   const item = itemRepo.create({
-    rental,                      // quan hệ
+    rental, // quan hệ
     product,
     rentPricePerDay: product.rentPricePerDay,
     quantity: 1,

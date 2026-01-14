@@ -8,10 +8,12 @@ export async function seedNotifications(dataSource: DataSource) {
   const notificationRepo = dataSource.getRepository(Notification);
   const userRepo = dataSource.getRepository(User);
 
-  const user = await userRepo.findOneBy({}); 
+  const user = await userRepo.findOneBy({});
 
   if (!user) {
-    console.log("⚠️ Không tìm thấy bất kỳ user nào trong database. Bỏ qua seed notification.");
+    console.log(
+      "⚠️ Không tìm thấy bất kỳ user nào trong database. Bỏ qua seed notification.",
+    );
     return;
   }
 
@@ -24,13 +26,15 @@ export async function seedNotifications(dataSource: DataSource) {
   });
 
   if (exists) {
-    console.log(`⚠️ Đã tồn tại notification SYSTEM cho User ID ${user.id}. Bỏ qua.`);
+    console.log(
+      `⚠️ Đã tồn tại notification SYSTEM cho User ID ${user.id}. Bỏ qua.`,
+    );
     return;
   }
 
   // Tạo notification mới
   const notification = notificationRepo.create({
-    user,                              // TypeORM tự map user_id
+    user, // TypeORM tự map user_id
     title: "Chào mừng bạn đến SmartClother",
     message: "Chúc bạn có trải nghiệm thuê trang phục tuyệt vời!",
     type: NotificationType.SYSTEM,

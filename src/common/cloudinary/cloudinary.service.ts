@@ -14,9 +14,14 @@ export class CloudinaryService {
 
   uploadBuffer(
     buffer: Buffer,
-    opts?: { folder?: string; publicId?: string; resourceType?: "image" | "raw" | "video" },
+    opts?: {
+      folder?: string;
+      publicId?: string;
+      resourceType?: "image" | "raw" | "video";
+    },
   ): Promise<{ url: string; public_id: string }> {
-    const folder = opts?.folder ?? process.env.CLOUDINARY_FOLDER ?? "smartdress";
+    const folder =
+      opts?.folder ?? process.env.CLOUDINARY_FOLDER ?? "smartdress";
     const resourceType = opts?.resourceType ?? "image";
 
     return new Promise((resolve, reject) => {
@@ -35,7 +40,8 @@ export class CloudinaryService {
     url: string,
     opts?: { folder?: string; publicId?: string },
   ): Promise<{ url: string; public_id: string }> {
-    const folder = opts?.folder ?? process.env.CLOUDINARY_FOLDER ?? "smartdress";
+    const folder =
+      opts?.folder ?? process.env.CLOUDINARY_FOLDER ?? "smartdress";
     const res = await cloudinary.uploader.upload(url, {
       folder,
       public_id: opts?.publicId,

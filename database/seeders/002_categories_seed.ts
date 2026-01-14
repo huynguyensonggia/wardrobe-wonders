@@ -54,4 +54,3 @@ export async function seedCategories(dataSource: DataSource) {
 
   console.log("✅ Categories seeded");
 }
-

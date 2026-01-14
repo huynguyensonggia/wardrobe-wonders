@@ -9,24 +9,24 @@ import {
 } from "typeorm";
 import { Rental } from "../../rentals/entities/rental.entity";
 import { User } from "../../users/entities/user.entity";
-import { PaymentMethod } from "../enums/payment-method.enum"; 
-import { PaymentStatus } from "../enums/payment-status.enum";    
+import { PaymentMethod } from "../enums/payment-method.enum";
+import { PaymentStatus } from "../enums/payment-status.enum";
 
 @Entity("payments")
 export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Rental, (rental) => rental.payments, { 
+  @ManyToOne(() => Rental, (rental) => rental.payments, {
     onDelete: "CASCADE",
-    nullable: false 
+    nullable: false,
   })
   @JoinColumn({ name: "rental_id" })
   rental: Rental;
 
-  @ManyToOne(() => User, { 
+  @ManyToOne(() => User, {
     onDelete: "CASCADE",
-    nullable: false 
+    nullable: false,
   })
   @JoinColumn({ name: "user_id" })
   user: User;
@@ -48,7 +48,12 @@ export class Payment {
   status: PaymentStatus;
 
   // Thêm name: "transaction_code" để khớp migration
-  @Column({ type: "varchar", length: 255, nullable: true, name: "transaction_code" })
+  @Column({
+    type: "varchar",
+    length: 255,
+    nullable: true,
+    name: "transaction_code",
+  })
   transactionCode?: string;
 
   // Thêm name: "paid_at"

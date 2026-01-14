@@ -1,8 +1,15 @@
-import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsPositive, IsString, Min } from 'class-validator';
-import { ProductSize } from '../enums/product-size.enum';
-import { ProductStatus } from '../enums/product-status.enum';
-import { ProductOccasion } from '../enums/product-occasion.enum';
+import { Type } from "class-transformer";
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min,
+} from "class-validator";
+import { ProductSize } from "../enums/product-size.enum";
+import { ProductStatus } from "../enums/product-status.enum";
+import { ProductOccasion } from "../enums/product-occasion.enum";
 
 export class CreateProductDto {
   @IsString()

@@ -9,21 +9,21 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { memoryStorage } from "multer";
 
-import { ProductService } from '../products/products.service';
-import { CreateProductDto } from '../products/dto/create-product.dto';
-import { UpdateProductDto } from '../products/dto/update-product.dto';
-import { Product } from '../products/entities/product.entity';
+import { ProductService } from "../products/products.service";
+import { CreateProductDto } from "../products/dto/create-product.dto";
+import { UpdateProductDto } from "../products/dto/update-product.dto";
+import { Product } from "../products/entities/product.entity";
 
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../../modules/auth/guards/roles.guard';
-import { Roles } from '../../common/decorators/roles.decorator';
-import { Role } from '../../common/enums/role.enum';
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../../modules/auth/guards/roles.guard";
+import { Roles } from "../../common/decorators/roles.decorator";
+import { Role } from "../../common/enums/role.enum";
 
-@Controller('admin/products')
+@Controller("admin/products")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminProductsController {
@@ -32,12 +32,15 @@ export class AdminProductsController {
   // ✅ POST: nhận file ảnh từ Postman + fields DTO
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor("image", {
       storage: memoryStorage(),
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
       fileFilter: (req, file, cb) => {
-        if (!file.mimetype.startsWith('image/')) {
-          return cb(new BadRequestException('Only image files are allowed'), false);
+        if (!file.mimetype.startsWith("image/")) {
+          return cb(
+            new BadRequestException("Only image files are allowed"),
+            false,
+          );
         }
         cb(null, true);
       },
@@ -51,16 +54,16 @@ export class AdminProductsController {
     return this.productService.create(createProductDto, file);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     return this.productService.update(Number(id), updateProductDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string): Promise<{ message: string }> {
+  @Delete(":id")
+  remove(@Param("id") id: string): Promise<{ message: string }> {
     return this.productService.remove(Number(id));
   }
 }

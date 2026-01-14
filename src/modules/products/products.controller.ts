@@ -1,22 +1,17 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query } from "@nestjs/common";
 
-import { ProductService } from './products.service';
-import { ProductStatus } from './enums/product-status.enum';
+import { ProductService } from "./products.service";
+import { ProductStatus } from "./enums/product-status.enum";
 
-@Controller('products')
+@Controller("products")
 export class ProductController {
   constructor(private readonly service: ProductService) {}
 
   // GET /products?categoryId=1&status=available
   @Get()
   getAll(
-    @Query('categoryId') categoryId?: string,
-    @Query('status') status?: ProductStatus,
+    @Query("categoryId") categoryId?: string,
+    @Query("status") status?: ProductStatus,
   ) {
     return this.service.findAll({
       categoryId: categoryId ? Number(categoryId) : undefined,
@@ -25,8 +20,8 @@ export class ProductController {
   }
 
   // GET /products/:id
-  @Get(':id')
-  getOne(@Param('id') id: string) {
+  @Get(":id")
+  getOne(@Param("id") id: string) {
     return this.service.findOne(Number(id));
   }
 }

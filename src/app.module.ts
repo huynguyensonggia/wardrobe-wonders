@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common';
-import EnvConfig from '../bootstrap/env';
-import DatabaseConfig from '../bootstrap/database';
-import { ProductsModule } from './modules/products/products.module';
-import { CategoriesModule } from './modules/categories/categories.module';
+import { Module } from "@nestjs/common";
+import EnvConfig from "../bootstrap/env";
+import DatabaseConfig from "../bootstrap/database";
+import { ProductsModule } from "./modules/products/products.module";
+import { CategoriesModule } from "./modules/categories/categories.module";
 import { TryonModule } from "./modules/tryon/tryon.module";
 import { AuthModule } from "./modules/auth/auth.module";
-import { UsersModule } from './modules/users/users.module';
-import { AdminModule } from './modules/admin/admin.module';
+import { UsersModule } from "./modules/users/users.module";
+import { AdminModule } from "./modules/admin/admin.module";
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { AdminModule } from './modules/admin/admin.module';
     TryonModule,
     AuthModule,
     UsersModule,
-    AdminModule, 
+    AdminModule,
   ],
   controllers: [],
   providers: [],
