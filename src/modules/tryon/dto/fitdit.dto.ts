@@ -1,6 +1,12 @@
-import { IsInt, IsOptional, IsEnum, IsString, IsNumber } from "class-validator";
+import { IsIn, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { VtonCategory } from "@/modules/categories/enums/vton-category.enum";
+
+class OffsetsDto {
+  @Type(() => Number) @IsInt() top: number;
+  @Type(() => Number) @IsInt() bottom: number;
+  @Type(() => Number) @IsInt() left: number;
+  @Type(() => Number) @IsInt() right: number;
+}
 
 export class FitditDto {
   @Type(() => Number)
@@ -8,11 +14,7 @@ export class FitditDto {
   productId: number;
 
   @IsOptional()
-  @IsEnum(VtonCategory)
-  category?: VtonCategory;
-
-  @IsOptional()
-  @IsString()
+  @IsIn(["768x1024", "1152x1536", "1536x2048"])
   resolution?: "768x1024" | "1152x1536" | "1536x2048";
 
   @IsOptional()
@@ -36,10 +38,12 @@ export class FitditDto {
   numImages?: number;
 
   @IsOptional()
-  offsets?: {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-  };
+  @ValidateNested()
+  @Type(() => OffsetsDto)
+  offsets?: OffsetsDto;
+
+  // fallback nếu FE gửi JSON string
+  @IsOptional()
+  @IsString()
+  offsetsJson?: string;
 }

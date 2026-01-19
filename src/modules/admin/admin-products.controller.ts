@@ -1,14 +1,14 @@
 import {
-  Controller,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  BadRequestException,
+    Controller,
+    Post,
+    Patch,
+    Delete,
+    Body,
+    Param,
+    UseGuards,
+    UseInterceptors,
+    UploadedFile,
+    BadRequestException,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
@@ -27,43 +27,56 @@ import { Role } from "../../common/enums/role.enum";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminProductsController {
-  constructor(private readonly productService: ProductService) {}
+    constructor(private readonly productService: ProductService) { }
 
-  // ✅ POST: nhận file ảnh từ Postman + fields DTO
-  @Post()
-  @UseInterceptors(
-    FileInterceptor("image", {
-      storage: memoryStorage(),
-      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
-      fileFilter: (req, file, cb) => {
-        if (!file.mimetype.startsWith("image/")) {
-          return cb(
-            new BadRequestException("Only image files are allowed"),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-    }),
-  )
-  create(
-    @Body() createProductDto: CreateProductDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ): Promise<Product> {
-    // ⚠️ Bạn cần update ProductService.create(dto, file)
-    return this.productService.create(createProductDto, file);
-  }
+    // ✅ POST: nhận file ảnh từ Postman + fields DTO
+    @Post()
+    @UseInterceptors(
+        FileInterceptor("image", {
+            storage: memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+            fileFilter: (req, file, cb) => {
+                if (!file.mimetype.startsWith("image/")) {
+                    return cb(
+                        new BadRequestException("Only image files are allowed"),
+                        false,
+                    );
+                }
+                cb(null, true);
+            },
+        }),
+    )
+    create(
+        @Body() createProductDto: CreateProductDto,
+        @UploadedFile() file?: Express.Multer.File,
+    ): Promise<Product> {
+        // ⚠️ Bạn cần update ProductService.create(dto, file)
+        return this.productService.create(createProductDto, file);
+    }
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    return this.productService.update(Number(id), updateProductDto);
-  }
+    @Patch(":id")
+    @UseInterceptors(
+        FileInterceptor("image", {
+            storage: memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 },
+            fileFilter: (req, file, cb) => {
+                if (!file.mimetype.startsWith("image/")) {
+                    return cb(new BadRequestException("Only image files are allowed"), false);
+                }
+                cb(null, true);
+            },
+        }),
+    )
+    update(
+        @Param("id") id: string,
+        @Body() updateProductDto: UpdateProductDto,
+        @UploadedFile() file?: Express.Multer.File,
+    ): Promise<Product> {
+        return this.productService.update(Number(id), updateProductDto, file);
+    }
 
-  @Delete(":id")
-  remove(@Param("id") id: string): Promise<{ message: string }> {
-    return this.productService.remove(Number(id));
-  }
+    @Delete(":id")
+    remove(@Param("id") id: string): Promise<{ message: string }> {
+        return this.productService.remove(Number(id));
+    }
 }

@@ -175,29 +175,62 @@ export const adminApi = {
 };
 
 // Try-On API
+export type FitditMaskResponse = {
+  inputs: { personUrl: string };
+  mask: { preMaskUrl: string; poseUrl: string };
+  raw?: any;
+};
+
+export type FitditProcessResponse = {
+  inputs: { personUrl: string; garmentUrl: string };
+  outputs: string[];
+  resultUrl: string | null;
+  raw?: any;
+};
+
 export const tryOnApi = {
-  generateTryOn: async (userImage: File, productId: string): Promise<ApiResponse<TryOnResult>> => {
-    const formData = new FormData();
-    formData.append('userImage', userImage);
-    formData.append('productId', productId);
+  // Step 1
+  runMask: (person: File, productId: string, offsetsJson?: { top: number; bottom: number; left: number; right: number }) => {
+    const fd = new FormData();
+    fd.append("productId", productId);
+    fd.append("person", person);
+    if (offsetsJson) fd.append("offsetsJson", JSON.stringify(offsetsJson));
 
-    const token = localStorage.getItem('auth_token');
-
-    const response = await fetch(`${API_BASE}/try-on`, {
-      method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: formData,
+    return fetchApi<FitditMaskResponse>("/tryon/fitdit/mask", {
+      method: "POST",
+      body: fd,
     });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Try-on failed' }));
-      throw new Error(error.message);
-    }
-
-    return response.json();
   },
 
-  getHistory: () => fetchApi<ApiResponse<TryOnResult[]>>('/try-on/history'),
+  // Step 2
+  runTryOn: (
+    person: File,
+    productId: string,
+    preMaskUrl: string,
+    poseUrl: string,
+    opts?: {
+      resolution?: "768x1024" | "1152x1536" | "1536x2048";
+      nSteps?: number;
+      imageScale?: number;
+      seed?: number;
+      numImages?: number;
+    }
+  ) => {
+    const fd = new FormData();
+    fd.append("productId", productId);
+    fd.append("person", person);
+    fd.append("preMaskUrl", preMaskUrl);
+    fd.append("poseUrl", poseUrl);
+
+    if (opts?.resolution) fd.append("resolution", opts.resolution);
+    if (opts?.nSteps !== undefined) fd.append("nSteps", String(opts.nSteps));
+    if (opts?.imageScale !== undefined) fd.append("imageScale", String(opts.imageScale));
+    if (opts?.seed !== undefined) fd.append("seed", String(opts.seed));
+    if (opts?.numImages !== undefined) fd.append("numImages", String(opts.numImages));
+
+    return fetchApi<FitditProcessResponse>("/tryon/fitdit/process", {
+      method: "POST",
+      body: fd,
+    });
+  },
 };

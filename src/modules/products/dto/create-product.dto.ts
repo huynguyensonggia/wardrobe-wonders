@@ -38,7 +38,7 @@ export class CreateProductDto {
   deposit: number;
 
   @IsEnum(ProductSize)
-  size: ProductSize;
+  size?: ProductSize;
 
   @IsOptional()
   @IsString()

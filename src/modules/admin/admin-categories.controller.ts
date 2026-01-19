@@ -1,11 +1,11 @@
 import {
-  Controller,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
+    Controller,
+    Post,
+    Patch,
+    Delete,
+    Body,
+    Param,
+    UseGuards,
 } from "@nestjs/common";
 import { CategoriesService } from "../categories/categories.service"; // dùng service chung
 import { CreateCategoryDto } from "../categories/dto/create-category.dto";
@@ -20,23 +20,23 @@ import { Role } from "../../common/enums/role.enum";
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminCategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+    constructor(private readonly categoriesService: CategoriesService) { }
 
-  @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
-    return this.categoriesService.create(createCategoryDto);
-  }
+    @Post()
+    create(@Body() createCategoryDto: CreateCategoryDto): Promise<Category> {
+        return this.categoriesService.create(createCategoryDto);
+    }
 
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    return this.categoriesService.update(Number(id), updateCategoryDto);
-  }
+    @Patch(":id")
+    update(
+        @Param("id") id: string,
+        @Body() updateCategoryDto: UpdateCategoryDto,
+    ): Promise<Category> {
+        return this.categoriesService.update(Number(id), updateCategoryDto);
+    }
 
-  @Delete(":id")
-  remove(@Param("id") id: string): Promise<{ deleted: boolean }> {
-    return this.categoriesService.remove(Number(id));
-  }
+    @Delete(":id")
+    remove(@Param("id") id: string): Promise<{ deleted: boolean }> {
+        return this.categoriesService.remove(Number(id));
+    }
 }

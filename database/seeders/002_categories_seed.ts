@@ -13,26 +13,26 @@ type SeedItem = {
 export async function seedCategories(dataSource: DataSource) {
   const repo = dataSource.getRepository(Category);
 
-  const items = [
+  const items: SeedItem[] = [
     {
-      name: "Áo",
+      name: "Tops",
       slug: "tops",
       vtonCategory: VtonCategory.UPPER_BODY,
     },
     {
-      name: "Quần",
+      name: "Pants",
       slug: "pants",
       vtonCategory: VtonCategory.LOWER_BODY,
     },
     {
-      name: "Váy / Đầm",
+      name: "Dresses",
       slug: "dresses",
       vtonCategory: VtonCategory.DRESSES,
     },
     {
-      name: "Blazer",
+      name: "Outerwear",
       slug: "outerwear",
-      vtonCategory: VtonCategory.OUTERWEAR,
+      vtonCategory: VtonCategory.UPPER_BODY,
     },
   ];
 

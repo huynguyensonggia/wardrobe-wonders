@@ -21,6 +21,7 @@ import Settings from "@/pages/dashboard/Settings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/NotFound";
 import AdminProducts from "@/pages/admin/AdminProducts";
+import AdminCategories from "@/pages/admin/AdminCategories";
 
 const queryClient = new QueryClient();
 
@@ -35,14 +36,14 @@ const App = () => (
             {/* Auth pages without main layout */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            
+
             {/* Main layout routes */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/products/:id" element={<ProductDetailPage />} />
               <Route path="/try-on" element={<TryOnPage />} />
-              
+
               {/* User Dashboard */}
               <Route path="/dashboard" element={<UserDashboard />}>
                 <Route index element={<MyRentals />} />
@@ -50,15 +51,15 @@ const App = () => (
                 <Route path="profile" element={<Profile />} />
                 <Route path="settings" element={<Settings />} />
               </Route>
-              
+
               {/* Admin Dashboard */}
               <Route path="/admin" element={<AdminDashboard />}>
                 <Route path="products" element={<AdminProducts />} />
-                <Route path="categories" element={<div className="text-center py-8 text-muted-foreground">Category management coming soon</div>} />
+                <Route path="categories" element={<AdminCategories />} />
                 <Route path="rentals" element={<div className="text-center py-8 text-muted-foreground">Rental management coming soon</div>} />
               </Route>
             </Route>
-            
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
