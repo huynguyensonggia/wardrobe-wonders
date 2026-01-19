@@ -1,3 +1,5 @@
+import type { VtonCategory } from "@/constants/vtonCategory";
+
 // User types
 export type UserRole = 'USER' | 'ADMIN';
 
@@ -27,6 +29,8 @@ export interface Category {
   slug: string;
   description?: string;
   image?: string;
+  vtonCategory?: VtonCategory | string; // dùng string để tránh vỡ nếu BE trả khác enum
+  isActive?: boolean;
 }
 
 export interface ProductImage {

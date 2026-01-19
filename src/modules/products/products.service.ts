@@ -23,7 +23,7 @@ export class ProductService {
 
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
-  ) {}
+  ) { }
 
   async findAll(query?: { categoryId?: number; status?: ProductStatus }) {
     const qb = this.productRepo
@@ -177,7 +177,7 @@ export class ProductService {
     }
   }
 
-  async update(id: number, dto: UpdateProductDto) {
+  async update(id: number, dto: UpdateProductDto, file?: Express.Multer.File) {
     const product = await this.findOne(id);
 
     // 1) category đổi thì validate
@@ -244,6 +244,24 @@ export class ProductService {
 
     try {
       await this.productRepo.save(product);
+
+      // ✅ Nếu có file thì upload và update imageUrl sau cùng
+      if (file) {
+        const uploaded = await this.cloudinaryService.uploadBuffer(file.buffer, {
+          folder: `products/${id}`,
+          publicId: "main",
+          resourceType: "image",
+        });
+        await this.productRepo.update(id, { imageUrl: uploaded.url });
+      } else if (dto.imageUrl !== undefined) {
+        // dto.imageUrl bạn đang hỗ trợ (update bằng URL)
+        const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
+          folder: `products/${id}`,
+          publicId: "main",
+        });
+        await this.productRepo.update(id, { imageUrl: uploaded.url });
+      }
+
       return this.findOne(id);
     } catch (error: any) {
       throw new BadRequestException(

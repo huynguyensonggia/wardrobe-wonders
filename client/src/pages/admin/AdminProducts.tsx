@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { productsApi, categoriesApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,9 +18,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import type { Product, Category } from "@/types";
 import { ProductCard } from "@/components/products/ProductCard";
+import { Pencil, Trash2 } from "lucide-react";
 
 /* ===== ENUM MIRROR FROM BE ===== */
 type ProductOccasion = "party" | "wedding" | "casual";
@@ -33,9 +45,14 @@ const OCCASIONS: { value: ProductOccasion; label: string }[] = [
 const SIZES = ["XS", "S", "M", "L", "XL"] as const;
 /* ================================= */
 
+type Mode = "create" | "edit";
+
 export default function AdminProducts() {
   const { toast } = useToast();
+
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<Mode>("create");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   /* ===== IMAGE + PREVIEW ===== */
   const [image, setImage] = useState<File | null>(null);
@@ -60,7 +77,7 @@ export default function AdminProducts() {
       try {
         const list = await categoriesApi.getAll();
         setCategories(list || []);
-        if ((list || []).length) setCategoryId(String(list[0].id));
+        if ((list || []).length) setCategoryId(String((list as any[])[0]?.id));
       } catch (e: any) {
         toast({ title: "Load categories failed", description: e?.message || "Error" });
       }
@@ -75,7 +92,7 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
-      const list = await productsApi.getAll(); // ✅ đã map BE -> mock Product
+      const list = await productsApi.getAll(); // ✅ map BE -> Product[]
       setProducts(list || []);
     } catch (e: any) {
       toast({ title: "Load products failed", description: e?.message || "Error" });
@@ -92,8 +109,8 @@ export default function AdminProducts() {
   /* ===== FORM STATE ===== */
   const [name, setName] = useState("");
   const [occasion, setOccasion] = useState<ProductOccasion>("party");
-  const [rentPricePerDay, setRentPricePerDay] = useState("150000");
-  const [deposit, setDeposit] = useState("500000");
+  const [rentPricePerDay, setRentPricePerDay] = useState("150");
+  const [deposit, setDeposit] = useState("200");
   const [size, setSize] = useState<(typeof SIZES)[number]>("M");
   const [quantity, setQuantity] = useState("1");
   const [color, setColor] = useState("unknown");
@@ -102,19 +119,53 @@ export default function AdminProducts() {
     setImage(null);
     setName("");
     setOccasion("party");
-    setRentPricePerDay("150000");
-    setDeposit("500000");
+    setRentPricePerDay("150");
+    setDeposit("200");
     setSize("M");
     setQuantity("1");
     setColor("unknown");
   };
 
-  const handleCreate = async () => {
+  const openCreate = () => {
+    setMode("create");
+    setEditingProduct(null);
+    resetForm();
+    // categoryId giữ theo categories
+    setOpen(true);
+  };
+
+  const openEdit = (p: Product) => {
+    setMode("edit");
+    setEditingProduct(p);
+
+    // prefill (best-effort theo shape Product của bạn)
+    setImage(null); // update: ảnh mới optional
+    setName((p as any).name ?? "");
+    setOccasion(((p as any).occasion ?? "party") as ProductOccasion);
+
+    // UI mock hay dùng pricePerDay/deposit, bạn đang gửi rentPricePerDay/deposit
+    setRentPricePerDay(String((p as any).pricePerDay ?? (p as any).rentPricePerDay ?? 150));
+    setDeposit(String((p as any).deposit ?? 200));
+
+    const catId = String((p as any).category?.id ?? (p as any).categoryId ?? "");
+    if (catId) setCategoryId(catId);
+
+    const sizes: string[] = (p as any).sizes ?? [];
+    setSize((sizes?.[0] ?? "M") as any);
+
+    const colors: string[] = (p as any).colors ?? [];
+    setColor(colors?.[0] ?? "unknown");
+
+    setQuantity(String((p as any).quantity ?? 1));
+
+    setOpen(true);
+  };
+
+  const dialogTitle = useMemo(() => (mode === "create" ? "Create product" : "Update product"), [mode]);
+
+  /* ===== CREATE / UPDATE ===== */
+  const handleSubmit = async () => {
     try {
-      if (!image) {
-        toast({ title: "Missing image", description: "Please choose an image." });
-        return;
-      }
       if (!name.trim()) {
         toast({ title: "Missing name", description: "Please input product name." });
         return;
@@ -124,27 +175,56 @@ export default function AdminProducts() {
         return;
       }
 
+      // Create: bắt buộc ảnh (theo logic bạn muốn)
+      if (mode === "create" && !image) {
+        toast({ title: "Missing image", description: "Please choose an image." });
+        return;
+      }
+
       const form = new FormData();
-      form.append("image", image);
+
+      // Update: ảnh optional
+      if (image) form.append("image", image);
+
       form.append("name", name.trim());
       form.append("categoryId", categoryId);
       form.append("occasion", occasion);
+
+      // Backend field names theo bạn đang dùng
       form.append("rentPricePerDay", rentPricePerDay);
       form.append("deposit", deposit);
       form.append("size", size);
       form.append("quantity", quantity);
       form.append("color", color);
 
-      await productsApi.create(form);
+      if (mode === "create") {
+        await productsApi.create(form);
+        toast({ title: "Success", description: "Product created" });
+      } else {
+        if (!editingProduct?.id) {
+          toast({ title: "Update failed", description: "Missing product id" });
+          return;
+        }
+        await productsApi.update(String(editingProduct.id), form);
+        toast({ title: "Success", description: "Product updated" });
+      }
 
-      toast({ title: "Success", description: "Product created" });
       setOpen(false);
       resetForm();
-
-      // ✅ refresh grid list ngay
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: "Create failed", description: e?.message || "Error" });
+      toast({ title: mode === "create" ? "Create failed" : "Update failed", description: e?.message || "Error" });
+    }
+  };
+
+  /* ===== DELETE ===== */
+  const handleDelete = async (id: string) => {
+    try {
+      await productsApi.delete(id);
+      toast({ title: "Deleted", description: "Product removed" });
+      await fetchProducts();
+    } catch (e: any) {
+      toast({ title: "Delete failed", description: e?.message || "Error" });
     }
   };
 
@@ -157,38 +237,41 @@ export default function AdminProducts() {
           <p className="text-muted-foreground">Manage products</p>
         </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>Create product</Button>
-          </DialogTrigger>
+        {/* IMPORTANT: dùng openCreate để reset đúng mode */}
+        <Button onClick={openCreate}>Create product</Button>
 
+        {/* Shared Dialog for Create/Update */}
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-[560px]">
             <DialogHeader>
-              <DialogTitle>Create product</DialogTitle>
+              <DialogTitle>{dialogTitle}</DialogTitle>
             </DialogHeader>
 
             <div className="grid gap-4">
               {/* IMAGE PREVIEW */}
               <div className="grid gap-2">
-                <Label>Image</Label>
+                <Label>Image {mode === "edit" ? "(optional)" : ""}</Label>
                 <div className="flex gap-4 items-start">
                   <div className="w-28 h-28 border rounded-md overflow-hidden flex items-center justify-center">
                     {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="preview"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-xs text-muted-foreground">No image</span>
                     )}
                   </div>
+
                   <Input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setImage(e.target.files?.[0] ?? null)}
                   />
                 </div>
+
+                {mode === "edit" && (
+                  <p className="text-xs text-muted-foreground">
+                    Nếu không chọn ảnh mới, hệ thống sẽ giữ ảnh cũ.
+                  </p>
+                )}
               </div>
 
               {/* NAME */}
@@ -272,11 +355,7 @@ export default function AdminProducts() {
 
                 <div className="grid gap-2">
                   <Label>Quantity</Label>
-                  <Input
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    inputMode="numeric"
-                  />
+                  <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} inputMode="numeric" />
                 </div>
 
                 <div className="grid gap-2">
@@ -285,7 +364,7 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              <Button onClick={handleCreate}>Submit</Button>
+              <Button onClick={handleSubmit}>{mode === "create" ? "Submit" : "Update"}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -299,9 +378,45 @@ export default function AdminProducts() {
           {products.map((product, i) => (
             <div
               key={product.id}
-              className="animate-fade-in"
+              className="animate-fade-in relative group"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
+              {/* Overlay actions */}
+              <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="h-8 w-8"
+                  onClick={() => openEdit(product)}
+                  title="Edit"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size="icon" variant="destructive" className="h-8 w-8" title="Delete">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete product?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm này?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(String(product.id))}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+
               <ProductCard product={product} />
             </div>
           ))}

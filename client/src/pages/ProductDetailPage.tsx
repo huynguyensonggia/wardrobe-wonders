@@ -1,35 +1,84 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { mockProducts } from '@/data/mockData';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { 
-  ChevronLeft, 
-  Heart, 
-  Share2, 
+import { useMemo, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+import { productsApi } from "@/lib/api";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  ChevronLeft,
+  Heart,
+  Share2,
   Calendar as CalendarIcon,
   Sparkles,
   Truck,
   Shield,
-  ArrowRight
-} from 'lucide-react';
-import { format, addDays, differenceInDays } from 'date-fns';
-import { cn } from '@/lib/utils';
+  ArrowRight,
+} from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
-  const product = mockProducts.find(p => p.id === id);
-  
-  const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const { id } = useParams<{ id: string }>();
+
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
     from: undefined,
     to: undefined,
   });
   const [selectedImage, setSelectedImage] = useState(0);
 
+  // ✅ Fetch product detail
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () => productsApi.getById(id!), // id chắc chắn có vì route /products/:id
+    enabled: !!id,
+    staleTime: 60_000,
+  });
+
+  const rentalDays = useMemo(() => {
+    return dateRange.from && dateRange.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
+  }, [dateRange.from, dateRange.to]);
+
+  const totalPrice = useMemo(() => {
+    if (!product) return 0;
+    return rentalDays * (product.pricePerDay ?? 0);
+  }, [product, rentalDays]);
+
+  // Loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-muted-foreground">Loading product...</div>
+      </div>
+    );
+  }
+
+  // Error
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="font-display text-2xl mb-2">Failed to load product</h1>
+          <p className="text-muted-foreground mb-4">{(error as Error)?.message}</p>
+          <Button asChild>
+            <Link to="/products">Back to Collection</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Not found
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -43,18 +92,17 @@ export default function ProductDetailPage() {
     );
   }
 
-  const rentalDays = dateRange.from && dateRange.to 
-    ? differenceInDays(dateRange.to, dateRange.from) + 1 
-    : 0;
-  const totalPrice = rentalDays * product.pricePerDay;
+  const images = product.images ?? [];
+  const sizes = product.sizes ?? [];
+  const colors = product.colors ?? [];
 
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Link 
-            to="/products" 
+          <Link
+            to="/products"
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
@@ -66,24 +114,25 @@ export default function ProductDetailPage() {
           {/* Image Gallery */}
           <div className="space-y-4">
             <div className="aspect-[3/4] overflow-hidden rounded-lg bg-secondary">
-              <img 
-                src={product.images[selectedImage]?.url} 
-                alt={product.images[selectedImage]?.alt}
+              <img
+                src={images[selectedImage]?.url}
+                alt={images[selectedImage]?.alt || product.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            {product.images.length > 1 && (
+
+            {images.length > 1 && (
               <div className="flex gap-2">
-                {product.images.map((img, i) => (
+                {images.map((img: any, i: number) => (
                   <button
-                    key={img.id}
+                    key={img.id ?? i}
                     onClick={() => setSelectedImage(i)}
                     className={cn(
                       "w-20 h-24 rounded-md overflow-hidden border-2 transition-colors",
                       selectedImage === i ? "border-accent" : "border-transparent"
                     )}
                   >
-                    <img src={img.url} alt={img.alt} className="w-full h-full object-cover" />
+                    <img src={img.url} alt={img.alt || product.name} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -95,11 +144,9 @@ export default function ProductDetailPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-sm text-muted-foreground uppercase tracking-wider mb-1">
-                  {product.category.name}
+                  {product.category?.name}
                 </p>
-                <h1 className="font-display text-3xl md:text-4xl font-semibold">
-                  {product.name}
-                </h1>
+                <h1 className="font-display text-3xl md:text-4xl font-semibold">{product.name}</h1>
               </div>
               <div className="flex gap-2">
                 <Button variant="icon" size="icon">
@@ -116,28 +163,26 @@ export default function ProductDetailPage() {
               <span className="text-muted-foreground">${product.deposit} deposit</span>
             </div>
 
-            {product.status !== 'AVAILABLE' && (
+            {product.status !== "AVAILABLE" && (
               <Badge variant="secondary" className="mb-4">
                 Currently Unavailable
               </Badge>
             )}
 
-            <p className="text-muted-foreground mb-8 leading-relaxed">
-              {product.description}
-            </p>
+            <p className="text-muted-foreground mb-8 leading-relaxed">{product.description}</p>
 
             {/* Size Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium mb-3">Select Size</label>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map(size => (
+                {sizes.map((size: string) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     className={cn(
                       "w-12 h-12 rounded-md border text-sm font-medium transition-all",
-                      selectedSize === size 
-                        ? "border-primary bg-primary text-primary-foreground" 
+                      selectedSize === size
+                        ? "border-primary bg-primary text-primary-foreground"
                         : "border-border hover:border-accent"
                     )}
                   >
@@ -148,18 +193,18 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Color Selection */}
-            {product.colors.length > 1 && (
+            {colors.length > 1 && (
               <div className="mb-6">
                 <label className="block text-sm font-medium mb-3">Select Color</label>
                 <div className="flex flex-wrap gap-2">
-                  {product.colors.map(color => (
+                  {colors.map((color: string) => (
                     <button
                       key={color}
                       onClick={() => setSelectedColor(color)}
                       className={cn(
                         "px-4 py-2 rounded-md border text-sm transition-all",
-                        selectedColor === color 
-                          ? "border-primary bg-primary text-primary-foreground" 
+                        selectedColor === color
+                          ? "border-primary bg-primary text-primary-foreground"
                           : "border-border hover:border-accent"
                       )}
                     >
@@ -180,10 +225,10 @@ export default function ProductDetailPage() {
                     {dateRange.from ? (
                       dateRange.to ? (
                         <>
-                          {format(dateRange.from, 'MMM d')} - {format(dateRange.to, 'MMM d, yyyy')}
+                          {format(dateRange.from, "MMM d")} - {format(dateRange.to, "MMM d, yyyy")}
                         </>
                       ) : (
-                        format(dateRange.from, 'MMM d, yyyy')
+                        format(dateRange.from, "MMM d, yyyy")
                       )
                     ) : (
                       "Select dates"
@@ -206,7 +251,9 @@ export default function ProductDetailPage() {
             {rentalDays > 0 && (
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
-                  <span>${product.pricePerDay} × {rentalDays} days</span>
+                  <span>
+                    ${product.pricePerDay} × {rentalDays} days
+                  </span>
                   <span>${totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
@@ -216,7 +263,7 @@ export default function ProductDetailPage() {
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
                     <span>Total due today</span>
-                    <span>${totalPrice + product.deposit}</span>
+                    <span>${totalPrice + (product.deposit ?? 0)}</span>
                   </div>
                 </div>
               </div>
@@ -224,15 +271,16 @@ export default function ProductDetailPage() {
 
             {/* Actions */}
             <div className="space-y-3">
-              <Button 
-                variant="hero" 
-                size="xl" 
+              <Button
+                variant="hero"
+                size="xl"
                 className="w-full"
-                disabled={product.status !== 'AVAILABLE' || !selectedSize || rentalDays === 0}
+                disabled={product.status !== "AVAILABLE" || !selectedSize || rentalDays === 0}
               >
                 Rent Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
+
               <Button variant="hero-outline" size="lg" className="w-full" asChild>
                 <Link to={`/try-on?product=${product.id}`}>
                   <Sparkles className="w-4 h-4 mr-2" />
