@@ -234,7 +234,6 @@ export default function TryOnPage() {
             {/* Upload Section */}
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2">Your Photo</label>
                 <div
                   className={cn(
                     "relative aspect-[3/4] rounded-lg border-2 border-dashed transition-colors overflow-hidden",

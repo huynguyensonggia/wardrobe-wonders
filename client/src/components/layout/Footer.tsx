@@ -9,7 +9,7 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link to="/" className="font-display text-2xl font-semibold tracking-tight">
-              ÉLÉGANCE
+              WARDROBE WONDERS
             </Link>
             <p className="mt-4 text-sm text-primary-foreground/70 leading-relaxed">
               Luxury fashion rental for the modern woman. Access designer pieces 

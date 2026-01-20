@@ -19,16 +19,21 @@ async function bootstrap() {
 
   // CORS cho frontend React/Vite
   app.enableCors({
-    origin: ["http://localhost:8080"], // thêm domain production sau
+    origin: [
+      "http://localhost:8080",
+      "http://10.12.64.161:8080",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
 
-  const port = process.env.PORT ?? 3000;
-  await app.listen(port);
 
-  console.log(`Server is running on: http://localhost:${port}`);
-  console.log("API base: http://localhost:${port}/api");
+  const port = Number(process.env.PORT) || 3000;
+  await app.listen(port, "0.0.0.0");
+
+  console.log(`Server is running on: http://0.0.0.0:${port}`);
+  console.log(`API base: http://localhost:${port}/api`);
   console.log(
     "Admin endpoints example: http://localhost:${port}/api/admin/products",
   );

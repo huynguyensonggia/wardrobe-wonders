@@ -4,23 +4,34 @@ import { ProductCard } from '@/components/products/ProductCard';
 import { mockProducts, mockCategories } from '@/data/mockData';
 import { ArrowRight, Sparkles, Shield, Truck, RefreshCw } from 'lucide-react';
 import heroImage from '@/assets/hero-fashion.jpg';
+import dressesImg from "@/assets/product-dress.jpg";
+import blazerImg from "@/assets/product-blazer.jpg";
+import shirtImg from "@/assets/product-shirt.jpg";
+import pantsImg from "@/assets/product-pants.jpg";
 
 export default function HomePage() {
   const featuredProducts = mockProducts.filter(p => p.featured).slice(0, 4);
+
+  const categoryImages: Record<string, string> = {
+    dresses: dressesImg,
+    outerwear: blazerImg,
+    tops: shirtImg,
+    bottoms: pantsImg,
+  };
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center">
         <div className="absolute inset-0">
-          <img 
-            src={heroImage} 
-            alt="Elegant fashion" 
+          <img
+            src={heroImage}
+            alt="Elegant fashion"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/50 to-transparent" />
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl">
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-tight animate-slide-up">
@@ -29,7 +40,7 @@ export default function HomePage() {
               <span className="text-gradient-gold">Own the Moment</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-lg animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              Access designer fashion without the commitment. 
+              Access designer fashion without the commitment.
               Sustainable, affordable, and always in style.
             </p>
             <div className="mt-8 flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
@@ -83,21 +94,31 @@ export default function HomePage() {
               Discover curated collections for every occasion
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {mockCategories.slice(0, 4).map((category, i) => (
-              <Link 
+              <Link
                 key={category.id}
                 to={`/products?category=${category.slug}`}
                 className="group relative aspect-[4/5] overflow-hidden rounded-lg bg-secondary hover-lift animate-scale-in"
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent" />
+                {/* ✅ Ảnh nền cố định */}
+                <img
+                  src={categoryImages[category.slug] ?? dressesImg}
+                  alt={category.name}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                {/* Text */}
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-display text-xl text-primary-foreground font-medium">
+                  <h3 className="font-display text-xl text-white font-medium">
                     {category.name}
                   </h3>
-                  <p className="text-sm text-primary-foreground/70 mt-1">
+                  <p className="text-sm text-white/80 mt-1">
                     {category.description}
                   </p>
                 </div>
@@ -126,7 +147,7 @@ export default function HomePage() {
               </Link>
             </Button>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {featuredProducts.map((product, i) => (
               <div key={product.id} className="animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
@@ -157,7 +178,7 @@ export default function HomePage() {
               Try Before You Rent
             </h2>
             <p className="text-lg text-primary-foreground/70 mb-8 max-w-xl mx-auto">
-              Our AI-powered virtual try-on lets you see how any piece looks on you. 
+              Our AI-powered virtual try-on lets you see how any piece looks on you.
               Upload your photo and discover your perfect fit.
             </p>
             <Button variant="gold" size="xl" asChild>
@@ -175,8 +196,8 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <blockquote className="font-display text-2xl md:text-3xl italic leading-relaxed">
-              "Élégance has completely changed how I approach fashion. 
-              I can wear designer pieces to every event without breaking the bank."
+              “Wardrobe Wonders changed the way I dress. Thanks to AI virtual try-on,
+              I can see how outfits fit before renting—so I always choose the right look for every event.”
             </blockquote>
             <div className="mt-6">
               <p className="font-medium">Sarah Mitchell</p>
