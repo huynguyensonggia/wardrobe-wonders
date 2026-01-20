@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -23,19 +23,41 @@ export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
+  // ✅ State filters (khởi tạo từ URL)
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
     category: searchParams.get("category") || "", // slug
     size: searchParams.get("size") || "",
     color: searchParams.get("color") || "",
-    status: (searchParams.get("status") as ProductStatus) || ("" as ProductStatus | ""),
+    status:
+      (searchParams.get("status") as ProductStatus) ||
+      ("" as ProductStatus | ""),
   });
+
+  // ✅ QUAN TRỌNG: Sync URL -> state (khi click nav đổi query)
+  const sp = searchParams.toString();
+  useEffect(() => {
+    setFilters({
+      search: searchParams.get("search") || "",
+      category: searchParams.get("category") || "",
+      size: searchParams.get("size") || "",
+      color: searchParams.get("color") || "",
+      status:
+        (searchParams.get("status") as ProductStatus) ||
+        ("" as ProductStatus | ""),
+    });
+
+    // optional: đổi category thì đóng mobile filter cho gọn
+    // setShowFilters(false);
+  }, [sp, searchParams]);
 
   const updateFilter = (key: keyof typeof filters, value: string) => {
     const actualValue = value === ALL_VALUE ? "" : value;
 
+    // update state
     setFilters((prev) => ({ ...prev, [key]: actualValue }));
 
+    // update URL
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       if (actualValue) next.set(key, actualValue);
@@ -79,7 +101,8 @@ export default function ProductsPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["products", categoryId, filters.status],
+    // ✅ thêm filters.category để chắc chắn đổi slug là refetch
+    queryKey: ["products", filters.category, categoryId, filters.status],
     queryFn: () =>
       productsApi.getAll({
         categoryId,
@@ -151,7 +174,9 @@ export default function ProductsPage() {
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">
             Our Collection
           </h1>
-          <p className="text-muted-foreground">{filteredProducts.length} pieces available</p>
+          <p className="text-muted-foreground">
+            {filteredProducts.length} pieces available
+          </p>
         </div>
 
         {/* Search & Filter Bar */}
@@ -245,7 +270,11 @@ export default function ProductsPage() {
             </div>
 
             {hasActiveFilters && (
-              <Button variant="ghost" onClick={clearFilters} className="text-muted-foreground">
+              <Button
+                variant="ghost"
+                onClick={clearFilters}
+                className="text-muted-foreground"
+              >
                 <X className="w-4 h-4 mr-1" />
                 Clear
               </Button>

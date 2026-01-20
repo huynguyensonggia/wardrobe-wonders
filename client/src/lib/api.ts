@@ -12,7 +12,7 @@ import {
 import type { BEProduct } from "@/types/backend";
 import { mapBEProductToMock } from "@/lib/mappers";
 
-const API_BASE = 'http://localhost:3000/api'; // Replace with actual API URL
+const API_BASE = import.meta.env.VITE_API_BASE; // Replace with actual API URL
 
 // Helper function for API calls
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

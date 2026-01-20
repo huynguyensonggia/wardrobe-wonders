@@ -2,16 +2,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Menu, 
-  X, 
-  ShoppingBag, 
-  User, 
-  Search, 
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  User,
+  Search,
   Sparkles,
   LogOut,
   Settings,
-  LayoutDashboard 
+  LayoutDashboard
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -38,32 +38,44 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-display text-2xl lg:text-3xl font-semibold tracking-tight">
-              ÉLÉGANCE
+              WARDROBE WONDERS
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            <Link 
-              to="/products" 
+            <Link
+              to="/products"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Collection
             </Link>
-            <Link 
-              to="/products?category=dresses" 
+            <Link
+              to="/products?category=dresses"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Dresses
             </Link>
-            <Link 
-              to="/products?category=outerwear" 
+            <Link
+              to="/products?category=tops"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Tops
+            </Link>
+            <Link
+              to="/products?category=pants"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pants
+            </Link>
+            <Link
+              to="/products?category=outerwear"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Outerwear
             </Link>
-            <Link 
-              to="/try-on" 
+            <Link
+              to="/try-on"
               className="flex items-center gap-1.5 text-sm font-medium text-gold hover:text-gold/80 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
@@ -76,15 +88,15 @@ export function Navbar() {
             <Button variant="ghost" size="icon">
               <Search className="w-5 h-5" />
             </Button>
-            
+
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">
                     {user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name} 
+                      <img
+                        src={user.avatar}
+                        alt={user.name}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
@@ -141,9 +153,9 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
@@ -155,29 +167,29 @@ export function Navbar() {
         {isOpen && (
           <div className="lg:hidden border-t border-border py-4 animate-slide-down">
             <div className="flex flex-col gap-4">
-              <Link 
-                to="/products" 
+              <Link
+                to="/products"
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
                 Collection
               </Link>
-              <Link 
-                to="/products?category=dresses" 
+              <Link
+                to="/products?category=dresses"
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
                 Dresses
               </Link>
-              <Link 
-                to="/products?category=outerwear" 
+              <Link
+                to="/products?category=outerwear"
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
                 Outerwear
               </Link>
-              <Link 
-                to="/try-on" 
+              <Link
+                to="/try-on"
                 className="flex items-center gap-1.5 text-sm font-medium py-2 text-gold"
                 onClick={() => setIsOpen(false)}
               >
@@ -187,23 +199,23 @@ export function Navbar() {
               <div className="pt-4 border-t border-border">
                 {isAuthenticated ? (
                   <>
-                    <Link 
-                      to="/dashboard" 
+                    <Link
+                      to="/dashboard"
                       className="block text-sm font-medium py-2"
                       onClick={() => setIsOpen(false)}
                     >
                       My Rentals
                     </Link>
                     {user?.role === 'ADMIN' && (
-                      <Link 
-                        to="/admin" 
+                      <Link
+                        to="/admin"
                         className="block text-sm font-medium py-2"
                         onClick={() => setIsOpen(false)}
                       >
                         Admin Dashboard
                       </Link>
                     )}
-                    <button 
+                    <button
                       onClick={() => {
                         handleLogout();
                         setIsOpen(false);
