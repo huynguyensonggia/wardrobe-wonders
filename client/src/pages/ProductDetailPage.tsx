@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { productsApi } from "@/lib/api";
+import { useCart } from "@/contexts/CartContext";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import {
   Truck,
   Shield,
   ArrowRight,
+  ShoppingBag,
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -32,6 +34,8 @@ export default function ProductDetailPage() {
   });
   const [selectedImage, setSelectedImage] = useState(0);
 
+  const { addItem } = useCart();
+
   // ✅ Fetch product detail
   const {
     data: product,
@@ -40,7 +44,7 @@ export default function ProductDetailPage() {
     error,
   } = useQuery({
     queryKey: ["product", id],
-    queryFn: () => productsApi.getById(id!), // id chắc chắn có vì route /products/:id
+    queryFn: () => productsApi.getById(id!),
     enabled: !!id,
     staleTime: 60_000,
   });
@@ -51,7 +55,7 @@ export default function ProductDetailPage() {
 
   const totalPrice = useMemo(() => {
     if (!product) return 0;
-    return rentalDays * (product.pricePerDay ?? 0);
+    return rentalDays * ((product as any).pricePerDay ?? 0);
   }, [product, rentalDays]);
 
   // Loading
@@ -92,9 +96,62 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product.images ?? [];
-  const sizes = product.sizes ?? [];
-  const colors = product.colors ?? [];
+  // ✅ Support both backend styles:
+  // - backend DB: image_url
+  // - mock/frontend: images[]
+  const images = (product as any).images ?? [];
+  const sizes = (product as any).sizes ?? [];
+  const colors = (product as any).colors ?? [];
+
+  const canRent = (product as any).status === "AVAILABLE";
+  const canAddToCart = canRent && !!selectedSize && rentalDays > 0;
+
+  const handleAddToCart = () => {
+    if (!canRent) return;
+
+    if (!selectedSize) {
+      alert("Please select size");
+      return;
+    }
+    if (!dateRange.from || !dateRange.to) {
+      alert("Please select rental dates");
+      return;
+    }
+
+    const startDate = format(dateRange.from, "yyyy-MM-dd");
+    const endDate = format(dateRange.to, "yyyy-MM-dd");
+
+    const imageUrl =
+      (product as any).imageUrl ||
+      (product as any).image_url ||
+      images?.[0]?.url;
+
+    const displayName =
+      `${(product as any).name} (${selectedSize}` + (selectedColor ? `, ${selectedColor}` : "") + `)`;
+
+    addItem(
+      {
+        productId: Number((product as any).id),
+        name: displayName,
+        imageUrl,
+        rentPricePerDay: (product as any).pricePerDay ?? 0,
+
+        // ✅ GỬI NGÀY + DAYS SANG CART
+        startDate,
+        endDate,
+        days: rentalDays,
+      },
+      1
+    );
+
+    alert("Added to cart!");
+  };
+
+  const mainImage =
+    images?.[selectedImage]?.url ||
+    (product as any).imageUrl ||
+    (product as any).image_url ||
+    "https://placehold.co/600x800?text=No+Image";
 
   return (
     <div className="min-h-screen py-8">
@@ -115,8 +172,8 @@ export default function ProductDetailPage() {
           <div className="space-y-4">
             <div className="aspect-[3/4] overflow-hidden rounded-lg bg-secondary">
               <img
-                src={images[selectedImage]?.url}
-                alt={images[selectedImage]?.alt || product.name}
+                src={mainImage}
+                alt={images?.[selectedImage]?.alt || (product as any).name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -132,7 +189,7 @@ export default function ProductDetailPage() {
                       selectedImage === i ? "border-accent" : "border-transparent"
                     )}
                   >
-                    <img src={img.url} alt={img.alt || product.name} className="w-full h-full object-cover" />
+                    <img src={img.url} alt={img.alt || (product as any).name} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -144,9 +201,11 @@ export default function ProductDetailPage() {
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-sm text-muted-foreground uppercase tracking-wider mb-1">
-                  {product.category?.name}
+                  {(product as any).category?.name}
                 </p>
-                <h1 className="font-display text-3xl md:text-4xl font-semibold">{product.name}</h1>
+                <h1 className="font-display text-3xl md:text-4xl font-semibold">
+                  {(product as any).name}
+                </h1>
               </div>
               <div className="flex gap-2">
                 <Button variant="icon" size="icon">
@@ -159,17 +218,23 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-2xl font-medium">${product.pricePerDay}/day</span>
-              <span className="text-muted-foreground">${product.deposit} deposit</span>
+              <span className="text-2xl font-medium">
+                ${(product as any).pricePerDay}/day
+              </span>
+              <span className="text-muted-foreground">
+                ${(product as any).deposit} deposit
+              </span>
             </div>
 
-            {product.status !== "AVAILABLE" && (
+            {!canRent && (
               <Badge variant="secondary" className="mb-4">
                 Currently Unavailable
               </Badge>
             )}
 
-            <p className="text-muted-foreground mb-8 leading-relaxed">{product.description}</p>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              {(product as any).description}
+            </p>
 
             {/* Size Selection */}
             <div className="mb-6">
@@ -252,18 +317,18 @@ export default function ProductDetailPage() {
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
-                    ${product.pricePerDay} × {rentalDays} days
+                    ${(product as any).pricePerDay} × {rentalDays} days
                   </span>
                   <span>${totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>Refundable deposit</span>
-                  <span>${product.deposit}</span>
+                  <span>${(product as any).deposit}</span>
                 </div>
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
                     <span>Total due today</span>
-                    <span>${totalPrice + (product.deposit ?? 0)}</span>
+                    <span>${totalPrice + ((product as any).deposit ?? 0)}</span>
                   </div>
                 </div>
               </div>
@@ -275,14 +340,26 @@ export default function ProductDetailPage() {
                 variant="hero"
                 size="xl"
                 className="w-full"
-                disabled={product.status !== "AVAILABLE" || !selectedSize || rentalDays === 0}
+                disabled={!canAddToCart}
               >
                 Rent Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
 
+              {/* ✅ Add to Cart */}
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full"
+                onClick={handleAddToCart}
+                disabled={!canAddToCart}
+              >
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                Add to Cart
+              </Button>
+
               <Button variant="hero-outline" size="lg" className="w-full" asChild>
-                <Link to={`/try-on?product=${product.id}`}>
+                <Link to={`/try-on?product=${(product as any).id}`}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   Try On Virtually
                 </Link>

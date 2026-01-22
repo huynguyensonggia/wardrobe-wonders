@@ -141,15 +141,22 @@ export const categoriesApi = {
 export const rentalsApi = {
   getUserRentals: () => fetchApi<ApiResponse<Rental[]>>('/rentals'),
 
-  create: (data: { productId: string; startDate: string; endDate: string }) =>
-    fetchApi<ApiResponse<Rental>>('/rentals', {
-      method: 'POST',
+  // ✅ đúng CreateRentalDto
+  create: (data: {
+    startDate: string;
+    endDate: string;
+    items: { productId: number; quantity: number }[];
+    note?: string;
+  }) =>
+    fetchApi<ApiResponse<Rental>>("/rentals", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
+  // ✅ backend là PATCH :id/cancel
   cancel: (id: string) =>
     fetchApi<ApiResponse<Rental>>(`/rentals/${id}/cancel`, {
-      method: 'POST',
+      method: "PATCH",
     }),
 
   extend: (id: string, newEndDate: string) =>

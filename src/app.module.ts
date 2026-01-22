@@ -7,6 +7,7 @@ import { TryonModule } from "./modules/tryon/tryon.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { AdminModule } from "./modules/admin/admin.module";
+import { RentalsModule } from "./modules/rentals/rentals.module"
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AdminModule } from "./modules/admin/admin.module";
     AuthModule,
     UsersModule,
     AdminModule,
+    RentalsModule,
   ],
   controllers: [],
   providers: [],

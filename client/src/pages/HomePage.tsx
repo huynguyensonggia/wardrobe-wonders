@@ -16,7 +16,7 @@ export default function HomePage() {
     dresses: dressesImg,
     outerwear: blazerImg,
     tops: shirtImg,
-    bottoms: pantsImg,
+    pants: pantsImg,
   };
 
   return (
