@@ -8,7 +8,7 @@ export const mockCategories: Category[] = [
   { id: '1', name: 'Dresses', slug: 'dresses', description: 'Elegant dresses for every occasion' },
   { id: '2', name: 'Outerwear', slug: 'outerwear', description: 'Coats, jackets, and blazers' },
   { id: '3', name: 'Tops', slug: 'tops', description: 'Blouses, shirts, and more' },
-  { id: '4', name: 'Bottoms', slug: 'bottoms', description: 'Pants, skirts, and shorts' },
+  { id: '4', name: 'Pants', slug: 'pants', description: 'Pants, skirts, and shorts' },
   { id: '5', name: 'Accessories', slug: 'accessories', description: 'Complete your look' },
 ];
 

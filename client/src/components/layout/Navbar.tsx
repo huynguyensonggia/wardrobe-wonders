@@ -1,34 +1,35 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 import {
   Menu,
   X,
   ShoppingBag,
   User,
-  Search,
   Sparkles,
   LogOut,
   Settings,
-  LayoutDashboard
-} from 'lucide-react';
+  LayoutDashboard,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { count } = useCart();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
@@ -85,8 +86,24 @@ export function Navbar() {
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="ghost" size="icon">
-              <Search className="w-5 h-5" />
+            {/* ✅ Cart button replaces Search */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={() => navigate("/cart")}
+              aria-label="Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {count > 0 && (
+                <span
+                  className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full
+                  bg-destructive text-destructive-foreground text-xs
+                  flex items-center justify-center"
+                >
+                  {count}
+                </span>
+              )}
             </Button>
 
             {isAuthenticated ? (
@@ -104,13 +121,16 @@ export function Navbar() {
                     )}
                   </Button>
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="end" className="w-56">
                   <div className="px-2 py-1.5">
                     <p className="text-sm font-medium">{user?.name}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
+
                   <DropdownMenuSeparator />
-                  {user?.role === 'ADMIN' && (
+
+                  {user?.role === "ADMIN" && (
                     <>
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
@@ -121,20 +141,27 @@ export function Navbar() {
                       <DropdownMenuSeparator />
                     </>
                   )}
+
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
                       <ShoppingBag className="w-4 h-4 mr-2" />
                       My Rentals
                     </Link>
                   </DropdownMenuItem>
+
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard/profile" className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" />
                       Settings
                     </Link>
                   </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-destructive"
+                  >
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>
@@ -174,6 +201,7 @@ export function Navbar() {
               >
                 Collection
               </Link>
+
               <Link
                 to="/products?category=dresses"
                 className="text-sm font-medium py-2"
@@ -181,6 +209,7 @@ export function Navbar() {
               >
                 Dresses
               </Link>
+
               <Link
                 to="/products?category=outerwear"
                 className="text-sm font-medium py-2"
@@ -188,6 +217,7 @@ export function Navbar() {
               >
                 Outerwear
               </Link>
+
               <Link
                 to="/try-on"
                 className="flex items-center gap-1.5 text-sm font-medium py-2 text-gold"
@@ -196,6 +226,18 @@ export function Navbar() {
                 <Sparkles className="w-4 h-4" />
                 AI Try-On
               </Link>
+
+              {/* ✅ Cart in mobile menu */}
+              <button
+                className="text-left text-sm font-medium py-2"
+                onClick={() => {
+                  navigate("/cart");
+                  setIsOpen(false);
+                }}
+              >
+                Cart {count > 0 ? `(${count})` : ""}
+              </button>
+
               <div className="pt-4 border-t border-border">
                 {isAuthenticated ? (
                   <>
@@ -206,7 +248,8 @@ export function Navbar() {
                     >
                       My Rentals
                     </Link>
-                    {user?.role === 'ADMIN' && (
+
+                    {user?.role === "ADMIN" && (
                       <Link
                         to="/admin"
                         className="block text-sm font-medium py-2"
@@ -215,6 +258,7 @@ export function Navbar() {
                         Admin Dashboard
                       </Link>
                     )}
+
                     <button
                       onClick={() => {
                         handleLogout();
@@ -228,10 +272,14 @@ export function Navbar() {
                 ) : (
                   <div className="flex flex-col gap-2">
                     <Button asChild className="w-full">
-                      <Link to="/login" onClick={() => setIsOpen(false)}>Sign In</Link>
+                      <Link to="/login" onClick={() => setIsOpen(false)}>
+                        Sign In
+                      </Link>
                     </Button>
                     <Button variant="outline" asChild className="w-full">
-                      <Link to="/register" onClick={() => setIsOpen(false)}>Join Now</Link>
+                      <Link to="/register" onClick={() => setIsOpen(false)}>
+                        Join Now
+                      </Link>
                     </Button>
                   </div>
                 )}

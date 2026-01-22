@@ -35,7 +35,7 @@ export async function seedRentals(dataSource: DataSource) {
     user, // ← Đây là cách đúng (quan hệ)
     // KHÔNG cần userId nữa vì TypeORM sẽ tự động điền foreign key
 
-    status: RentalStatus.CREATED,
+    status: RentalStatus.PENDING,
     startDate: new Date(),
     endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // +3 ngày
     totalPrice: 500000,
