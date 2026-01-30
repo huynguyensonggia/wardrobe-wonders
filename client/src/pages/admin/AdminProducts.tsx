@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { productsApi, categoriesApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -32,7 +31,7 @@ import {
 
 import type { Product, Category } from "@/types";
 import { ProductCard } from "@/components/products/ProductCard";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Upload } from "lucide-react";
 
 /* ===== ENUM MIRROR FROM BE ===== */
 type ProductOccasion = "party" | "wedding" | "casual";
@@ -53,6 +52,10 @@ export default function AdminProducts() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("create");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  /* ===== IMPORT EXCEL ===== */
+  const importInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
 
   /* ===== IMAGE + PREVIEW ===== */
   const [image, setImage] = useState<File | null>(null);
@@ -79,7 +82,10 @@ export default function AdminProducts() {
         setCategories(list || []);
         if ((list || []).length) setCategoryId(String((list as any[])[0]?.id));
       } catch (e: any) {
-        toast({ title: "Load categories failed", description: e?.message || "Error" });
+        toast({
+          title: "Load categories failed",
+          description: e?.message || "Error",
+        });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,7 +101,10 @@ export default function AdminProducts() {
       const list = await productsApi.getAll(); // ✅ map BE -> Product[]
       setProducts(list || []);
     } catch (e: any) {
-      toast({ title: "Load products failed", description: e?.message || "Error" });
+      toast({
+        title: "Load products failed",
+        description: e?.message || "Error",
+      });
     } finally {
       setLoadingProducts(false);
     }
@@ -130,7 +139,6 @@ export default function AdminProducts() {
     setMode("create");
     setEditingProduct(null);
     resetForm();
-    // categoryId giữ theo categories
     setOpen(true);
   };
 
@@ -138,13 +146,13 @@ export default function AdminProducts() {
     setMode("edit");
     setEditingProduct(p);
 
-    // prefill (best-effort theo shape Product của bạn)
-    setImage(null); // update: ảnh mới optional
+    setImage(null);
     setName((p as any).name ?? "");
     setOccasion(((p as any).occasion ?? "party") as ProductOccasion);
 
-    // UI mock hay dùng pricePerDay/deposit, bạn đang gửi rentPricePerDay/deposit
-    setRentPricePerDay(String((p as any).pricePerDay ?? (p as any).rentPricePerDay ?? 150));
+    setRentPricePerDay(
+      String((p as any).pricePerDay ?? (p as any).rentPricePerDay ?? 150),
+    );
     setDeposit(String((p as any).deposit ?? 200));
 
     const catId = String((p as any).category?.id ?? (p as any).categoryId ?? "");
@@ -161,36 +169,40 @@ export default function AdminProducts() {
     setOpen(true);
   };
 
-  const dialogTitle = useMemo(() => (mode === "create" ? "Create product" : "Update product"), [mode]);
+  const dialogTitle = useMemo(
+    () => (mode === "create" ? "Create product" : "Update product"),
+    [mode],
+  );
 
   /* ===== CREATE / UPDATE ===== */
   const handleSubmit = async () => {
     try {
       if (!name.trim()) {
-        toast({ title: "Missing name", description: "Please input product name." });
+        toast({
+          title: "Missing name",
+          description: "Please input product name.",
+        });
         return;
       }
       if (!categoryId) {
-        toast({ title: "Missing category", description: "Please select a category." });
+        toast({
+          title: "Missing category",
+          description: "Please select a category.",
+        });
         return;
       }
 
-      // Create: bắt buộc ảnh (theo logic bạn muốn)
       if (mode === "create" && !image) {
         toast({ title: "Missing image", description: "Please choose an image." });
         return;
       }
 
       const form = new FormData();
-
-      // Update: ảnh optional
       if (image) form.append("image", image);
 
       form.append("name", name.trim());
       form.append("categoryId", categoryId);
       form.append("occasion", occasion);
-
-      // Backend field names theo bạn đang dùng
       form.append("rentPricePerDay", rentPricePerDay);
       form.append("deposit", deposit);
       form.append("size", size);
@@ -213,7 +225,10 @@ export default function AdminProducts() {
       resetForm();
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: mode === "create" ? "Create failed" : "Update failed", description: e?.message || "Error" });
+      toast({
+        title: mode === "create" ? "Create failed" : "Update failed",
+        description: e?.message || "Error",
+      });
     }
   };
 
@@ -228,17 +243,66 @@ export default function AdminProducts() {
     }
   };
 
+  /* ===== IMPORT EXCEL ===== */
+  const handleImportExcel = async (file: File) => {
+    try {
+      setImporting(true);
+      const form = new FormData();
+      form.append("file", file);
+
+      // ✅ Requires productsApi.importExcel in api.ts
+      const res: any = await (productsApi as any).importExcel(form);
+
+      toast({
+        title: "Import done",
+        description: `Imported: ${res?.imported ?? 0} | Failed: ${
+          res?.failedCount ?? res?.failed ?? 0
+        }`,
+      });
+
+      await fetchProducts();
+    } catch (e: any) {
+      toast({ title: "Import failed", description: e?.message || "Error" });
+    } finally {
+      setImporting(false);
+      if (importInputRef.current) importInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header + Create button */}
+      {/* Header + Create + Import */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-semibold">Products</h2>
           <p className="text-muted-foreground">Manage products</p>
         </div>
 
-        {/* IMPORTANT: dùng openCreate để reset đúng mode */}
-        <Button onClick={openCreate}>Create product</Button>
+        <div className="flex items-center gap-2">
+          {/* ✅ Import Excel */}
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".xlsx"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              handleImportExcel(f);
+            }}
+          />
+          <Button
+            variant="secondary"
+            onClick={() => importInputRef.current?.click()}
+            disabled={importing}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            {importing ? "Importing..." : "Import Excel"}
+          </Button>
+
+          {/* ✅ Create */}
+          <Button onClick={openCreate}>Create product</Button>
+        </div>
 
         {/* Shared Dialog for Create/Update */}
         <Dialog open={open} onOpenChange={setOpen}>
@@ -254,7 +318,11 @@ export default function AdminProducts() {
                 <div className="flex gap-4 items-start">
                   <div className="w-28 h-28 border rounded-md overflow-hidden flex items-center justify-center">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
+                      <img
+                        src={imagePreview}
+                        alt="preview"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="text-xs text-muted-foreground">No image</span>
                     )}
@@ -300,7 +368,10 @@ export default function AdminProducts() {
 
                 <div className="grid gap-2">
                   <Label>Occasion</Label>
-                  <Select value={occasion} onValueChange={(v) => setOccasion(v as ProductOccasion)}>
+                  <Select
+                    value={occasion}
+                    onValueChange={(v) => setOccasion(v as ProductOccasion)}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select occasion" />
                     </SelectTrigger>
@@ -355,7 +426,11 @@ export default function AdminProducts() {
 
                 <div className="grid gap-2">
                   <Label>Quantity</Label>
-                  <Input value={quantity} onChange={(e) => setQuantity(e.target.value)} inputMode="numeric" />
+                  <Input
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    inputMode="numeric"
+                  />
                 </div>
 
                 <div className="grid gap-2">
@@ -364,7 +439,9 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              <Button onClick={handleSubmit}>{mode === "create" ? "Submit" : "Update"}</Button>
+              <Button onClick={handleSubmit}>
+                {mode === "create" ? "Submit" : "Update"}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -395,7 +472,12 @@ export default function AdminProducts() {
 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button size="icon" variant="destructive" className="h-8 w-8" title="Delete">
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="h-8 w-8"
+                      title="Delete"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
@@ -404,7 +486,8 @@ export default function AdminProducts() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete product?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm này?
+                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm
+                        này?
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

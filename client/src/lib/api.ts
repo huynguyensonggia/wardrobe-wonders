@@ -113,6 +113,22 @@ export const productsApi = {
     fetchApi<{ message: string } | { deleted: boolean }>(`/admin/products/${id}`, {
       method: "DELETE",
     }),
+
+  importExcel: (file: File) => {
+    const fd = new FormData();
+    fd.append("file", file);
+
+    return fetchApi<{
+      total: number;
+      imported: number;
+      failedCount: number;
+      success?: any[];
+      failed?: any[];
+    }>("/admin/products/import-excel", {
+      method: "POST",
+      body: fd,
+    });
+  },
 };
 
 // Categories API
