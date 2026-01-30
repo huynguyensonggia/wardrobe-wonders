@@ -181,40 +181,23 @@ export const adminApi = {
   getStats: () => fetchApi<ApiResponse<AdminStats>>('/admin/stats'),
 };
 
-// Try-On API
-export type FitditMaskResponse = {
-  inputs: { personUrl: string };
-  mask: { preMaskUrl: string; poseUrl: string };
-  raw?: any;
-};
-
-export type FitditProcessResponse = {
+// =============================
+// ✅ Try-On API (ONE-STEP)
+// endpoint mới: POST /tryon/fitdit
+// =============================
+export type FitditOneStepResponse = {
   inputs: { personUrl: string; garmentUrl: string };
   outputs: string[];
   resultUrl: string | null;
+  preview?: { maskUrl?: string | null; poseUrl?: string | null }; // optional debug
   raw?: any;
 };
 
 export const tryOnApi = {
-  // Step 1
-  runMask: (person: File, productId: string, offsetsJson?: { top: number; bottom: number; left: number; right: number }) => {
-    const fd = new FormData();
-    fd.append("productId", productId);
-    fd.append("person", person);
-    if (offsetsJson) fd.append("offsetsJson", JSON.stringify(offsetsJson));
-
-    return fetchApi<FitditMaskResponse>("/tryon/fitdit/mask", {
-      method: "POST",
-      body: fd,
-    });
-  },
-
-  // Step 2
   runTryOn: (
     person: File,
     productId: string,
-    preMaskUrl: string,
-    poseUrl: string,
+    offsetsJson?: { top: number; bottom: number; left: number; right: number },
     opts?: {
       resolution?: "768x1024" | "1152x1536" | "1536x2048";
       nSteps?: number;
@@ -226,8 +209,8 @@ export const tryOnApi = {
     const fd = new FormData();
     fd.append("productId", productId);
     fd.append("person", person);
-    fd.append("preMaskUrl", preMaskUrl);
-    fd.append("poseUrl", poseUrl);
+
+    if (offsetsJson) fd.append("offsetsJson", JSON.stringify(offsetsJson));
 
     if (opts?.resolution) fd.append("resolution", opts.resolution);
     if (opts?.nSteps !== undefined) fd.append("nSteps", String(opts.nSteps));
@@ -235,7 +218,7 @@ export const tryOnApi = {
     if (opts?.seed !== undefined) fd.append("seed", String(opts.seed));
     if (opts?.numImages !== undefined) fd.append("numImages", String(opts.numImages));
 
-    return fetchApi<FitditProcessResponse>("/tryon/fitdit/process", {
+    return fetchApi<FitditOneStepResponse>("/tryon/fitdit", {
       method: "POST",
       body: fd,
     });
