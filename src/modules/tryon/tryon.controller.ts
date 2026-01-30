@@ -12,7 +12,6 @@ import { Repository } from "typeorm";
 
 import { FitditService } from "./fitdit.service";
 import { FitditDto } from "./dto/fitdit.dto";
-import { FitditProcessDto } from "./dto/fitdit-process.dto";
 import { Product } from "../../modules/products/entities/product.entity";
 
 function normalizeOffsets(body: FitditDto) {
@@ -46,10 +45,10 @@ export class TryonController {
     private readonly productRepo: Repository<Product>,
   ) {}
 
-  // ✅ Step 1: Run Mask
-  @Post("fitdit/mask")
+  // ✅ ONE-STEP: run mask (ẩn) + try-on (trả kết quả)
+  @Post("fitdit")
   @UseInterceptors(FileFieldsInterceptor([{ name: "person", maxCount: 1 }]))
-  async runMask(
+  async runFitdit(
     @UploadedFiles() files: { person?: Express.Multer.File[] },
     @Body() body: FitditDto,
   ) {
@@ -68,51 +67,19 @@ export class TryonController {
     if (!product) throw new BadRequestException("Product not found");
     if (!product.category) throw new BadRequestException("Product has no category");
 
-    const vtonCategory = product.category.vtonCategory;
-    const offsets = normalizeOffsets(body);
-
-    return this.fitditService.generateMask({
-      person,
-      category: vtonCategory,
-      offsets,
-    });
-  }
-
-  // ✅ Step 2: Run Try-On (now uses jobId from Step 1)
-  @Post("fitdit/process")
-  @UseInterceptors(FileFieldsInterceptor([{ name: "person", maxCount: 1 }]))
-  async runProcess(
-    @UploadedFiles() files: { person?: Express.Multer.File[] },
-    @Body() body: FitditProcessDto,
-  ) {
-    const person = files.person?.[0];
-    if (!person) throw new BadRequestException("Missing person image");
-
-    if (!body.productId || Number.isNaN(+body.productId)) {
-      throw new BadRequestException("Invalid productId");
-    }
-
-    if (!body.jobId || typeof body.jobId !== "string") {
-      throw new BadRequestException("Missing jobId (run Step 1 first)");
-    }
-
-    const product = await this.productRepo.findOne({
-      where: { id: body.productId },
-      relations: { category: true },
-    });
-
-    if (!product) throw new BadRequestException("Product not found");
-    if (!product.category) throw new BadRequestException("Product has no category");
-
     const garmentUrl = product.imageUrl;
     if (!garmentUrl) {
       throw new BadRequestException("Product has no imageUrl to use as garment");
     }
 
+    const vtonCategory = product.category.vtonCategory;
+    const offsets = normalizeOffsets(body);
+
     return this.fitditService.process({
-      jobId: body.jobId,
       person,
       garmentUrl,
+      category: vtonCategory,
+      offsets,
       resolution: body.resolution ?? "768x1024",
       nSteps: body.nSteps ?? 20,
       imageScale: body.imageScale ?? 2,

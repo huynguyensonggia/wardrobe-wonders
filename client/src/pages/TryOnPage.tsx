@@ -25,15 +25,12 @@ export default function TryOnPage() {
   const [userImage, setUserImage] = useState<string | null>(null); // preview base64
   const [userFile, setUserFile] = useState<File | null>(null); // file gửi BE
 
-  // ✅ Step1 outputs (new)
-  const [jobId, setJobId] = useState<string | null>(null);
-  const [maskPreviewUrl, setMaskPreviewUrl] = useState<string | null>(null);
-
-  // Step 2 output
+  // ✅ ONE STEP output
   const [resultImage, setResultImage] = useState<string | null>(null);
 
-  const [isMasking, setIsMasking] = useState(false);
+  // ✅ only one loading state
   const [isProcessing, setIsProcessing] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,23 +53,19 @@ export default function TryOnPage() {
   }, [product]);
 
   // Preview khung bên phải:
-  // ưu tiên: result -> maskPreview -> garment
+  // ưu tiên: result -> garment
   const previewUrl = useMemo(() => {
     if (resultImage) return resultImage;
-    if (maskPreviewUrl) return maskPreviewUrl;
     return garmentUrl;
-  }, [resultImage, maskPreviewUrl, garmentUrl]);
+  }, [resultImage, garmentUrl]);
 
   const previewLabel = useMemo(() => {
     if (resultImage) return "Result";
-    if (maskPreviewUrl) return "Mask Preview (Step 1)";
     if (garmentUrl) return "Selected Product";
     return "Preview";
-  }, [resultImage, maskPreviewUrl, garmentUrl]);
+  }, [resultImage, garmentUrl]);
 
   const clearOutputs = () => {
-    setJobId(null);
-    setMaskPreviewUrl(null);
     setResultImage(null);
   };
 
@@ -100,51 +93,9 @@ export default function TryOnPage() {
     reader.readAsDataURL(file);
   }, []);
 
-  // ✅ STEP 1: Run Mask (new response shape)
-  const handleRunMask = async () => {
-    if (!userFile || !selectedProduct) return;
-
-    setIsMasking(true);
-    setError(null);
-    clearOutputs();
-
-    try {
-      const fd = new FormData();
-      fd.append("productId", selectedProduct);
-      fd.append("person", userFile);
-
-      const res = await fetch("http://localhost:3000/api/tryon/fitdit/mask", {
-        method: "POST",
-        body: fd,
-      });
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(txt || "Failed to run mask. Please try again.");
-      }
-
-      const data = await res.json();
-
-      const id = data?.jobId ?? null;
-      const mUrl = data?.preview?.maskUrl ?? null;
-
-      if (!id || !mUrl) {
-        console.log("mask response =", data);
-        throw new Error("Mask preview/jobId not returned from server");
-      }
-
-      setJobId(id);
-      setMaskPreviewUrl(mUrl);
-    } catch (err: any) {
-      setError(err?.message || "Failed to run mask. Please try again.");
-    } finally {
-      setIsMasking(false);
-    }
-  };
-
-  // ✅ STEP 2: Run Try-On (send jobId)
+  // ✅ ONE STEP: Run mask (ẩn) + try-on (trả kết quả)
   const handleRunTryOn = async () => {
-    if (!userFile || !selectedProduct || !jobId) return;
+    if (!userFile || !selectedProduct) return;
 
     setIsProcessing(true);
     setError(null);
@@ -154,9 +105,16 @@ export default function TryOnPage() {
       const fd = new FormData();
       fd.append("productId", selectedProduct);
       fd.append("person", userFile);
-      fd.append("jobId", jobId);
 
-      const res = await fetch("http://localhost:3000/api/tryon/fitdit/process", {
+      // optional: bạn có thể mở lại nếu muốn chất lượng cao hơn
+      // fd.append("resolution", "1152x1536");
+      // fd.append("nSteps", "20");
+      // fd.append("imageScale", "2");
+      // fd.append("seed", "0");
+      // fd.append("numImages", "1");
+      // fd.append("offsetsJson", JSON.stringify({ top: 0, bottom: 0, left: 0, right: 0 }));
+
+      const res = await fetch("http://localhost:3000/api/tryon/fitdit", {
         method: "POST",
         body: fd,
       });
@@ -170,7 +128,7 @@ export default function TryOnPage() {
       const url = data?.resultUrl ?? data?.outputs?.[0] ?? null;
 
       if (!url) {
-        console.log("process response =", data);
+        console.log("one-step response =", data);
         throw new Error("No resultUrl returned from server");
       }
 
@@ -190,8 +148,8 @@ export default function TryOnPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const canRunMask = !!userFile && !!selectedProduct && !isMasking && !isProcessing;
-  const canRunTryOn = !!userFile && !!selectedProduct && !!jobId && !isMasking && !isProcessing;
+  // ✅ one-step availability
+  const canRunTryOn = !!userFile && !!selectedProduct && !isProcessing;
 
   return (
     <div className="min-h-screen py-8">
@@ -205,7 +163,7 @@ export default function TryOnPage() {
             AI Virtual Try-On
           </h1>
           <p className="text-muted-foreground max-w-lg mx-auto">
-            Step 1 generates a mask preview. Step 2 generates your final try-on.
+            Upload your photo and generate the final try-on in one step.
           </p>
         </div>
 
@@ -214,8 +172,8 @@ export default function TryOnPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { step: 1, title: "Upload Photo", desc: "Full-body photo with good lighting" },
-              { step: 2, title: "Step 1: Run Mask", desc: "Preview the mask to ensure it looks correct" },
-              { step: 3, title: "Step 2: Try-On", desc: "Generate the final try-on result" },
+              { step: 2, title: "Generate Try-On", desc: "AI will process and generate result" },
+              { step: 3, title: "Save & Rent", desc: "Save result and rent the piece you love" },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium">
@@ -292,22 +250,28 @@ export default function TryOnPage() {
 
             {/* Result Section */}
             <div className="space-y-6">
-              {/* Preview */}
-              <div className="aspect-[3/4] rounded-lg bg-secondary overflow-hidden relative">
-                {(isMasking || isProcessing) ? (
+              {/* Preview (taller + prevent crop for result) */}
+              <div className="relative aspect-[3/4] rounded-lg bg-secondary overflow-hidden">
+                {isProcessing ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <div className="relative">
                       <div className="w-16 h-16 border-4 border-accent/30 border-t-accent rounded-full animate-spin" />
                       <Sparkles className="w-6 h-6 text-accent absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                     </div>
-                    <p className="mt-4 font-medium">
-                      {isMasking ? "Running mask..." : "Generating try-on..."}
-                    </p>
+                    <p className="mt-4 font-medium">Generating try-on...</p>
                     <p className="text-sm text-muted-foreground">This may take a few seconds</p>
                   </div>
                 ) : previewUrl ? (
                   <>
-                    <img src={previewUrl} alt={previewLabel} className="w-full h-full object-cover" />
+                    <img
+                      src={previewUrl}
+                      alt={previewLabel}
+                      className={cn(
+                        "w-full h-full bg-secondary",
+                        // ✅ Result: contain để không mất chân
+                        resultImage ? "object-cover object-bottom" : "object-cover",
+                      )}
+                    />
                     <div className="absolute top-3 left-3 rounded-md bg-background/80 backdrop-blur px-3 py-2">
                       <div className="text-xs text-muted-foreground">{previewLabel}</div>
                       <div className="text-sm font-medium truncate max-w-[220px]">
@@ -356,18 +320,8 @@ export default function TryOnPage() {
                 </div>
               )}
 
-              {/* Step Buttons */}
+              {/* One-step Button */}
               <div className="space-y-3">
-                <Button
-                  variant="hero-outline"
-                  size="xl"
-                  className="w-full"
-                  onClick={handleRunMask}
-                  disabled={!canRunMask}
-                >
-                  {isMasking ? "Running Mask..." : "Step 1: Run Mask"}
-                </Button>
-
                 <Button
                   variant="hero"
                   size="xl"
@@ -375,7 +329,7 @@ export default function TryOnPage() {
                   onClick={handleRunTryOn}
                   disabled={!canRunTryOn}
                 >
-                  {isProcessing ? "Processing..." : "Step 2: Generate Try-On"}
+                  {isProcessing ? "Processing..." : "Generate Try-On"}
                 </Button>
               </div>
 
