@@ -5,12 +5,15 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import * as XLSX from "xlsx";
 
 import { Product } from "./entities/product.entity";
 import { Category } from "../categories/entities/category.entity";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { ProductStatus } from "./enums/product-status.enum";
+import { ProductOccasion } from "./enums/product-occasion.enum";
+import { ProductSize } from "./enums/product-size.enum";
 import { CloudinaryService } from "../../common/cloudinary/cloudinary.service";
 
 @Injectable()
@@ -63,12 +66,43 @@ export class ProductService {
   }
 
   private normalizeOccasion(occasion: any) {
-    // enum hoặc string đều ok
     return (occasion ?? "").toString().trim();
   }
 
+  private toNumber(v: any) {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  /** parse enum value by (value or key), case-insensitive */
+  private parseEnum<T extends Record<string, string | number>>(
+    enumObj: T,
+    input: any,
+    field: string,
+  ): T[keyof T] {
+    if (input === null || input === undefined || input === "") {
+      throw new BadRequestException(`${field} is required`);
+    }
+
+    const raw = String(input).trim();
+
+    // 1) direct match by value
+    const values = Object.values(enumObj).map(String);
+    const idxVal = values.findIndex((v) => v.toLowerCase() === raw.toLowerCase());
+    if (idxVal >= 0) return Object.values(enumObj)[idxVal] as any;
+
+    // 2) match by key
+    const keys = Object.keys(enumObj);
+    const idxKey = keys.findIndex((k) => k.toLowerCase() === raw.toLowerCase());
+    if (idxKey >= 0) return (enumObj as any)[keys[idxKey]];
+
+    throw new BadRequestException(
+      `${field} invalid: "${raw}". Allowed: ${values.join(", ")}`,
+    );
+  }
+
   /**
-   * Duplicate definition (bạn có thể đổi tiêu chí tại đây):
+   * Duplicate definition:
    * name + categoryId + occasion + size + color
    */
   private async assertNoDuplicate(params: {
@@ -100,14 +134,12 @@ export class ProductService {
   }
 
   async create(dto: CreateProductDto, file?: Express.Multer.File) {
-    // 0) validate category
     const category = await this.categoryRepo.findOne({
       where: { id: dto.categoryId },
     });
     if (!category)
       throw new BadRequestException("Invalid categoryId - Category not found");
 
-    // 1) normalize + validate
     const name = this.normalizeName(dto.name);
     if (!name) throw new BadRequestException("name is required");
 
@@ -116,7 +148,6 @@ export class ProductService {
 
     const color = this.normalizeColor(dto.color);
 
-    // 2) duplicate check BEFORE create (ngăn bấm tạo 2 lần)
     await this.assertNoDuplicate({
       name,
       categoryId: dto.categoryId,
@@ -125,7 +156,6 @@ export class ProductService {
       color,
     });
 
-    // 3) tạo product trước (để có id)
     const product = this.productRepo.create({
       name,
       category,
@@ -144,56 +174,42 @@ export class ProductService {
     const saved = await this.productRepo.save(product);
 
     try {
-      // 4) upload image vào folder theo id
       if (file) {
-        const uploaded = await this.cloudinaryService.uploadBuffer(
-          file.buffer,
-          {
-            folder: `products/${saved.id}`,
-            publicId: "main",
-            resourceType: "image",
-          },
-        );
+        const uploaded = await this.cloudinaryService.uploadBuffer(file.buffer, {
+          folder: `products/${saved.id}`,
+          publicId: "main",
+          resourceType: "image",
+        });
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       } else if (dto.imageUrl) {
-        const uploaded = await this.cloudinaryService.uploadFromUrl(
-          dto.imageUrl,
-          {
-            folder: `products/${saved.id}`,
-            publicId: "main",
-          },
-        );
+        const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
+          folder: `products/${saved.id}`,
+          publicId: "main",
+        });
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       }
 
       return this.findOne(saved.id);
     } catch (e: unknown) {
-      // upload fail -> xoá record vừa tạo (tránh rác)
       await this.productRepo.delete(saved.id);
       const msg = e instanceof Error ? e.message : String(e);
-      throw new BadRequestException(
-        `Failed to create product with image: ${msg}`,
-      );
+      throw new BadRequestException(`Failed to create product with image: ${msg}`);
     }
   }
 
   async update(id: number, dto: UpdateProductDto, file?: Express.Multer.File) {
     const product = await this.findOne(id);
 
-    // 1) category đổi thì validate
     if (dto.categoryId !== undefined) {
       const category = await this.categoryRepo.findOne({
         where: { id: dto.categoryId },
       });
       if (!category)
-        throw new BadRequestException(
-          "Invalid categoryId - Category not found",
-        );
+        throw new BadRequestException("Invalid categoryId - Category not found");
       product.category = category;
       product.categoryId = category.id;
     }
 
-    // 2) normalize fields (nếu gửi)
     const nextName =
       dto.name !== undefined ? this.normalizeName(dto.name) : product.name;
     const nextOccasion =
@@ -204,7 +220,6 @@ export class ProductService {
     const nextColor =
       dto.color !== undefined ? this.normalizeColor(dto.color) : product.color;
 
-    // 3) nếu các field key có thay đổi -> check duplicate (exclude chính nó)
     const categoryIdForDup =
       dto.categoryId !== undefined ? dto.categoryId : product.categoryId;
 
@@ -228,12 +243,9 @@ export class ProductService {
       });
     }
 
-    // 4) apply update (partial)
     if (dto.name !== undefined) product.name = nextName;
-    if ((dto as any).occasion !== undefined)
-      (product as any).occasion = nextOccasion;
-    if (dto.rentPricePerDay !== undefined)
-      product.rentPricePerDay = dto.rentPricePerDay;
+    if ((dto as any).occasion !== undefined) (product as any).occasion = nextOccasion;
+    if (dto.rentPricePerDay !== undefined) product.rentPricePerDay = dto.rentPricePerDay;
     if (dto.deposit !== undefined) product.deposit = dto.deposit;
     if (dto.size !== undefined) product.size = dto.size as any;
     if (dto.color !== undefined) product.color = nextColor;
@@ -245,7 +257,6 @@ export class ProductService {
     try {
       await this.productRepo.save(product);
 
-      // ✅ Nếu có file thì upload và update imageUrl sau cùng
       if (file) {
         const uploaded = await this.cloudinaryService.uploadBuffer(file.buffer, {
           folder: `products/${id}`,
@@ -254,7 +265,6 @@ export class ProductService {
         });
         await this.productRepo.update(id, { imageUrl: uploaded.url });
       } else if (dto.imageUrl !== undefined) {
-        // dto.imageUrl bạn đang hỗ trợ (update bằng URL)
         const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
           folder: `products/${id}`,
           publicId: "main",
@@ -264,9 +274,7 @@ export class ProductService {
 
       return this.findOne(id);
     } catch (error: any) {
-      throw new BadRequestException(
-        `Failed to update product: ${error?.message ?? error}`,
-      );
+      throw new BadRequestException(`Failed to update product: ${error?.message ?? error}`);
     }
   }
 
@@ -274,5 +282,122 @@ export class ProductService {
     await this.findOne(id);
     await this.productRepo.delete({ id });
     return { message: `Product with ID ${id} deleted successfully` };
+  }
+
+  // =============================
+  // ✅ IMPORT EXCEL (.xlsx)
+  // Sheet header recommended:
+  // name, categoryId, occasion, size, color, rentPricePerDay, deposit, quantity, status, description, imageUrl
+  // =============================
+  async importFromExcel(file: Express.Multer.File) {
+    const wb = XLSX.read(file.buffer, { type: "buffer" });
+    const sheetName = wb.SheetNames[0];
+    if (!sheetName) throw new BadRequestException("Excel has no sheets");
+
+    const ws = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: null });
+    if (!rows.length) throw new BadRequestException("Excel is empty");
+
+    // preload categories
+    const categories = await this.categoryRepo.find();
+    const categoryMap = new Map<number, Category>(categories.map((c) => [c.id, c]));
+
+    const success: any[] = [];
+    const failed: any[] = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      const rowIndex = i + 2; // row 1 is header
+
+      try {
+        const name = this.normalizeName(r.name);
+        if (!name) throw new BadRequestException("name is required");
+
+        const categoryId = this.toNumber(r.categoryId);
+        if (!categoryId) throw new BadRequestException("categoryId is required");
+
+        const category = categoryMap.get(categoryId);
+        if (!category) throw new BadRequestException(`Category ${categoryId} not found`);
+
+        // enums (accept key or value, case-insensitive)
+        const occasion = this.parseEnum(ProductOccasion, r.occasion, "occasion");
+        const size = this.parseEnum(ProductSize, r.size, "size");
+
+        // numbers
+        const rentPricePerDay = this.toNumber(r.rentPricePerDay);
+        if (rentPricePerDay === null) throw new BadRequestException("rentPricePerDay is required");
+
+        const deposit = this.toNumber(r.deposit);
+        if (deposit === null) throw new BadRequestException("deposit is required");
+
+        const quantity = this.toNumber(r.quantity) ?? 1;
+
+        // status optional
+        const status =
+          r.status === null || r.status === undefined || r.status === ""
+            ? ProductStatus.AVAILABLE
+            : this.parseEnum(ProductStatus, r.status, "status");
+
+        const color = this.normalizeColor(r.color);
+        const description = r.description ?? null;
+        const imageUrl = r.imageUrl ?? null;
+
+        // duplicate check
+        await this.assertNoDuplicate({
+          name,
+          categoryId,
+          occasion,
+          size,
+          color,
+        });
+
+        // create first
+        const product = this.productRepo.create({
+          name,
+          category,
+          categoryId,
+          occasion: occasion as any,
+          rentPricePerDay,
+          deposit,
+          size: size as any,
+          color,
+          quantity,
+          imageUrl: null,
+          description,
+          status,
+        });
+
+        const saved = await this.productRepo.save(product);
+
+        // upload image if provided (fail -> keep product, just warning)
+        if (imageUrl) {
+          try {
+            const uploaded = await this.cloudinaryService.uploadFromUrl(imageUrl, {
+              folder: `products/${saved.id}`,
+              publicId: "main",
+            });
+            await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
+          } catch (e) {
+            console.log(`Row ${rowIndex}: image upload failed`, e);
+          }
+        }
+
+        success.push({ row: rowIndex, id: saved.id, name });
+      } catch (e: any) {
+        failed.push({
+          row: rowIndex,
+          reason: e?.message ?? String(e),
+          data: r,
+        });
+      }
+    }
+
+    return {
+      total: rows.length,
+      imported: success.length,
+      failedCount: failed.length,
+      success,
+      failed, // list chi tiết lỗi
+    };
   }
 }

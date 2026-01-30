@@ -29,7 +29,7 @@ import { Role } from "../../common/enums/role.enum";
 export class AdminProductsController {
     constructor(private readonly productService: ProductService) { }
 
-    // ✅ POST: nhận file ảnh từ Postman + fields DTO
+    // ✅ POST: tạo 1 product (ảnh optional)
     @Post()
     @UseInterceptors(
         FileInterceptor("image", {
@@ -37,10 +37,7 @@ export class AdminProductsController {
             limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
             fileFilter: (req, file, cb) => {
                 if (!file.mimetype.startsWith("image/")) {
-                    return cb(
-                        new BadRequestException("Only image files are allowed"),
-                        false,
-                    );
+                    return cb(new BadRequestException("Only image files are allowed"), false);
                 }
                 cb(null, true);
             },
@@ -50,10 +47,37 @@ export class AdminProductsController {
         @Body() createProductDto: CreateProductDto,
         @UploadedFile() file?: Express.Multer.File,
     ): Promise<Product> {
-        // ⚠️ Bạn cần update ProductService.create(dto, file)
         return this.productService.create(createProductDto, file);
     }
 
+    // ✅ IMPORT EXCEL: tạo nhiều products 1 lần
+    // POST /admin/products/import-excel
+    // form-data:
+    // - file: .xlsx
+    @Post("import-excel")
+    @UseInterceptors(
+        FileInterceptor("file", {
+            storage: memoryStorage(),
+            limits: { fileSize: 20 * 1024 * 1024 }, // 20MB (excel lớn)
+            fileFilter: (req, file, cb) => {
+                const ok =
+                    file.mimetype ===
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                    file.originalname.toLowerCase().endsWith(".xlsx");
+
+                if (!ok) {
+                    return cb(new BadRequestException("Only .xlsx files are allowed"), false);
+                }
+                cb(null, true);
+            },
+        }),
+    )
+    async importExcel(@UploadedFile() file?: Express.Multer.File) {
+        if (!file) throw new BadRequestException("Missing excel file (field name: file)");
+        return this.productService.importFromExcel(file);
+    }
+
+    // ✅ PATCH: update 1 product (ảnh optional)
     @Patch(":id")
     @UseInterceptors(
         FileInterceptor("image", {
@@ -75,6 +99,7 @@ export class AdminProductsController {
         return this.productService.update(Number(id), updateProductDto, file);
     }
 
+    // ✅ DELETE
     @Delete(":id")
     remove(@Param("id") id: string): Promise<{ message: string }> {
         return this.productService.remove(Number(id));
