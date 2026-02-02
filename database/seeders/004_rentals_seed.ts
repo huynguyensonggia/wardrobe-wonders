@@ -7,7 +7,7 @@ export async function seedRentals(dataSource: DataSource) {
   const rentalRepo = dataSource.getRepository(Rental);
   const userRepo = dataSource.getRepository(User);
 
-  // Tìm user
+  // 1) Tìm user
   const user = await userRepo.findOne({
     where: { email: "user@smartdress.com" },
   });
@@ -17,12 +17,9 @@ export async function seedRentals(dataSource: DataSource) {
     return;
   }
 
-  // Kiểm tra đã tồn tại rental cho user này chưa
-  // (dùng quan hệ user thay vì userId)
+  // 2) Check đã có rental chưa
   const exists = await rentalRepo.findOne({
-    where: {
-      user: { id: user.id },
-    },
+    where: { user: { id: user.id } },
   });
 
   if (exists) {
@@ -30,24 +27,36 @@ export async function seedRentals(dataSource: DataSource) {
     return;
   }
 
-  // Tạo rental mới - gán trực tiếp object user
+  // 3) Seed data
+  const start = new Date();
+  const end = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // +3 ngày
+
   const rental = rentalRepo.create({
-    user, // ← Đây là cách đúng (quan hệ)
-    // KHÔNG cần userId nữa vì TypeORM sẽ tự động điền foreign key
+    user, // relation
+
+    // ✅ nên set rentalCode rõ ràng (đỡ phụ thuộc BeforeInsert)
+    rentalCode: `RENT-SEED-${Date.now()}`,
 
     status: RentalStatus.PENDING,
-    startDate: new Date(),
-    endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // +3 ngày
+    startDate: start,
+    endDate: end,
+
+    totalDays: 3,
     totalPrice: 500000,
     totalDeposit: 1000000,
 
-    // Nếu muốn điền thêm các field tính toán
-    totalDays: 3,
-    // note: "Rental seed đầu tiên",
+    note: "Seed rental",
+
+    // ✅ SHIPPING INFO (NEW)
+    shipFullName: "Nguyen Van A",
+    shipPhone: "0901234567",
+    shipAddress: "123 Le Loi",
+    shipNote: "Gọi trước khi giao",
   });
 
   await rentalRepo.save(rental);
 
   console.log(`✅ Đã tạo rental thành công cho user: ${user.email}`);
   console.log(`   Rental ID: ${rental.id}`);
+  console.log(`   Rental Code: ${rental.rentalCode}`);
 }

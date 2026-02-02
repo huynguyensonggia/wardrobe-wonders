@@ -23,7 +23,11 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import NotFound from "@/pages/NotFound";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminCategories from "@/pages/admin/AdminCategories";
+import AdminRentals from "@/pages/admin/AdminRentals";
 import CartPage from "@/pages/CartPage";
+
+// ✅ NEW: Checkout page
+import CheckoutPage from "@/pages/CheckoutPage";
 
 const queryClient = new QueryClient();
 
@@ -31,43 +35,46 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Auth pages without main layout */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Auth pages without main layout */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Main layout routes */}
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/products/:id" element={<ProductDetailPage />} />
-              <Route path="/try-on" element={<TryOnPage />} />
-              <Route path="/cart" element={<CartPage />} />
+              {/* Main layout routes */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/products" element={<ProductsPage />} />
+                <Route path="/products/:id" element={<ProductDetailPage />} />
+                <Route path="/try-on" element={<TryOnPage />} />
+                <Route path="/cart" element={<CartPage />} />
 
-              {/* User Dashboard */}
-              <Route path="/dashboard" element={<UserDashboard />}>
-                <Route index element={<MyRentals />} />
-                <Route path="history" element={<RentalHistory />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="settings" element={<Settings />} />
+                {/* ✅ NEW: Checkout */}
+                <Route path="/checkout" element={<CheckoutPage />} />
+
+                {/* User Dashboard */}
+                <Route path="/dashboard" element={<UserDashboard />}>
+                  <Route index element={<MyRentals />} />
+                  <Route path="history" element={<RentalHistory />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="settings" element={<Settings />} />
+                </Route>
+
+                {/* Admin Dashboard */}
+                <Route path="/admin" element={<AdminDashboard />}>
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="rentals" element={<AdminRentals />} />
+                </Route>
               </Route>
 
-              {/* Admin Dashboard */}
-              <Route path="/admin" element={<AdminDashboard />}>
-                <Route path="products" element={<AdminProducts />} />
-                <Route path="categories" element={<AdminCategories />} />
-                <Route path="rentals" element={<div className="text-center py-8 text-muted-foreground">Rental management coming soon</div>} />
-              </Route>
-            </Route>
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
