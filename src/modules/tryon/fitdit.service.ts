@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CloudinaryService } from "../../common/cloudinary/cloudinary.service";
 import { VtonCategory } from "../../modules/categories/enums/vton-category.enum";
+import sharp from "sharp";
 
 function fileToBlob(f: Express.Multer.File) {
   return new Blob([new Uint8Array(f.buffer)], { type: f.mimetype || "image/png" });
@@ -15,7 +16,10 @@ async function urlToBlob(url: string) {
 }
 
 function getRootUrl(client: any) {
-  const root = client?.config?.root_url || client?.root_url || "https://boyuanjiang-fitdit.hf.space";
+  const root =
+    client?.config?.root_url ||
+    client?.root_url ||
+    "https://boyuanjiang-fitdit.hf.space";
   return String(root).replace(/\/$/, "");
 }
 
@@ -81,6 +85,65 @@ function pickOutUrl(client: any, item: any): string | null {
   return null;
 }
 
+// ✅ lấy mask preview url từ ImageEditor object (robust)
+function pickMaskPreviewUrl(client: any, preMaskRaw: any): string | null {
+  if (!preMaskRaw) return null;
+
+  const maybe =
+    preMaskRaw?.composite?.url ||
+    preMaskRaw?.composite?.path ||
+    preMaskRaw?.layers?.[0]?.url ||
+    preMaskRaw?.layers?.[0]?.path ||
+    preMaskRaw?.background?.url ||
+    preMaskRaw?.background?.path ||
+    null;
+
+  if (!maybe) return null;
+
+  // nếu string thì resolve
+  if (typeof maybe === "string") return resolveGradioFileUrl(client, maybe) ?? maybe;
+
+  // nếu object {url/path}
+  return resolveGradioFileUrl(client, maybe);
+}
+
+// ✅ đo mask “dính xuống thấp” hay không bằng alpha bottom
+async function getMaskBottomRatio(maskUrl: string): Promise<number | null> {
+  try {
+    const res = await fetch(maskUrl);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+
+    const img = sharp(buf).ensureAlpha();
+    const meta = await img.metadata();
+    if (!meta.width || !meta.height) return null;
+
+    const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
+    const w = info.width;
+    const h = info.height;
+
+    let bottomY = -1;
+
+    // tìm pixel thấp nhất có alpha > 10
+    for (let y = h - 1; y >= 0; y--) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const a = data[idx + 3];
+        if (a > 10) {
+          bottomY = y;
+          break;
+        }
+      }
+      if (bottomY !== -1) break;
+    }
+
+    if (bottomY === -1) return 0;
+    return bottomY / h; // 0..1
+  } catch {
+    return null;
+  }
+}
+
 @Injectable()
 export class FitditService {
   private clientPromise: Promise<any> | null = null;
@@ -137,32 +200,66 @@ export class FitditService {
     const garmBlob = await urlToBlob(garmentInputUrl);
 
     // =========================
-    // ✅ STEP 1 (ẨN): generate_mask
+    // ✅ STEP 1 (ẨN): generate_mask (AUTO-FIT bottom)
     // =========================
-    const maskRes = await client.predict("/generate_mask", [
-      vtonBlob,
-      args.category,
-      args.offsets.top,
-      args.offsets.bottom,
-      args.offsets.left,
-      args.offsets.right,
-    ]);
 
-    const preMaskRaw = maskRes?.data?.[0]; // ImageEditor object
-    const poseRaw = maskRes?.data?.[1]; // FileData object
+    // ✅ chỉ auto-loop cho Upper-body (vì lỗi quần/đùi thường xảy ra ở đây)
+    const bottomCandidates =
+      args.category === VtonCategory.UPPER_BODY
+        ? [-140, -220, -300, -380] // bạn có thể tăng/giảm tuỳ dataset
+        : [args.offsets.bottom];
 
-    const maskPreviewUrl =
-      preMaskRaw?.composite?.url ||
-      preMaskRaw?.layers?.[0]?.url ||
-      preMaskRaw?.background?.url ||
-      null;
+    // ✅ nếu mask xuống quá 62% chiều cao => coi là dính quần/đùi
+    const MAX_BOTTOM_RATIO = 0.62;
 
-    const posePreviewUrl = poseRaw?.url ?? resolveGradioFileUrl(client, poseRaw);
+    let bestPreMaskRaw: any = null;
+    let bestPoseRaw: any = null;
+    let bestMaskPreviewUrl: string | null = null;
+    let bestPosePreviewUrl: string | null = null;
 
-    if (!preMaskRaw || !poseRaw) {
-      console.log("maskRes.data =", maskRes?.data);
-      console.log("preMaskRaw =", preMaskRaw);
-      console.log("poseRaw =", poseRaw);
+    for (const bottom of bottomCandidates) {
+      const maskRes = await client.predict("/generate_mask", [
+        vtonBlob,
+        args.category,
+        args.offsets.top,
+        bottom,
+        args.offsets.left,
+        args.offsets.right,
+      ]);
+
+      const preMaskRaw = maskRes?.data?.[0]; // ImageEditor object
+      const poseRaw = maskRes?.data?.[1]; // FileData object
+
+      if (!preMaskRaw || !poseRaw) continue;
+
+      const maskPreviewUrl = pickMaskPreviewUrl(client, preMaskRaw);
+      const posePreviewUrl = poseRaw?.url ?? resolveGradioFileUrl(client, poseRaw);
+
+      // lưu fallback
+      bestPreMaskRaw = preMaskRaw;
+      bestPoseRaw = poseRaw;
+      bestMaskPreviewUrl = maskPreviewUrl;
+      bestPosePreviewUrl = posePreviewUrl;
+
+      // nếu không lấy được mask url thì thôi, thử candidate khác
+      if (!maskPreviewUrl) continue;
+
+      const ratio = await getMaskBottomRatio(maskPreviewUrl);
+
+      // ratio null => không đo được => tạm accept (để không fail)
+      if (ratio === null) {
+        break;
+      }
+
+      // ✅ nếu mask không dính xuống quá thấp -> chọn và dừng
+      if (ratio <= MAX_BOTTOM_RATIO) {
+        break;
+      }
+
+      // nếu ratio > MAX_BOTTOM_RATIO => dính quần/đùi -> thử bottom âm hơn
+    }
+
+    if (!bestPreMaskRaw || !bestPoseRaw) {
       throw new BadRequestException("FitDiT did not return preMask/pose");
     }
 
@@ -172,8 +269,8 @@ export class FitditService {
     const outRes = await client.predict("/process", [
       vtonBlob,
       garmBlob,
-      preMaskRaw,
-      poseRaw,
+      bestPreMaskRaw,
+      bestPoseRaw,
       args.nSteps,
       args.imageScale,
       args.seed,
@@ -212,7 +309,7 @@ export class FitditService {
       inputs: { personUrl: personUp.url, garmentUrl: garmentInputUrl },
 
       // optional debug (FE có thể bỏ qua)
-      preview: { maskUrl: maskPreviewUrl, poseUrl: posePreviewUrl },
+      preview: { maskUrl: bestMaskPreviewUrl, poseUrl: bestPosePreviewUrl },
 
       outputs: outputUrls,
       resultUrl: outputUrls[0] ?? null,

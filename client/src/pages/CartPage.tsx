@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
-import { rentalsApi } from "@/lib/api";
 
 export default function CartPage() {
   const { items, count, updateQty, removeItem, clear } = useCart();
@@ -20,42 +19,44 @@ export default function CartPage() {
   }
 
   // ✅ tổng tiền = sum(subtotal từng item)
-  const total = items.reduce(
-    (sum, it) => sum + it.quantity * it.rentPricePerDay * it.days,
-    0
-  );
+  const total = items.reduce((sum, it) => sum + it.quantity * it.rentPricePerDay * it.days, 0);
 
-  // ✅ Checkout tạo rental theo từng nhóm date (vì backend yêu cầu 1 start/end cho 1 rental)
-  const handleCheckout = async () => {
-    try {
-      // group items by startDate-endDate
-      const map = new Map<string, typeof items>();
-      for (const it of items) {
-        const key = `${it.startDate}_${it.endDate}`;
-        if (!map.has(key)) map.set(key, []);
-        map.get(key)!.push(it);
-      }
-
-      for (const [key, groupItems] of map.entries()) {
-        const [startDate, endDate] = key.split("_");
-
-        await rentalsApi.create({
-          startDate,
-          endDate,
-          items: groupItems.map((x) => ({
-            productId: x.productId,
-            quantity: x.quantity,
-          })),
-          note: "Created from cart",
-        });
-      }
-
-      clear();
-      alert("Checkout successful!");
-      navigate("/dashboard");
-    } catch (e: any) {
-      alert(e?.message || "Checkout failed");
+  // ✅ Checkout: chuyển sang /checkout để user điền shipping info
+  // Backend cần 1 rental = 1 startDate/endDate => ta group theo date trước, rồi gửi sang checkout
+  const handleCheckout = () => {
+    // group items by startDate-endDate
+    const map = new Map<string, typeof items>();
+    for (const it of items) {
+      const key = `${it.startDate}_${it.endDate}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(it);
     }
+
+    // Convert map -> array groups
+    const groups = Array.from(map.entries()).map(([key, groupItems]) => {
+      const [startDate, endDate] = key.split("_");
+      return {
+        startDate,
+        endDate,
+        items: groupItems.map((x) => ({
+          productId: x.productId,
+          name: x.name,
+          imageUrl: x.imageUrl,
+          rentPricePerDay: x.rentPricePerDay,
+          quantity: x.quantity,
+          days: x.days,
+        })),
+      };
+    });
+
+    // ✅ điều hướng sang CheckoutPage
+    navigate("/checkout", {
+      state: {
+        from: "cart",
+        groups,
+        cartTotal: total,
+      },
+    });
   };
 
   return (
@@ -108,7 +109,10 @@ export default function CartPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updateQty(it.productId, it.startDate, it.endDate, it.quantity - 1)}
+                    onClick={() =>
+                      updateQty(it.productId, it.startDate, it.endDate, it.quantity - 1)
+                    }
+                    disabled={it.quantity <= 1}
                   >
                     -
                   </Button>
@@ -116,7 +120,9 @@ export default function CartPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updateQty(it.productId, it.startDate, it.endDate, it.quantity + 1)}
+                    onClick={() =>
+                      updateQty(it.productId, it.startDate, it.endDate, it.quantity + 1)
+                    }
                   >
                     +
                   </Button>

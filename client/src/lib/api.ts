@@ -114,16 +114,17 @@ export const productsApi = {
       method: "DELETE",
     }),
 
+  // ✅ IMPORT EXCEL
   importExcel: (file: File) => {
     const fd = new FormData();
-    fd.append("file", file);
+    fd.append("file", file); // ✅ đúng key backend
 
     return fetchApi<{
       total: number;
       imported: number;
       failedCount: number;
-      success?: any[];
       failed?: any[];
+      success?: any[];
     }>("/admin/products/import-excel", {
       method: "POST",
       body: fd,
@@ -163,6 +164,11 @@ export const rentalsApi = {
     endDate: string;
     items: { productId: number; quantity: number }[];
     note?: string;
+
+    shipFullName: string;
+    shipPhone: string;
+    shipAddress: string;
+    shipNote?: string;
   }) =>
     fetchApi<ApiResponse<Rental>>("/rentals", {
       method: "POST",
@@ -187,7 +193,7 @@ export const rentalsApi = {
 
   updateStatus: (id: string, status: string) =>
     fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/status`, {
-      method: 'PUT',
+      method: 'PATCH',
       body: JSON.stringify({ status }),
     }),
 };

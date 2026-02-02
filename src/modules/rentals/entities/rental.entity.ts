@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
   BeforeInsert,
+  Index,
 } from "typeorm";
 
 import { User } from "../../users/entities/user.entity";
@@ -21,6 +22,7 @@ export class Rental {
   id: number;
 
   // ✅ ADD: rental_code (UNIQUE)
+  @Index({ unique: true })
   @Column({ name: "rental_code", type: "varchar", length: 50, unique: true })
   rentalCode: string;
 
@@ -67,6 +69,22 @@ export class Rental {
 
   @Column({ type: "text", nullable: true })
   note?: string;
+
+  // =========================
+  // ✅ SHIPPING INFO (NEW)
+  // =========================
+
+  @Column({ name: "ship_full_name", type: "varchar", length: 120, nullable: true })
+  shipFullName?: string;
+
+  @Column({ name: "ship_phone", type: "varchar", length: 30, nullable: true })
+  shipPhone?: string;
+
+  @Column({ name: "ship_address", type: "varchar", length: 255 })
+  shipAddress: string;
+
+  @Column({ name: "ship_note", type: "varchar", length: 255, nullable: true })
+  shipNote?: string;
 
   // ===== TIMESTAMPS =====
   @CreateDateColumn({ name: "created_at" })

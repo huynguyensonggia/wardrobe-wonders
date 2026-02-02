@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { productsApi } from "@/lib/api";
@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
@@ -96,9 +97,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  // ✅ Support both backend styles:
-  // - backend DB: image_url
-  // - mock/frontend: images[]
+  // ✅ Support both backend styles
   const images = (product as any).images ?? [];
   const sizes = (product as any).sizes ?? [];
   const colors = (product as any).colors ?? [];
@@ -106,28 +105,23 @@ export default function ProductDetailPage() {
   const canRent = (product as any).status === "AVAILABLE";
   const canAddToCart = canRent && !!selectedSize && rentalDays > 0;
 
+  const imageUrl =
+    (product as any).imageUrl ||
+    (product as any).image_url ||
+    images?.[0]?.url;
+
+  const displayName =
+    `${(product as any).name} (${selectedSize}` + (selectedColor ? `, ${selectedColor}` : "") + `)`;
+
+  const startDate = dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "";
+  const endDate = dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : "";
+
+  // ✅ Add to cart giữ nguyên
   const handleAddToCart = () => {
     if (!canRent) return;
 
-    if (!selectedSize) {
-      alert("Please select size");
-      return;
-    }
-    if (!dateRange.from || !dateRange.to) {
-      alert("Please select rental dates");
-      return;
-    }
-
-    const startDate = format(dateRange.from, "yyyy-MM-dd");
-    const endDate = format(dateRange.to, "yyyy-MM-dd");
-
-    const imageUrl =
-      (product as any).imageUrl ||
-      (product as any).image_url ||
-      images?.[0]?.url;
-
-    const displayName =
-      `${(product as any).name} (${selectedSize}` + (selectedColor ? `, ${selectedColor}` : "") + `)`;
+    if (!selectedSize) return alert("Please select size");
+    if (!dateRange.from || !dateRange.to) return alert("Please select rental dates");
 
     addItem(
       {
@@ -135,8 +129,6 @@ export default function ProductDetailPage() {
         name: displayName,
         imageUrl,
         rentPricePerDay: (product as any).pricePerDay ?? 0,
-
-        // ✅ GỬI NGÀY + DAYS SANG CART
         startDate,
         endDate,
         days: rentalDays,
@@ -145,6 +137,30 @@ export default function ProductDetailPage() {
     );
 
     alert("Added to cart!");
+  };
+
+  // ✅ Rent Now -> đi thẳng sang checkout với 1 group
+  const handleRentNow = () => {
+    if (!canRent) return;
+
+    if (!selectedSize) return alert("Please select size");
+    if (!dateRange.from || !dateRange.to) return alert("Please select rental dates");
+
+    navigate("/checkout", {
+      state: {
+        source: "rentNow",
+        product: {
+          productId: Number((product as any).id),
+          name: displayName,
+          imageUrl,
+          rentPricePerDay: (product as any).pricePerDay ?? 0,
+          startDate,
+          endDate,
+          days: rentalDays,
+          quantity: 1,
+        },
+      },
+    });
   };
 
   const mainImage =
@@ -189,7 +205,11 @@ export default function ProductDetailPage() {
                       selectedImage === i ? "border-accent" : "border-transparent"
                     )}
                   >
-                    <img src={img.url} alt={img.alt || (product as any).name} className="w-full h-full object-cover" />
+                    <img
+                      src={img.url}
+                      alt={img.alt || (product as any).name}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -341,6 +361,7 @@ export default function ProductDetailPage() {
                 size="xl"
                 className="w-full"
                 disabled={!canAddToCart}
+                onClick={handleRentNow}
               >
                 Rent Now
                 <ArrowRight className="w-5 h-5 ml-2" />

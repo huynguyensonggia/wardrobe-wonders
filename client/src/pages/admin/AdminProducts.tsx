@@ -247,17 +247,12 @@ export default function AdminProducts() {
   const handleImportExcel = async (file: File) => {
     try {
       setImporting(true);
-      const form = new FormData();
-      form.append("file", file);
 
-      // ✅ Requires productsApi.importExcel in api.ts
-      const res: any = await (productsApi as any).importExcel(form);
+      const res = await productsApi.importExcel(file); // ✅ truyền File
 
       toast({
         title: "Import done",
-        description: `Imported: ${res?.imported ?? 0} | Failed: ${
-          res?.failedCount ?? res?.failed ?? 0
-        }`,
+        description: `Imported: ${res?.imported ?? 0} | Failed: ${res?.failedCount ?? 0}`,
       });
 
       await fetchProducts();

@@ -10,9 +10,10 @@ export class CreateRentalsTable1768016779243 implements MigrationInterface {
 
         status ENUM(
           'pending',
-          'confirmed',
-          'renting',
-          'returned',
+          'approved',
+          'active',
+          'completed',
+          'rejected',
           'cancelled'
         ) NOT NULL DEFAULT 'pending',
 
@@ -22,6 +23,12 @@ export class CreateRentalsTable1768016779243 implements MigrationInterface {
         total_price INT NOT NULL,
         total_deposit INT NOT NULL DEFAULT 0,
         note TEXT NULL,
+
+        -- ✅ SHIPPING INFO (NEW)
+        ship_full_name VARCHAR(120) NULL,
+        ship_phone VARCHAR(30) NULL,
+        ship_address VARCHAR(255) NULL,
+        ship_note VARCHAR(255) NULL,
 
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
