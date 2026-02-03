@@ -7,7 +7,6 @@ import {
   PaginatedResponse,
   ProductFilters,
   AdminStats,
-  TryOnResult
 } from '@/types';
 import type { BEProduct } from "@/types/backend";
 import { mapBEProductToMock } from "@/lib/mappers";
@@ -156,9 +155,8 @@ export const categoriesApi = {
 
 // Rentals API
 export const rentalsApi = {
-  getUserRentals: () => fetchApi<ApiResponse<Rental[]>>('/rentals'),
+  getUserRentals: () => fetchApi<ApiResponse<Rental[]>>("/rentals"),
 
-  // ✅ đúng CreateRentalDto
   create: (data: {
     startDate: string;
     endDate: string;
@@ -175,7 +173,6 @@ export const rentalsApi = {
       body: JSON.stringify(data),
     }),
 
-  // ✅ backend là PATCH :id/cancel
   cancel: (id: string) =>
     fetchApi<ApiResponse<Rental>>(`/rentals/${id}/cancel`, {
       method: "PATCH",
@@ -183,18 +180,35 @@ export const rentalsApi = {
 
   extend: (id: string, newEndDate: string) =>
     fetchApi<ApiResponse<Rental>>(`/rentals/${id}/extend`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify({ endDate: newEndDate }),
     }),
 
   // Admin endpoints
   getAll: (page = 1, pageSize = 20) =>
-    fetchApi<PaginatedResponse<Rental>>(`/admin/rentals?page=${page}&pageSize=${pageSize}`),
+    fetchApi<PaginatedResponse<Rental>>(
+      `/admin/rentals?page=${page}&pageSize=${pageSize}`
+    ),
 
   updateStatus: (id: string, status: string) =>
     fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/status`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify({ status }),
+    }),
+
+  // ✅ NEW: update shipping info
+  updateShipping: (
+    id: string,
+    data: {
+      shipFullName?: string;
+      shipPhone?: string;
+      shipAddress?: string;
+      shipNote?: string;
+    }
+  ) =>
+    fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/shipping`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
     }),
 };
 

@@ -10,7 +10,7 @@ export class CreateRentalsTable1768016779243 implements MigrationInterface {
 
         status ENUM(
           'pending',
-          'approved',
+          'shipping',
           'active',
           'completed',
           'rejected',

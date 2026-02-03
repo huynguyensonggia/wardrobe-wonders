@@ -27,9 +27,7 @@ export async function seedProducts(dataSource: DataSource) {
       occasion: ProductOccasion.WEDDING, // ✅ QUAN TRỌNG
       rentPricePerDay: 250000,
       deposit: 1000000,
-      size: ProductSize.M,
       color: "black",
-      quantity: 2,
       status: ProductStatus.AVAILABLE,
       imageUrl: "https://example.com/party-black.jpg",
       description: "Đầm dạ hội sang trọng màu đen",
@@ -41,9 +39,7 @@ export async function seedProducts(dataSource: DataSource) {
       occasion: ProductOccasion.PARTY, // ✅ QUAN TRỌNG
       rentPricePerDay: 220000,
       deposit: 900000,
-      size: ProductSize.S,
       color: "red",
-      quantity: 1,
       status: ProductStatus.MAINTENANCE,
       imageUrl: "https://example.com/party-red.jpg",
       description: "Đầm đỏ nổi bật cho tiệc tối",

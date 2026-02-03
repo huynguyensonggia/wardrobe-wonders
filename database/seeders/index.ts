@@ -8,6 +8,7 @@ import { seedRentalItems } from "./005_rental_items_seed";
 import { seedPayments } from "./006_payments_seed";
 import { seedReviews } from "./007_reviews_seed";
 import { seedNotifications } from "./008_notifications_seed";
+import { seedProductVariants } from "./009_products_variant_seed";
 
 async function runSeeders() {
   await AppDataSource.initialize();
@@ -24,6 +25,7 @@ async function runSeeders() {
   await seedPayments(AppDataSource);
   await seedReviews(AppDataSource);
   await seedNotifications(AppDataSource);
+  await seedProductVariants(AppDataSource);
 
   await AppDataSource.destroy();
   console.log("✅ Seeding completed.");

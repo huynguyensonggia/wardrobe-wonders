@@ -41,10 +41,25 @@ const OCCASIONS: { value: ProductOccasion; label: string }[] = [
   { value: "casual", label: "Casual" },
 ];
 
-const SIZES = ["XS", "S", "M", "L", "XL"] as const;
+const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
+
+type VariantForm = {
+  id: string; // ✅ stable key for React list
+  size: (typeof SIZES)[number];
+  stock: string;
+};
 /* ================================= */
 
 type Mode = "create" | "edit";
+
+/** Generate stable id for UI rows */
+const makeRowId = () => {
+  // browser supports crypto.randomUUID in modern envs
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return (crypto as any).randomUUID() as string;
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+};
 
 export default function AdminProducts() {
   const { toast } = useToast();
@@ -98,7 +113,7 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
-      const list = await productsApi.getAll(); // ✅ map BE -> Product[]
+      const list = await productsApi.getAll();
       setProducts(list || []);
     } catch (e: any) {
       toast({
@@ -120,9 +135,11 @@ export default function AdminProducts() {
   const [occasion, setOccasion] = useState<ProductOccasion>("party");
   const [rentPricePerDay, setRentPricePerDay] = useState("150");
   const [deposit, setDeposit] = useState("200");
-  const [size, setSize] = useState<(typeof SIZES)[number]>("M");
-  const [quantity, setQuantity] = useState("1");
   const [color, setColor] = useState("unknown");
+
+  const [variants, setVariants] = useState<VariantForm[]>([
+    { id: makeRowId(), size: "M", stock: "1" },
+  ]);
 
   const resetForm = () => {
     setImage(null);
@@ -130,9 +147,8 @@ export default function AdminProducts() {
     setOccasion("party");
     setRentPricePerDay("150");
     setDeposit("200");
-    setSize("M");
-    setQuantity("1");
     setColor("unknown");
+    setVariants([{ id: makeRowId(), size: "M", stock: "1" }]);
   };
 
   const openCreate = () => {
@@ -150,21 +166,27 @@ export default function AdminProducts() {
     setName((p as any).name ?? "");
     setOccasion(((p as any).occasion ?? "party") as ProductOccasion);
 
-    setRentPricePerDay(
-      String((p as any).pricePerDay ?? (p as any).rentPricePerDay ?? 150),
-    );
+    // ✅ keep only rentPricePerDay (avoid confusion)
+    setRentPricePerDay(String((p as any).rentPricePerDay ?? 150));
     setDeposit(String((p as any).deposit ?? 200));
 
     const catId = String((p as any).category?.id ?? (p as any).categoryId ?? "");
     if (catId) setCategoryId(catId);
 
-    const sizes: string[] = (p as any).sizes ?? [];
-    setSize((sizes?.[0] ?? "M") as any);
+    setColor((p as any).color ?? "unknown");
 
-    const colors: string[] = (p as any).colors ?? [];
-    setColor(colors?.[0] ?? "unknown");
-
-    setQuantity(String((p as any).quantity ?? 1));
+    const vts = ((p as any).variants ?? []) as any[];
+    if (Array.isArray(vts) && vts.length) {
+      setVariants(
+        vts.map((v) => ({
+          id: String(v.id ?? makeRowId()), // ✅ use DB id as key
+          size: (v.size ?? "M") as any,
+          stock: String(v.stock ?? 0),
+        })),
+      );
+    } else {
+      setVariants([{ id: makeRowId(), size: "M", stock: "1" }]);
+    }
 
     setOpen(true);
   };
@@ -173,6 +195,15 @@ export default function AdminProducts() {
     () => (mode === "create" ? "Create product" : "Update product"),
     [mode],
   );
+
+  const sizesDuplicate = useMemo(() => {
+    const seen = new Set<string>();
+    for (const v of variants) {
+      if (seen.has(v.size)) return true;
+      seen.add(v.size);
+    }
+    return false;
+  }, [variants]);
 
   /* ===== CREATE / UPDATE ===== */
   const handleSubmit = async () => {
@@ -197,6 +228,31 @@ export default function AdminProducts() {
         return;
       }
 
+      if (!variants.length) {
+        toast({ title: "Missing variants", description: "Add at least 1 size." });
+        return;
+      }
+
+      if (sizesDuplicate) {
+        toast({
+          title: "Duplicate size",
+          description: "Each size should appear once.",
+        });
+        return;
+      }
+
+      const invalid = variants.some((v) => {
+        const n = Number(v.stock);
+        return !v.size || v.stock === "" || !Number.isFinite(n) || n < 0;
+      });
+      if (invalid) {
+        toast({
+          title: "Invalid variants",
+          description: "Stock must be a number >= 0.",
+        });
+        return;
+      }
+
       const form = new FormData();
       if (image) form.append("image", image);
 
@@ -205,9 +261,15 @@ export default function AdminProducts() {
       form.append("occasion", occasion);
       form.append("rentPricePerDay", rentPricePerDay);
       form.append("deposit", deposit);
-      form.append("size", size);
-      form.append("quantity", quantity);
       form.append("color", color);
+
+      // IMPORTANT: multipart/form-data -> variants as JSON string
+      form.append(
+        "variants",
+        JSON.stringify(
+          variants.map((v) => ({ size: v.size, stock: Number(v.stock) })),
+        ),
+      );
 
       if (mode === "create") {
         await productsApi.create(form);
@@ -248,7 +310,7 @@ export default function AdminProducts() {
     try {
       setImporting(true);
 
-      const res = await productsApi.importExcel(file); // ✅ truyền File
+      const res = await productsApi.importExcel(file);
 
       toast({
         title: "Import done",
@@ -401,34 +463,89 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              {/* SIZE + QTY + COLOR */}
-              <div className="grid grid-cols-3 gap-3">
-                <div className="grid gap-2">
-                  <Label>Size</Label>
-                  <Select value={size} onValueChange={(v) => setSize(v as any)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SIZES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* VARIANTS + COLOR */}
+              <div className="grid gap-3">
+                <div className="flex items-center justify-between">
+                  <Label>Variants (Size + Stock)</Label>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      setVariants((prev) => [
+                        ...prev,
+                        { id: makeRowId(), size: "M", stock: "0" },
+                      ])
+                    }
+                  >
+                    + Add size
+                  </Button>
                 </div>
 
-                <div className="grid gap-2">
-                  <Label>Quantity</Label>
-                  <Input
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    inputMode="numeric"
-                  />
+                {sizesDuplicate && (
+                  <div className="text-xs text-destructive">
+                    Duplicate size detected. Please keep each size unique.
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {variants.map((v) => (
+                    <div
+                      key={v.id} // ✅ FIX: stable key
+                      className="grid grid-cols-[140px_1fr_40px] gap-2 items-center"
+                    >
+                      <Select
+                        value={v.size}
+                        onValueChange={(val) =>
+                          setVariants((prev) =>
+                            prev.map((x) =>
+                              x.id === v.id ? { ...x, size: val as any } : x,
+                            ),
+                          )
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SIZES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      <Input
+                        value={v.stock}
+                        onChange={(e) =>
+                          setVariants((prev) =>
+                            prev.map((x) =>
+                              x.id === v.id ? { ...x, stock: e.target.value } : x,
+                            ),
+                          )
+                        }
+                        inputMode="numeric"
+                        placeholder="Stock"
+                      />
+
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="destructive"
+                        onClick={() =>
+                          setVariants((prev) => prev.filter((x) => x.id !== v.id))
+                        }
+                        disabled={variants.length === 1}
+                        title="Remove"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="grid gap-2">
+                <div className="grid gap-2 max-w-[260px]">
                   <Label>Color</Label>
                   <Input value={color} onChange={(e) => setColor(e.target.value)} />
                 </div>
@@ -442,7 +559,7 @@ export default function AdminProducts() {
         </Dialog>
       </div>
 
-      {/* ===== GRID LIST (giống ProductsPage) ===== */}
+      {/* ===== GRID LIST ===== */}
       {loadingProducts ? (
         <div className="text-sm text-muted-foreground">Loading products...</div>
       ) : products.length > 0 ? (
@@ -453,7 +570,6 @@ export default function AdminProducts() {
               className="animate-fade-in relative group"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
-              {/* Overlay actions */}
               <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button
                   size="icon"
@@ -481,8 +597,7 @@ export default function AdminProducts() {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete product?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm
-                        này?
+                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm này?
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

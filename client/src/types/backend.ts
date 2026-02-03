@@ -1,7 +1,7 @@
 // types/backend.ts
 
 export type BEProductStatus = "available" | "rented" | "maintenance";
-export type BEProductSize = "XS" | "S" | "M" | "L" | "XL";
+export type BEProductSize = "XXL" | "S" | "M" | "L" | "XL";
 
 // ✅ bạn chốt dùng 3 giá trị này
 export type BEProductOccasion = "party" | "wedding" | "casual";
