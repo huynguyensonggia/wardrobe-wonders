@@ -42,25 +42,33 @@ export class TryonController {
   constructor(
     private readonly fitditService: FitditService,
     @InjectRepository(Product)
-    private readonly productRepo: Repository<Product>,
+    private readonly productRepo: Repository<Product>
   ) {}
 
   // ✅ ONE-STEP: run mask (ẩn) + try-on (trả kết quả)
+  // ✅ hỗ trợ: person file OR personUrl
   @Post("fitdit")
   @UseInterceptors(FileFieldsInterceptor([{ name: "person", maxCount: 1 }]))
   async runFitdit(
     @UploadedFiles() files: { person?: Express.Multer.File[] },
-    @Body() body: FitditDto,
+    @Body() body: FitditDto
   ) {
-    const person = files.person?.[0];
-    if (!person) throw new BadRequestException("Missing person image");
+    const person = files?.person?.[0];
 
-    if (!body.productId || Number.isNaN(+body.productId)) {
+    const personUrl = String((body as any).personUrl || "").trim();
+
+    // ✅ cho phép thiếu file nếu có personUrl
+    if (!person && !personUrl) {
+      throw new BadRequestException("Missing person image (file or personUrl)");
+    }
+
+    const productId = Number((body as any).productId);
+    if (!Number.isFinite(productId) || productId <= 0) {
       throw new BadRequestException("Invalid productId");
     }
 
     const product = await this.productRepo.findOne({
-      where: { id: body.productId },
+      where: { id: productId as any },
       relations: { category: true },
     });
 
@@ -76,15 +84,16 @@ export class TryonController {
     const offsets = normalizeOffsets(body);
 
     return this.fitditService.process({
-      person,
+      person, // optional
+      personUrl: personUrl || undefined, // ✅ tránh gửi ""
       garmentUrl,
       category: vtonCategory,
       offsets,
-      resolution: body.resolution ?? "768x1024",
-      nSteps: body.nSteps ?? 20,
-      imageScale: body.imageScale ?? 2,
-      seed: body.seed ?? -1,
-      numImages: body.numImages ?? 1,
+      resolution: (body as any).resolution ?? "768x1024",
+      nSteps: (body as any).nSteps ?? 20,
+      imageScale: (body as any).imageScale ?? 2,
+      seed: (body as any).seed ?? -1,
+      numImages: (body as any).numImages ?? 1,
     });
   }
 }

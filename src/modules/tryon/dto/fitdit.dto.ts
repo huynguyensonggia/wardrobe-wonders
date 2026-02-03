@@ -1,4 +1,12 @@
-import { IsIn, IsInt, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import {
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from "class-validator";
 import { Type } from "class-transformer";
 
 class OffsetsDto {
@@ -12,6 +20,12 @@ export class FitditDto {
   @Type(() => Number)
   @IsInt()
   productId: number;
+
+  // ✅ NEW: dùng khi mix lần 2 (base image = resultUrl lần trước)
+  @IsOptional()
+  @IsString()
+  @IsUrl()
+  personUrl?: string;
 
   @IsOptional()
   @IsIn(["768x1024", "1152x1536", "1536x2048"])

@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { productsApi } from "@/lib/api";
+import { productsApi, tryOnApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -16,26 +16,87 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type MixVton = "upper-body" | "lower-body" | "dresses";
+
+type ProductLite = {
+  id: string;
+  name: string;
+  img: string;
+  catName?: string;
+  vton?: MixVton | null;
+};
+
+function normVton(s: any) {
+  return String(s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-")
+    .replace(/\s+/g, "-");
+}
+
+function inferVtonFromCategoryName(catName: any): MixVton | null {
+  const n = String(catName || "").toLowerCase().trim();
+  if (n.includes("pant")) return "lower-body";
+  if (n.includes("top")) return "upper-body";
+  if (n.includes("outerwear")) return "upper-body";
+  if (n.includes("dress")) return "dresses";
+  return null;
+}
+
+function getProductVton(product: any): MixVton | null {
+  if (!product) return null;
+
+  const raw =
+    product?.category?.vtonCategory ??
+    product?.category?.vton_category ??
+    product?.category?.vton_category_name ??
+    "";
+
+  const v = normVton(raw);
+  if (v === "upper-body" || v === "lower-body" || v === "dresses") return v;
+
+  return inferVtonFromCategoryName(product?.category?.name);
+}
+
+function pickProductImage(p: any): string {
+  const imgs = p?.images ?? [];
+  return (
+    imgs?.[0]?.url ||
+    p?.imageUrl ||
+    p?.image_url ||
+    "https://placehold.co/600x600?text=No+Image"
+  );
+}
+
+async function urlToFile(url: string, fileName = "result.png"): Promise<File> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Cannot fetch result image to mix");
+  const blob = await res.blob();
+  return new File([blob], fileName, { type: blob.type || "image/png" });
+}
+
 export default function TryOnPage() {
   const [searchParams] = useSearchParams();
   const preselectedProduct = searchParams.get("product"); // /try-on?product=3
 
-  const [selectedProduct] = useState(preselectedProduct || ""); // không cho chọn nữa
+  // base product (khóa, không cho chọn nữa)
+  const [selectedProduct] = useState(preselectedProduct || "");
 
-  const [userImage, setUserImage] = useState<string | null>(null); // preview base64
-  const [userFile, setUserFile] = useState<File | null>(null); // file gửi BE
+  const [userImage, setUserImage] = useState<string | null>(null);
+  const [userFile, setUserFile] = useState<File | null>(null);
 
-  // ✅ ONE STEP output
+  // output
   const [resultImage, setResultImage] = useState<string | null>(null);
+  const [baseResultImage, setBaseResultImage] = useState<string | null>(null);
 
-  // ✅ only one loading state
+  // mix state
+  const [mixProductId, setMixProductId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch product detail để lấy ảnh garment
+  // ===== Product detail (base)
   const {
     data: product,
     isLoading: isLoadingProduct,
@@ -48,12 +109,70 @@ export default function TryOnPage() {
   });
 
   const garmentUrl = useMemo(() => {
-    const imgs = (product as any)?.images ?? [];
-    return imgs?.[0]?.url ?? null;
+    return product ? pickProductImage(product as any) : null;
   }, [product]);
 
-  // Preview khung bên phải:
-  // ưu tiên: result -> garment
+  // base vton
+  const baseVton = useMemo(() => getProductVton(product as any), [product]);
+
+  const targetVton = useMemo<MixVton | null>(() => {
+    if (!baseVton) return null;
+    if (baseVton === "lower-body") return "upper-body";
+    if (baseVton === "upper-body") return "lower-body";
+    return null; // dresses => không mix
+  }, [baseVton]);
+
+  // ===== Fetch all products for mix
+  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "/api";
+
+  const { data: allProductsRaw } = useQuery({
+    queryKey: ["products", "mix-list"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/products?page=1&pageSize=200`);
+      if (!res.ok) return null;
+      return res.json();
+    },
+    staleTime: 60_000,
+    enabled: !!selectedProduct,
+  });
+
+  const allProducts: any[] = useMemo(() => {
+    const raw: any = allProductsRaw;
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+
+    if (Array.isArray(raw?.data)) return raw.data;
+    if (Array.isArray(raw?.items)) return raw.items;
+    if (Array.isArray(raw?.data?.data)) return raw.data.data;
+    if (Array.isArray(raw?.data?.items)) return raw.data.items;
+
+    return [];
+  }, [allProductsRaw]);
+
+  const mixCandidates: ProductLite[] = useMemo(() => {
+    if (!targetVton) return [];
+
+    const list = allProducts
+      .filter((p: any) => {
+        const pid = String(p?.id ?? "");
+        if (pid && pid === String(selectedProduct)) return false;
+
+        const v = getProductVton(p);
+        return v === targetVton;
+      })
+      .map((p: any) => {
+        const id = String(p?.id ?? "");
+        const name = String(p?.name ?? `Product #${id}`);
+        const img = pickProductImage(p);
+        const catName = p?.category?.name ? String(p.category.name) : undefined;
+        const vton = getProductVton(p);
+        return { id, name, img, catName, vton };
+      });
+
+    return list;
+  }, [allProducts, selectedProduct, targetVton]);
+
+  // Preview bên phải
   const previewUrl = useMemo(() => {
     if (resultImage) return resultImage;
     return garmentUrl;
@@ -67,71 +186,78 @@ export default function TryOnPage() {
 
   const clearOutputs = () => {
     setResultImage(null);
+    setMixProductId("");
   };
 
-  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const restoreBaseResult = () => {
+    if (!baseResultImage) return;
+    setResultImage(baseResultImage);
+    setMixProductId("");
+  };
 
-    if (!file.type.startsWith("image/")) {
-      setError("Please upload an image file");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      setError("Image must be less than 10MB");
-      return;
-    }
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    setError(null);
-    setUserFile(file);
-    clearOutputs();
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setError("Image must be less than 10MB");
+        return;
+      }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setUserImage(event.target?.result as string);
-    };
-    reader.readAsDataURL(file);
-  }, []);
+      setError(null);
+      setUserFile(file);
+      clearOutputs();
+      setBaseResultImage(null);
 
-  // ✅ ONE STEP: Run mask (ẩn) + try-on (trả kết quả)
+      const reader = new FileReader();
+      reader.onload = (event) => setUserImage(event.target?.result as string);
+      reader.readAsDataURL(file);
+    },
+    []
+  );
+
+  // ✅ ONE STEP: base try-on hoặc mix try-on
   const handleRunTryOn = async () => {
-    if (!userFile || !selectedProduct) return;
+    if (!selectedProduct) return;
+
+    const isFirstRun = !resultImage;
+    if (isFirstRun && !userFile) return;
+
+    const isMixRun = !!resultImage;
+    if (isMixRun && !mixProductId) {
+      setError("Please select an item to mix");
+      return;
+    }
 
     setIsProcessing(true);
     setError(null);
-    setResultImage(null);
 
     try {
-      const fd = new FormData();
-      fd.append("productId", selectedProduct);
-      fd.append("person", userFile);
+      let personToSend: File;
 
-      // optional: bạn có thể mở lại nếu muốn chất lượng cao hơn
-      // fd.append("resolution", "1152x1536");
-      // fd.append("nSteps", "20");
-      // fd.append("imageScale", "2");
-      // fd.append("seed", "0");
-      // fd.append("numImages", "1");
-      // fd.append("offsetsJson", JSON.stringify({ top: 0, bottom: 0, left: 0, right: 0 }));
+      if (isFirstRun) {
+        personToSend = userFile!;
+      } else {
+        personToSend = await urlToFile(resultImage!, "person_from_result.png");
+      }
 
-      const res = await fetch("http://localhost:3000/api/tryon/fitdit", {
-        method: "POST",
-        body: fd,
+      const productIdToUse = isFirstRun ? selectedProduct : mixProductId;
+
+      // ✅ FIX: runTryOn chỉ nhận 1 argument => truyền object
+      const resp = await tryOnApi.runTryOn({
+        person: personToSend,
+        productId: String(productIdToUse),
       });
 
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(txt || "Failed to generate try-on image. Please try again.");
-      }
+      const url = (resp as any)?.resultUrl ?? (resp as any)?.outputs?.[0] ?? null;
+      if (!url) throw new Error("No resultUrl returned from server");
 
-      const data = await res.json();
-      const url = data?.resultUrl ?? data?.outputs?.[0] ?? null;
-
-      if (!url) {
-        console.log("one-step response =", data);
-        throw new Error("No resultUrl returned from server");
-      }
-
+      if (isFirstRun) setBaseResultImage(url);
       setResultImage(url);
     } catch (err: any) {
       setError(err?.message || "Failed to generate try-on image. Please try again.");
@@ -143,13 +269,17 @@ export default function TryOnPage() {
   const resetTryOn = () => {
     setUserImage(null);
     setUserFile(null);
-    clearOutputs();
+    setResultImage(null);
+    setBaseResultImage(null);
+    setMixProductId("");
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // ✅ one-step availability
-  const canRunTryOn = !!userFile && !!selectedProduct && !isProcessing;
+  const canRunTryOn =
+    !!selectedProduct &&
+    !isProcessing &&
+    ((!resultImage && !!userFile) || (!!resultImage && !!mixProductId));
 
   return (
     <div className="min-h-screen py-8">
@@ -196,7 +326,7 @@ export default function TryOnPage() {
                   className={cn(
                     "relative aspect-[3/4] rounded-lg border-2 border-dashed transition-colors overflow-hidden",
                     userImage ? "border-accent" : "border-border hover:border-accent/50",
-                    !userImage && "cursor-pointer",
+                    !userImage && "cursor-pointer"
                   )}
                   onClick={() => !userImage && fileInputRef.current?.click()}
                 >
@@ -250,7 +380,7 @@ export default function TryOnPage() {
 
             {/* Result Section */}
             <div className="space-y-6">
-              {/* Preview (taller + prevent crop for result) */}
+              {/* Preview */}
               <div className="relative aspect-[3/4] rounded-lg bg-secondary overflow-hidden">
                 {isProcessing ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -266,11 +396,7 @@ export default function TryOnPage() {
                     <img
                       src={previewUrl}
                       alt={previewLabel}
-                      className={cn(
-                        "w-full h-full bg-secondary",
-                        // ✅ Result: contain để không mất chân
-                        resultImage ? "object-cover object-bottom" : "object-cover",
-                      )}
+                      className={cn("w-full h-full bg-secondary", "object-cover object-bottom")}
                     />
                     <div className="absolute top-3 left-3 rounded-md bg-background/80 backdrop-blur px-3 py-2">
                       <div className="text-xs text-muted-foreground">{previewLabel}</div>
@@ -279,7 +405,6 @@ export default function TryOnPage() {
                       </div>
                     </div>
 
-                    {/* Save button chỉ khi có result */}
                     {resultImage && (
                       <div className="absolute bottom-3 right-3 flex gap-2">
                         <Button
@@ -300,8 +425,8 @@ export default function TryOnPage() {
                       {isLoadingProduct
                         ? "Loading product..."
                         : isProductError
-                          ? "Failed to load product"
-                          : "No product image"}
+                        ? "Failed to load product"
+                        : "No product image"}
                     </p>
                     {!selectedProduct && (
                       <Button variant="secondary" size="sm" asChild className="mt-4">
@@ -320,7 +445,83 @@ export default function TryOnPage() {
                 </div>
               )}
 
-              {/* One-step Button */}
+              {/* ✅ MIX & MATCH (CARDS) */}
+              {resultImage && (
+                <div className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="font-medium">Mix & Match</div>
+                      <div className="text-sm text-muted-foreground">
+                        {targetVton
+                          ? targetVton === "upper-body"
+                            ? "You tried on a lower-body item. Pick a Top/Outerwear to mix."
+                            : "You tried on an upper-body item. Pick a Pant to mix."
+                          : "Mix is unavailable for this category (e.g. Dresses)."}
+                      </div>
+                    </div>
+
+                    {!!baseResultImage && baseResultImage !== resultImage && (
+                      <Button variant="outline" size="sm" onClick={restoreBaseResult}>
+                        Restore base
+                      </Button>
+                    )}
+                  </div>
+
+                  {targetVton ? (
+                    <>
+                      {mixCandidates.length === 0 ? (
+                        <div className="text-sm text-muted-foreground">
+                          Chưa thấy sản phẩm phù hợp để mix.
+                          <div className="text-xs mt-1">
+                            Gợi ý: kiểm tra API <code>/products</code> có trả{" "}
+                            <code>category.vtonCategory</code> hoặc category.name đúng (Tops/Pants/Outerwear).
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {mixCandidates.map((p) => {
+                            const active = mixProductId === p.id;
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                onClick={() => setMixProductId(p.id)}
+                                className={cn(
+                                  "text-left rounded-lg border overflow-hidden transition hover:bg-secondary/40",
+                                  active ? "border-primary ring-2 ring-primary/20" : "border-border"
+                                )}
+                              >
+                                <div className="aspect-square bg-muted overflow-hidden">
+                                  <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="p-2">
+                                  <div className="text-sm font-medium line-clamp-1">{p.name}</div>
+                                  <div className="text-xs text-muted-foreground line-clamp-1">
+                                    {p.catName || (p.vton ? p.vton : "Category")}
+                                  </div>
+                                  {active && (
+                                    <div className="mt-1 text-xs font-medium text-primary">Selected</div>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      <div className="text-xs text-muted-foreground">
+                        Chọn 1 item ở trên rồi bấm <b>Mix & Generate Again</b>.
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      Currently, we only recommend mixing <b>Upper-body ↔ Lower-body</b>.
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Buttons */}
               <div className="space-y-3">
                 <Button
                   variant="hero"
@@ -329,7 +530,7 @@ export default function TryOnPage() {
                   onClick={handleRunTryOn}
                   disabled={!canRunTryOn}
                 >
-                  {isProcessing ? "Processing..." : "Generate Try-On"}
+                  {isProcessing ? "Processing..." : !resultImage ? "Generate Try-On" : "Mix & Generate Again"}
                 </Button>
               </div>
 

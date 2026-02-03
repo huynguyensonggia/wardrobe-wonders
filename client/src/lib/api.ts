@@ -205,34 +205,50 @@ export const adminApi = {
 
 // =============================
 // ✅ Try-On API (ONE-STEP)
-// endpoint mới: POST /tryon/fitdit
+// endpoint: POST /tryon/fitdit
 // =============================
 export type FitditOneStepResponse = {
   inputs: { personUrl: string; garmentUrl: string };
   outputs: string[];
   resultUrl: string | null;
-  preview?: { maskUrl?: string | null; poseUrl?: string | null }; // optional debug
+  preview?: { maskUrl?: string | null; poseUrl?: string | null };
   raw?: any;
 };
 
-export const tryOnApi = {
-  runTryOn: (
-    person: File,
-    productId: string,
-    offsetsJson?: { top: number; bottom: number; left: number; right: number },
-    opts?: {
-      resolution?: "768x1024" | "1152x1536" | "1536x2048";
-      nSteps?: number;
-      imageScale?: number;
-      seed?: number;
-      numImages?: number;
-    }
-  ) => {
-    const fd = new FormData();
-    fd.append("productId", productId);
-    fd.append("person", person);
+export type FitditOffsets = { top: number; bottom: number; left: number; right: number };
 
-    if (offsetsJson) fd.append("offsetsJson", JSON.stringify(offsetsJson));
+export type FitditOptions = {
+  resolution?: "768x1024" | "1152x1536" | "1536x2048";
+  nSteps?: number;
+  imageScale?: number;
+  seed?: number;
+  numImages?: number;
+};
+
+export const tryOnApi = {
+  runTryOn: (args: {
+    productId: string | number;
+    person?: File;
+    personUrl?: string;
+    offsets?: FitditOffsets;
+    opts?: FitditOptions;
+  }) => {
+    const { productId, person, personUrl, offsets, opts } = args;
+
+    const safePersonUrl = typeof personUrl === "string" ? personUrl.trim() : "";
+
+    // ✅ FE guard: phải có 1 trong 2
+    if (!person && !safePersonUrl) {
+      throw new Error("Missing person or personUrl");
+    }
+
+    const fd = new FormData();
+    fd.append("productId", String(productId));
+
+    if (person) fd.append("person", person);
+    if (safePersonUrl) fd.append("personUrl", safePersonUrl);
+
+    if (offsets) fd.append("offsetsJson", JSON.stringify(offsets));
 
     if (opts?.resolution) fd.append("resolution", opts.resolution);
     if (opts?.nSteps !== undefined) fd.append("nSteps", String(opts.nSteps));
@@ -246,3 +262,4 @@ export const tryOnApi = {
     });
   },
 };
+
