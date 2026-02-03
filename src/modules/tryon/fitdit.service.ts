@@ -144,25 +144,102 @@ async function getMaskBottomRatio(maskUrl: string): Promise<number | null> {
   }
 }
 
+// =========================
+// ✅ ZeroGPU retry helpers
+// =========================
+function isZeroGpuTimeout(err: any) {
+  const msg = String(err?.message || "");
+  const title = String(err?.title || "");
+  const rawTitle = String(err?.original_msg?.title || "");
+  return (
+    title.includes("ZeroGPU queue timeout") ||
+    rawTitle.includes("ZeroGPU queue timeout") ||
+    msg.includes("No GPU was available after 60s") ||
+    msg.includes("ZeroGPU queue timeout")
+  );
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function backoffMs(attempt: number) {
+  // 1 -> ~1500ms, 2 -> ~3000ms, 3 -> ~6000ms, 4 -> ~10000-12000ms
+  const base = Math.min(1500 * Math.pow(2, attempt - 1), 12_000);
+  const jitter = Math.floor(Math.random() * 700);
+  return base + jitter;
+}
+
 @Injectable()
 export class FitditService {
   private clientPromise: Promise<any> | null = null;
 
-  constructor(private readonly cloudinary: CloudinaryService) {}
+  constructor(private readonly cloudinary: CloudinaryService) { }
 
   private async getClient() {
     if (!this.clientPromise) {
       this.clientPromise = (async () => {
         const { Client } = await import("@gradio/client");
-        return Client.connect("BoyuanJiang/FitDiT");
+
+        const envToken = process.env.HF_TOKEN;
+
+        // ✅ runtime check: token phải bắt đầu bằng "hf_"
+        const token =
+          envToken && envToken.startsWith("hf_")
+            ? (envToken as `hf_${string}`)
+            : undefined;
+
+        return Client.connect(
+          "BoyuanJiang/FitDiT",
+          token ? { token } : undefined
+        );
       })();
     }
     return this.clientPromise;
   }
 
+  private async predictWithRetry<T = any>(
+    client: any,
+    endpoint: string,
+    payload: any[],
+    opts?: { maxRetries?: number }
+  ): Promise<T> {
+    const maxRetries = opts?.maxRetries ?? 4;
+
+    let lastErr: any = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return (await client.predict(endpoint, payload)) as T;
+      } catch (err: any) {
+        lastErr = err;
+
+        // ✅ chỉ retry cho lỗi queue GPU
+        if (!isZeroGpuTimeout(err)) throw err;
+
+        if (attempt === maxRetries) break;
+
+        const wait = backoffMs(attempt);
+        console.log(
+          `[FitDiT] ZeroGPU timeout on ${endpoint}. Retry ${attempt}/${maxRetries} after ${wait}ms`
+        );
+        await sleep(wait);
+      }
+    }
+
+    console.log(`[FitDiT] lastErr =`, lastErr);
+
+    // ✅ map sang lỗi dễ hiểu cho FE
+    throw new BadRequestException(
+      "Hệ thống AI đang quá tải (GPU queue). Vui lòng thử lại sau 10–30 giây."
+    );
+  }
+
   // ✅ ONE-STEP: tự run mask (ẩn) -> run try-on -> trả ảnh kết quả
+  // ✅ SUPPORT: person file OR personUrl
   async process(args: {
-    person: Express.Multer.File;
+    person?: Express.Multer.File; // ✅ optional
+    personUrl?: string; // ✅ NEW
     garmentUrl: string;
     category: VtonCategory;
     offsets: { top: number; bottom: number; left: number; right: number };
@@ -173,17 +250,35 @@ export class FitditService {
     numImages: number;
     resolution: "768x1024" | "1152x1536" | "1536x2048";
   }) {
-    if (!args.person) throw new BadRequestException("Missing person image");
+    if (!args.person && !args.personUrl) {
+      throw new BadRequestException("Missing person image (file or personUrl)");
+    }
     if (!args.garmentUrl) throw new BadRequestException("Missing garmentUrl");
     if (!args.category) throw new BadRequestException("Missing category");
     if (!args.offsets) throw new BadRequestException("Missing offsets");
 
-    // ✅ upload person 1 lần
-    const personUp = await this.cloudinary.uploadBuffer(args.person.buffer, {
-      folder: "smartdress/inputs/person",
-    });
+    // =========================
+    // ✅ PERSON INPUT
+    // =========================
+    let personInputUrl = args.personUrl || "";
+    let vtonBlob: Blob;
 
-    // optional: ổn định garmentUrl (upload cloudinary)
+    if (args.personUrl) {
+      // Lần 2: lấy ảnh person từ URL (resultUrl lần trước)
+      vtonBlob = await urlToBlob(args.personUrl);
+    } else {
+      // Lần 1: upload person để lưu lại url + dùng fileToBlob
+      const personUp = await this.cloudinary.uploadBuffer(args.person!.buffer, {
+        folder: "smartdress/inputs/person",
+      });
+      personInputUrl = personUp.url;
+
+      vtonBlob = fileToBlob(args.person!);
+    }
+
+    // =========================
+    // ✅ GARMENT INPUT
+    // =========================
     let garmentInputUrl = args.garmentUrl;
     try {
       const garmentUp = await this.cloudinary.uploadFromUrl(args.garmentUrl, {
@@ -195,21 +290,16 @@ export class FitditService {
     }
 
     const client = await this.getClient();
-
-    const vtonBlob = fileToBlob(args.person);
     const garmBlob = await urlToBlob(garmentInputUrl);
 
     // =========================
     // ✅ STEP 1 (ẨN): generate_mask (AUTO-FIT bottom)
     // =========================
-
-    // ✅ chỉ auto-loop cho Upper-body (vì lỗi quần/đùi thường xảy ra ở đây)
     const bottomCandidates =
       args.category === VtonCategory.UPPER_BODY
-        ? [-140, -220, -300, -380] // bạn có thể tăng/giảm tuỳ dataset
+        ? [-140, -260, -360] // ✅ giảm số lần gọi để đỡ queue
         : [args.offsets.bottom];
 
-    // ✅ nếu mask xuống quá 62% chiều cao => coi là dính quần/đùi
     const MAX_BOTTOM_RATIO = 0.62;
 
     let bestPreMaskRaw: any = null;
@@ -218,14 +308,14 @@ export class FitditService {
     let bestPosePreviewUrl: string | null = null;
 
     for (const bottom of bottomCandidates) {
-      const maskRes = await client.predict("/generate_mask", [
+      const maskRes = await this.predictWithRetry(client, "/generate_mask", [
         vtonBlob,
         args.category,
         args.offsets.top,
         bottom,
         args.offsets.left,
         args.offsets.right,
-      ]);
+      ], { maxRetries: 2 }); // ✅ mask retry ít hơn
 
       const preMaskRaw = maskRes?.data?.[0]; // ImageEditor object
       const poseRaw = maskRes?.data?.[1]; // FileData object
@@ -241,22 +331,15 @@ export class FitditService {
       bestMaskPreviewUrl = maskPreviewUrl;
       bestPosePreviewUrl = posePreviewUrl;
 
-      // nếu không lấy được mask url thì thôi, thử candidate khác
       if (!maskPreviewUrl) continue;
 
       const ratio = await getMaskBottomRatio(maskPreviewUrl);
 
-      // ratio null => không đo được => tạm accept (để không fail)
-      if (ratio === null) {
-        break;
-      }
+      // không đo được thì thôi, dùng fallback hiện tại
+      if (ratio === null) break;
 
-      // ✅ nếu mask không dính xuống quá thấp -> chọn và dừng
-      if (ratio <= MAX_BOTTOM_RATIO) {
-        break;
-      }
-
-      // nếu ratio > MAX_BOTTOM_RATIO => dính quần/đùi -> thử bottom âm hơn
+      // ok rồi thì dừng
+      if (ratio <= MAX_BOTTOM_RATIO) break;
     }
 
     if (!bestPreMaskRaw || !bestPoseRaw) {
@@ -266,7 +349,7 @@ export class FitditService {
     // =========================
     // ✅ STEP 2: process try-on
     // =========================
-    const outRes = await client.predict("/process", [
+    const outRes = await this.predictWithRetry(client, "/process", [
       vtonBlob,
       garmBlob,
       bestPreMaskRaw,
@@ -276,9 +359,8 @@ export class FitditService {
       args.seed,
       args.numImages,
       args.resolution,
-    ]);
+    ], { maxRetries: 5 }); // ✅ process retry nhiều hơn
 
-    // ✅ robust parse output
     const gallery = outRes?.data?.[0] ?? outRes?.data ?? outRes;
     const items = Array.isArray(gallery) ? gallery : [gallery];
 
@@ -288,7 +370,6 @@ export class FitditService {
       const url = pickOutUrl(client, it);
       if (!url) continue;
 
-      // ✅ upload cloudinary fail thì fallback hf url để FE vẫn hiển thị
       try {
         const up = await this.cloudinary.uploadFromUrl(url, {
           folder: "smartdress/outputs/fitdit",
@@ -306,11 +387,8 @@ export class FitditService {
     }
 
     return {
-      inputs: { personUrl: personUp.url, garmentUrl: garmentInputUrl },
-
-      // optional debug (FE có thể bỏ qua)
+      inputs: { personUrl: personInputUrl, garmentUrl: garmentInputUrl },
       preview: { maskUrl: bestMaskPreviewUrl, poseUrl: bestPosePreviewUrl },
-
       outputs: outputUrls,
       resultUrl: outputUrls[0] ?? null,
       raw: { gallery },
