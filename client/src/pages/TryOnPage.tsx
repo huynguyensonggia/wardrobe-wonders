@@ -68,13 +68,6 @@ function pickProductImage(p: any): string {
   );
 }
 
-async function urlToFile(url: string, fileName = "result.png"): Promise<File> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Cannot fetch result image to mix");
-  const blob = await res.blob();
-  return new File([blob], fileName, { type: blob.type || "image/png" });
-}
-
 export default function TryOnPage() {
   const [searchParams] = useSearchParams();
   const preselectedProduct = searchParams.get("product"); // /try-on?product=3
@@ -238,20 +231,14 @@ export default function TryOnPage() {
     setError(null);
 
     try {
-      let personToSend: File;
-
-      if (isFirstRun) {
-        personToSend = userFile!;
-      } else {
-        personToSend = await urlToFile(resultImage!, "person_from_result.png");
-      }
-
       const productIdToUse = isFirstRun ? selectedProduct : mixProductId;
 
-      // ✅ FIX: runTryOn chỉ nhận 1 argument => truyền object
+      // ✅ Lần 1: gửi file
+      // ✅ Lần 2: gửi personUrl = resultUrl lần trước (backend hỗ trợ)
       const resp = await tryOnApi.runTryOn({
-        person: personToSend,
         productId: String(productIdToUse),
+        person: isFirstRun ? userFile! : undefined,
+        personUrl: !isFirstRun ? resultImage! : undefined,
       });
 
       const url = (resp as any)?.resultUrl ?? (resp as any)?.outputs?.[0] ?? null;
@@ -478,34 +465,44 @@ export default function TryOnPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                          {mixCandidates.map((p) => {
-                            const active = mixProductId === p.id;
-                            return (
-                              <button
-                                key={p.id}
-                                type="button"
-                                onClick={() => setMixProductId(p.id)}
-                                className={cn(
-                                  "text-left rounded-lg border overflow-hidden transition hover:bg-secondary/40",
-                                  active ? "border-primary ring-2 ring-primary/20" : "border-border"
-                                )}
-                              >
-                                <div className="aspect-square bg-muted overflow-hidden">
-                                  <img src={p.img} alt={p.name} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="p-2">
-                                  <div className="text-sm font-medium line-clamp-1">{p.name}</div>
-                                  <div className="text-xs text-muted-foreground line-clamp-1">
-                                    {p.catName || (p.vton ? p.vton : "Category")}
-                                  </div>
-                                  {active && (
-                                    <div className="mt-1 text-xs font-medium text-primary">Selected</div>
+                        <div className="max-h-[420px] sm:max-h-[520px] overflow-y-auto pr-1">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {mixCandidates.map((p) => {
+                              const active = mixProductId === p.id;
+                              return (
+                                <button
+                                  key={p.id}
+                                  type="button"
+                                  onClick={() => setMixProductId(p.id)}
+                                  className={cn(
+                                    "text-left rounded-lg border overflow-hidden transition hover:bg-secondary/40",
+                                    active
+                                      ? "border-primary ring-2 ring-primary/20"
+                                      : "border-border"
                                   )}
-                                </div>
-                              </button>
-                            );
-                          })}
+                                >
+                                  <div className="aspect-square bg-muted overflow-hidden">
+                                    <img
+                                      src={p.img}
+                                      alt={p.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  <div className="p-2">
+                                    <div className="text-sm font-medium line-clamp-1">{p.name}</div>
+                                    <div className="text-xs text-muted-foreground line-clamp-1">
+                                      {p.catName || (p.vton ? p.vton : "Category")}
+                                    </div>
+                                    {active && (
+                                      <div className="mt-1 text-xs font-medium text-primary">
+                                        Selected
+                                      </div>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
 
@@ -530,7 +527,11 @@ export default function TryOnPage() {
                   onClick={handleRunTryOn}
                   disabled={!canRunTryOn}
                 >
-                  {isProcessing ? "Processing..." : !resultImage ? "Generate Try-On" : "Mix & Generate Again"}
+                  {isProcessing
+                    ? "Processing..."
+                    : !resultImage
+                    ? "Generate Try-On"
+                    : "Mix & Generate Again"}
                 </Button>
               </div>
 

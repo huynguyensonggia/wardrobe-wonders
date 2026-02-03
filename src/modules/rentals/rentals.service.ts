@@ -10,6 +10,7 @@ import { Rental } from "./entities/rental.entity";
 import { RentalItem } from "./entities/rental-item.entity";
 import { CreateRentalDto } from "./dto/create-rental.dto";
 import { UpdateRentalDto } from "./dto/update-rental.dto";
+import { UpdateShippingDto } from "./dto/update-shipping.dto";
 import { RentalStatus } from "./enums/rental-status.enum";
 
 import { User } from "../users/entities/user.entity";
@@ -51,10 +52,8 @@ export class RentalsService {
   // CREATE RENTAL (USER)
   // =========================
   async create(userId: number, dto: CreateRentalDto) {
-    // 0) validate items
     if (!dto.items?.length) throw new BadRequestException("items is required");
 
-    // 1) validate dates
     const start = new Date(dto.startDate);
     const end = new Date(dto.endDate);
 
@@ -68,7 +67,7 @@ export class RentalsService {
     const totalDays = daysBetweenInclusive(start, end);
     if (totalDays <= 0) throw new BadRequestException("Invalid rental days");
 
-    // 2) validate shipping
+    // shipping
     const shipFullName = String((dto as any).shipFullName ?? "").trim();
     const shipPhone = normalizePhone((dto as any).shipPhone);
     const shipAddress = String((dto as any).shipAddress ?? "").trim();
@@ -78,11 +77,10 @@ export class RentalsService {
     if (!shipPhone) throw new BadRequestException("shipPhone is required");
     if (!shipAddress) throw new BadRequestException("shipAddress is required");
 
-    // 3) user exists
     const user = await this.usersRepo.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException("User not found");
 
-    // 4) products exist (✅ unique ids to avoid false missing)
+    // unique product ids
     const productIdsRaw = dto.items.map((i) => i.productId);
     const productIds = Array.from(new Set(productIdsRaw));
 
@@ -96,11 +94,9 @@ export class RentalsService {
       throw new NotFoundException(`Products not found: ${missing.join(", ")}`);
     }
 
-    // build map for O(1)
     const productById = new Map<number, Product>();
     for (const p of products) productById.set(p.id, p);
 
-    // 5) totals + prepare snapshots
     let totalPrice = 0;
     let totalDeposit = 0;
 
@@ -134,7 +130,6 @@ export class RentalsService {
       return { product, rentPricePerDay, quantity, days, subtotal };
     });
 
-    // ✅ 6) create + save rental (fix overload with DeepPartial)
     const rentalData: DeepPartial<Rental> = {
       user,
       startDate: start,
@@ -154,10 +149,9 @@ export class RentalsService {
     const rentalEntity = this.rentalsRepo.create(rentalData);
     const savedRental = await this.rentalsRepo.save(rentalEntity);
 
-    // ✅ 7) create + save rental items (fix overload with DeepPartial)
     const itemEntities = preparedItems.map((x) =>
       this.rentalItemsRepo.create({
-        rental: savedRental, // ✅ object Rental (not array, not {id} needed)
+        rental: savedRental,
         product: x.product,
         rentPricePerDay: x.rentPricePerDay,
         quantity: x.quantity,
@@ -168,10 +162,9 @@ export class RentalsService {
 
     await this.rentalItemsRepo.save(itemEntities);
 
-    // ✅ 8) return full
     return this.rentalsRepo.findOne({
       where: { id: savedRental.id },
-      relations: ["items", "items.product", "payments"],
+      relations: ["items", "items.product", "payments", "user"],
     });
   }
 
@@ -213,60 +206,111 @@ export class RentalsService {
   }
 
   // =========================
-  // ADMIN: UPDATE
+  // ADMIN: UPDATE (status/note + shipping optional)
   // =========================
- async update(id: number, dto: UpdateRentalDto) {
-  const rental = await this.rentalsRepo.findOne({ where: { id } });
-  if (!rental) throw new NotFoundException("Rental not found");
+  async update(id: number, dto: UpdateRentalDto) {
+    const rental = await this.rentalsRepo.findOne({ where: { id } });
+    if (!rental) throw new NotFoundException("Rental not found");
 
-  const d: any = dto as any;
+    const d: any = dto as any;
 
-  // ✅ STATUS: chặn null / rỗng
-  if (d.status !== undefined) {
-    if (d.status === null || String(d.status).trim() === "") {
-      throw new BadRequestException("status cannot be empty");
+    // STATUS
+    if (d.status !== undefined) {
+      if (d.status === null || String(d.status).trim() === "") {
+        throw new BadRequestException("status cannot be empty");
+      }
+      rental.status = d.status;
     }
-    rental.status = d.status; // phải là enum lowercase đúng backend
-  }
 
-  // ✅ NOTE: cho phép null -> lưu null
-  if (d.note !== undefined) {
-    rental.note = d.note ?? null;
+    // NOTE
+    if (d.note !== undefined) {
+      rental.note = d.note ?? null;
+    }
+
+    // SHIPPING (nếu bạn muốn gom chung update)
+    if (d.shipFullName !== undefined) {
+      if (d.shipFullName === null)
+        throw new BadRequestException("shipFullName cannot be null");
+      const v = String(d.shipFullName).trim();
+      if (!v) throw new BadRequestException("shipFullName cannot be empty");
+      rental.shipFullName = v;
+    }
+
+    if (d.shipPhone !== undefined) {
+      if (d.shipPhone === null)
+        throw new BadRequestException("shipPhone cannot be null");
+      const v = normalizePhone(d.shipPhone);
+      if (!v) throw new BadRequestException("shipPhone cannot be empty");
+      rental.shipPhone = v;
+    }
+
+    if (d.shipAddress !== undefined) {
+      if (d.shipAddress === null)
+        throw new BadRequestException("shipAddress cannot be null");
+      const v = String(d.shipAddress).trim();
+      if (!v) throw new BadRequestException("shipAddress cannot be empty");
+      rental.shipAddress = v;
+    }
+
+    if (d.shipNote !== undefined) {
+      const v = String(d.shipNote ?? "").trim();
+      rental.shipNote = v || undefined;
+    }
+
+    return this.rentalsRepo.save(rental);
   }
 
   // =========================
-  // SHIPPING (optional update)
+  // ADMIN: UPDATE SHIPPING (route riêng)
   // =========================
+  async updateShipping(id: number, dto: UpdateShippingDto) {
+    const rental = await this.rentalsRepo.findOne({ where: { id } });
+    if (!rental) throw new NotFoundException("Rental not found");
 
-  if (d.shipFullName !== undefined) {
-    if (d.shipFullName === null) throw new BadRequestException("shipFullName cannot be null");
-    const v = String(d.shipFullName).trim();
-    if (!v) throw new BadRequestException("shipFullName cannot be empty");
-    rental.shipFullName = v;
+    // ✅ chỉ cho sửa khi pending hoặc shipping
+    const editable: RentalStatus[] = [
+      RentalStatus.PENDING,
+      // nếu enum bạn có SHIPPING thì mở dòng dưới
+      (RentalStatus as any).SHIPPING,
+    ].filter(Boolean) as RentalStatus[];
+
+    if (!editable.includes(rental.status)) {
+      throw new BadRequestException(
+        "Only can edit shipping when PENDING/SHIPPING",
+      );
+    }
+
+    if (dto.shipFullName !== undefined) {
+      const v = String(dto.shipFullName ?? "").trim();
+      if (!v) throw new BadRequestException("shipFullName cannot be empty");
+      rental.shipFullName = v;
+    }
+
+    if (dto.shipPhone !== undefined) {
+      const v = normalizePhone(dto.shipPhone);
+      if (!v) throw new BadRequestException("shipPhone cannot be empty");
+      rental.shipPhone = v;
+    }
+
+    if (dto.shipAddress !== undefined) {
+      const v = String(dto.shipAddress ?? "").trim();
+      if (!v) throw new BadRequestException("shipAddress cannot be empty");
+      rental.shipAddress = v;
+    }
+
+    if (dto.shipNote !== undefined) {
+      const v = String(dto.shipNote ?? "").trim();
+      rental.shipNote = v || undefined;
+    }
+
+    const saved = await this.rentalsRepo.save(rental);
+
+    // trả về full để FE cập nhật ngay
+    return this.rentalsRepo.findOne({
+      where: { id: saved.id },
+      relations: ["user", "items", "items.product", "payments"],
+    });
   }
-
-  if (d.shipPhone !== undefined) {
-    if (d.shipPhone === null) throw new BadRequestException("shipPhone cannot be null");
-    const v = normalizePhone(d.shipPhone);
-    if (!v) throw new BadRequestException("shipPhone cannot be empty");
-    rental.shipPhone = v;
-  }
-
-  if (d.shipAddress !== undefined) {
-    if (d.shipAddress === null) throw new BadRequestException("shipAddress cannot be null");
-    const v = String(d.shipAddress).trim();
-    if (!v) throw new BadRequestException("shipAddress cannot be empty");
-    rental.shipAddress = v;
-  }
-
-  if (d.shipNote !== undefined) {
-    // shipNote cho phép rỗng => null
-    const v = String(d.shipNote ?? "").trim();
-    rental.shipNote = v || undefined;
-  }
-
-  return this.rentalsRepo.save(rental);
-}
 
   // =========================
   // ADMIN: REMOVE
@@ -287,8 +331,8 @@ export class RentalsService {
     });
     if (!rental) throw new NotFoundException("Rental not found");
 
-    // ✅ theo enum mới của bạn: cho cancel khi PENDING / APPROVED (tuỳ bạn)
-    const cancellable: RentalStatus[] = [RentalStatus.PENDING, RentalStatus.APPROVED];
+    // cho cancel khi pending (bạn có thể thêm shipping tuỳ nghiệp vụ)
+    const cancellable: RentalStatus[] = [RentalStatus.PENDING];
 
     if (!cancellable.includes(rental.status)) {
       throw new BadRequestException("Cannot cancel this rental");

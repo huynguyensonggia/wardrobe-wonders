@@ -1,15 +1,29 @@
 import { Type } from "class-transformer";
 import {
+  ArrayMinSize,
+  IsArray,
   IsEnum,
   IsInt,
   IsOptional,
   IsPositive,
   IsString,
   Min,
+  ValidateNested,
 } from "class-validator";
-import { ProductSize } from "../enums/product-size.enum";
 import { ProductStatus } from "../enums/product-status.enum";
 import { ProductOccasion } from "../enums/product-occasion.enum";
+import { ProductSize } from "../enums/product-size.enum";
+
+// ✅ DTO con cho 1 variant
+export class CreateProductVariantDto {
+  @IsEnum(ProductSize)
+  size: ProductSize;
+
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  stock: number;
+}
 
 export class CreateProductDto {
   @IsString()
@@ -37,18 +51,9 @@ export class CreateProductDto {
   @Min(0)
   deposit: number;
 
-  @IsEnum(ProductSize)
-  size?: ProductSize;
-
   @IsOptional()
   @IsString()
   color?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  quantity?: number;
 
   @IsOptional()
   @IsString()
@@ -57,4 +62,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  // ✅ NEW: nhiều size + stock
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateProductVariantDto)
+  variants: CreateProductVariantDto[];
 }

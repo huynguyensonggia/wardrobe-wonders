@@ -5,11 +5,7 @@ import { rentalsApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  RentalStatus,
-  RENTAL_STATUS_OPTIONS,
-  formatRentalStatus,
-} from "@/types/rental-status";
+import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
 
 type RentalItem = {
   id: number;
@@ -73,12 +69,32 @@ function statusBadgeVariant(
       return "default";
     case RentalStatus.PENDING:
       return "secondary";
-    case RentalStatus.APPROVED:
+    case RentalStatus.SHIPPING:
     case RentalStatus.ACTIVE:
     default:
       return "outline";
   }
 }
+
+// ✅ Chỉ những nút admin cần (không thừa)
+const ADMIN_ACTIONS: Record<
+  RentalStatus,
+  { label: string; to: RentalStatus; variant?: "default" | "outline" | "destructive" }[]
+> = {
+  [RentalStatus.PENDING]: [
+    { label: "Bắt đầu giao hàng", to: RentalStatus.SHIPPING, variant: "default" },
+    { label: "Từ chối", to: RentalStatus.REJECTED, variant: "destructive" },
+  ],
+  [RentalStatus.SHIPPING]: [
+    { label: "Khách đã nhận", to: RentalStatus.ACTIVE, variant: "default" },
+  ],
+  [RentalStatus.ACTIVE]: [
+    { label: "Hoàn tất", to: RentalStatus.COMPLETED, variant: "default" },
+  ],
+  [RentalStatus.COMPLETED]: [],
+  [RentalStatus.REJECTED]: [],
+  [RentalStatus.CANCELLED]: [],
+};
 
 export default function AdminRentals() {
   const qc = useQueryClient();
@@ -87,6 +103,13 @@ export default function AdminRentals() {
   const [pageSize] = useState(10);
 
   const [selected, setSelected] = useState<Rental | null>(null);
+
+  // ✅ Shipping edit state
+  const [editingShip, setEditingShip] = useState(false);
+  const [shipFullName, setShipFullName] = useState("");
+  const [shipPhone, setShipPhone] = useState("");
+  const [shipAddress, setShipAddress] = useState("");
+  const [shipNote, setShipNote] = useState("");
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-rentals", page, pageSize],
@@ -107,21 +130,81 @@ export default function AdminRentals() {
       rentalsApi.updateStatus(id, status),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
-      // giữ selected không bị mất
       setSelected((prev) => (prev ? { ...prev } : prev));
     },
   });
 
-  const handlePick = (r: Rental) => setSelected(r);
+  // ✅ mutation update shipping (cần rentalsApi.updateShipping)
+  const updateShippingMutation = useMutation({
+    mutationFn: (args: {
+      id: string;
+      shipFullName?: string;
+      shipPhone?: string;
+      shipAddress?: string;
+      shipNote?: string;
+    }) =>
+      rentalsApi.updateShipping(args.id, {
+        shipFullName: args.shipFullName,
+        shipPhone: args.shipPhone,
+        shipAddress: args.shipAddress,
+        shipNote: args.shipNote,
+      }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
+    },
+  });
+
+  const canEditShipping =
+    selected?.status === RentalStatus.PENDING ||
+    selected?.status === RentalStatus.SHIPPING;
+
+  const handlePick = (r: Rental) => {
+    setSelected(r);
+    setEditingShip(false);
+
+    setShipFullName(r.shipFullName ?? "");
+    setShipPhone(r.shipPhone ?? "");
+    setShipAddress(r.shipAddress ?? "");
+    setShipNote(r.shipNote ?? "");
+  };
 
   const handleStatusChange = async (rentalId: number, status: RentalStatus) => {
     try {
       await updateStatusMutation.mutateAsync({ id: String(rentalId), status });
-
-      // update UI selected ngay lập tức (optimistic nhỏ)
       setSelected((prev) => (prev ? { ...prev, status } : prev));
     } catch (e: any) {
       alert(e?.message || "Update status failed");
+    }
+  };
+
+  const handleSaveShipping = async () => {
+    if (!selected) return;
+
+    try {
+      await updateShippingMutation.mutateAsync({
+        id: String(selected.id),
+        shipFullName: shipFullName.trim(),
+        shipPhone: shipPhone.trim(),
+        shipAddress: shipAddress.trim(),
+        shipNote: shipNote.trim(),
+      });
+
+      // update selected ngay
+      setSelected((prev) =>
+        prev
+          ? {
+              ...prev,
+              shipFullName: shipFullName.trim(),
+              shipPhone: shipPhone.trim(),
+              shipAddress: shipAddress.trim(),
+              shipNote: shipNote.trim(),
+            }
+          : prev
+      );
+
+      setEditingShip(false);
+    } catch (e: any) {
+      alert(e?.message || "Update shipping failed");
     }
   };
 
@@ -245,12 +328,10 @@ export default function AdminRentals() {
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">Rental</div>
               <div className="font-medium">
-                #{selected.id}{" "}
-                {selected.rentalCode ? `• ${selected.rentalCode}` : ""}
+                #{selected.id} {selected.rentalCode ? `• ${selected.rentalCode}` : ""}
               </div>
               <div className="text-sm text-muted-foreground">
-                {selected.startDate} → {selected.endDate} • {selected.totalDays}{" "}
-                days
+                {selected.startDate} → {selected.endDate} • {selected.totalDays} days
               </div>
               <div className="text-sm">
                 <span className="text-muted-foreground">Total: </span>
@@ -260,50 +341,147 @@ export default function AdminRentals() {
               </div>
             </div>
 
+            {/* ✅ STATUS (không thừa nút) */}
             <div className="border-t pt-4 space-y-2">
               <div className="text-sm text-muted-foreground">Status</div>
 
-              <div className="flex flex-wrap gap-2">
-                {RENTAL_STATUS_OPTIONS.map((s) => (
-                  <Button
-                    key={s}
-                    size="sm"
-                    variant={selected.status === s ? "default" : "outline"}
-                    disabled={updateStatusMutation.isPending}
-                    onClick={() => handleStatusChange(selected.id, s)}
-                  >
-                    {formatRentalStatus(s)}
-                  </Button>
-                ))}
+              <div className="flex items-center justify-between gap-3">
+                <Badge variant={statusBadgeVariant(selected.status)}>
+                  {formatRentalStatus(selected.status)}
+                </Badge>
+
+                <div className="flex flex-wrap gap-2 justify-end">
+                  {(ADMIN_ACTIONS[selected.status] ?? []).map((a) => (
+                    <Button
+                      key={a.to}
+                      size="sm"
+                      variant={a.variant ?? "outline"}
+                      disabled={updateStatusMutation.isPending}
+                      onClick={() => handleStatusChange(selected.id, a.to)}
+                    >
+                      {a.label}
+                    </Button>
+                  ))}
+
+                  {(ADMIN_ACTIONS[selected.status] ?? []).length === 0 && (
+                    <span className="text-xs text-muted-foreground">No actions</span>
+                  )}
+                </div>
               </div>
 
               {updateStatusMutation.isPending && (
-                <div className="text-xs text-muted-foreground">
-                  Updating status...
-                </div>
+                <div className="text-xs text-muted-foreground">Updating status...</div>
               )}
             </div>
 
-            <div className="border-t pt-4 space-y-2">
-              <div className="text-sm text-muted-foreground">Shipping</div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Name: </span>
-                <span className="font-medium">{selected.shipFullName || "-"}</span>
+            {/* ✅ SHIPPING (editable) */}
+            <div className="border-t pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Shipping</div>
+
+                {!editingShip ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!canEditShipping}
+                    onClick={() => setEditingShip(true)}
+                    title={!canEditShipping ? "Chỉ sửa khi PENDING/SHIPPING" : "Edit shipping"}
+                  >
+                    Edit
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={updateShippingMutation.isPending}
+                      onClick={() => {
+                        setShipFullName(selected.shipFullName ?? "");
+                        setShipPhone(selected.shipPhone ?? "");
+                        setShipAddress(selected.shipAddress ?? "");
+                        setShipNote(selected.shipNote ?? "");
+                        setEditingShip(false);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={updateShippingMutation.isPending}
+                      onClick={handleSaveShipping}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
               </div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Phone: </span>
-                <span className="font-medium">{selected.shipPhone || "-"}</span>
-              </div>
-              <div className="text-sm">
-                <span className="text-muted-foreground">Address: </span>
-                <span className="font-medium">{selected.shipAddress || "-"}</span>
-              </div>
-              {selected.shipNote ? (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Note: </span>
-                  <span className="font-medium">{selected.shipNote}</span>
+
+              {!editingShip ? (
+                <>
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Name: </span>
+                    <span className="font-medium">{selected.shipFullName || "-"}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Phone: </span>
+                    <span className="font-medium">{selected.shipPhone || "-"}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Address: </span>
+                    <span className="font-medium">{selected.shipAddress || "-"}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="text-muted-foreground">Note: </span>
+                    <span className="font-medium">{selected.shipNote || "-"}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-2">
+                  <div className="grid gap-1">
+                    <div className="text-xs text-muted-foreground">Name</div>
+                    <input
+                      className="w-full border rounded-md px-3 py-2 text-sm"
+                      value={shipFullName}
+                      onChange={(e) => setShipFullName(e.target.value)}
+                      placeholder="Full name"
+                    />
+                  </div>
+
+                  <div className="grid gap-1">
+                    <div className="text-xs text-muted-foreground">Phone</div>
+                    <input
+                      className="w-full border rounded-md px-3 py-2 text-sm"
+                      value={shipPhone}
+                      onChange={(e) => setShipPhone(e.target.value)}
+                      placeholder="Phone"
+                    />
+                  </div>
+
+                  <div className="grid gap-1">
+                    <div className="text-xs text-muted-foreground">Address</div>
+                    <input
+                      className="w-full border rounded-md px-3 py-2 text-sm"
+                      value={shipAddress}
+                      onChange={(e) => setShipAddress(e.target.value)}
+                      placeholder="Address"
+                    />
+                  </div>
+
+                  <div className="grid gap-1">
+                    <div className="text-xs text-muted-foreground">Note</div>
+                    <input
+                      className="w-full border rounded-md px-3 py-2 text-sm"
+                      value={shipNote}
+                      onChange={(e) => setShipNote(e.target.value)}
+                      placeholder="Note (optional)"
+                    />
+                  </div>
+
+                  {updateShippingMutation.isPending && (
+                    <div className="text-xs text-muted-foreground">Saving shipping...</div>
+                  )}
                 </div>
-              ) : null}
+              )}
             </div>
 
             <div className="border-t pt-4 space-y-2">
@@ -316,8 +494,7 @@ export default function AdminRentals() {
                         {it.product?.name || `Product#${it.product?.id ?? "?"}`}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        ${it.rentPricePerDay}/day • {it.days} days • Qty{" "}
-                        {it.quantity}
+                        ${it.rentPricePerDay}/day • {it.days} days • Qty {it.quantity}
                       </div>
                       <div className="text-sm">
                         <span className="text-muted-foreground">Subtotal: </span>

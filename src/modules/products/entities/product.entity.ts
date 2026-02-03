@@ -7,19 +7,19 @@ import {
   ManyToOne,
   OneToMany,
   JoinColumn,
-  RelationId,
   Index,
 } from "typeorm";
 
 import { Category } from "../../categories/entities/category.entity";
 import { Review } from "../../reviews/entities/review.entity";
 import { RentalItem } from "../../rentals/entities/rental-item.entity";
+import { ProductVariant } from "@/modules/products/entities/product-variant.entity";
 
 import { ProductStatus } from "../enums/product-status.enum";
 import { ProductSize } from "../enums/product-size.enum";
 import { ProductOccasion } from "../enums/product-occasion.enum";
 
-@Index(["name", "categoryId", "occasion", "size", "color"], { unique: true })
+@Index(["name", "categoryId", "occasion", "color"], { unique: true })
 @Entity({ name: "products" })
 export class Product {
   @PrimaryGeneratedColumn()
@@ -41,6 +41,9 @@ export class Product {
   @JoinColumn({ name: "category_id" })
   category: Category;
 
+  @OneToMany(() => ProductVariant, (v) => v.product, { cascade: true })
+  variants: ProductVariant[];
+
   // ===== PRODUCT ATTRIBUTES =====
   @Column({
     name: "occasion",
@@ -55,19 +58,8 @@ export class Product {
   @Column({ name: "deposit", type: "int" })
   deposit: number;
 
-  @Column({
-    name: "size",
-    type: "enum",
-    enum: ProductSize,
-    default: ProductSize.M,
-  })
-  size: ProductSize;
-
   @Column({ name: "color", length: 30, default: "unknown" })
   color: string;
-
-  @Column({ name: "quantity", type: "int", default: 1 })
-  quantity: number;
 
   // ===== MEDIA =====
   @Column({

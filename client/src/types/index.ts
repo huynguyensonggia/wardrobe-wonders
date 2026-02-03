@@ -40,6 +40,16 @@ export interface ProductImage {
   isPrimary: boolean;
 }
 
+export interface ProductVariant {
+  id: number;
+  productId: number;
+  size: string;
+  stock: number;
+  isActive?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -55,6 +65,7 @@ export interface Product {
   status: ProductStatus;
   featured: boolean;
   createdAt: string;
+  variants?: ProductVariant[];
 }
 
 // Rental types
