@@ -1,4 +1,5 @@
 import type { VtonCategory } from "@/constants/vtonCategory";
+import { RentalStatus } from "./rental-status"
 
 // User types
 export type UserRole = 'USER' | 'ADMIN';
@@ -68,19 +69,54 @@ export interface Product {
   variants?: ProductVariant[];
 }
 
-// Rental types
-export type RentalStatus = 'PENDING' | 'ACTIVE' | 'RETURNED' | 'CANCELLED' | 'OVERDUE';
+// =====================
+// Rental types (match BE)
+// =====================
+
+export interface RentalItem {
+  id: number;
+
+  // relations
+  product: Product;
+
+  // ✅ variant/size
+  variantId: number;
+  variant?: ProductVariant;
+
+  // snapshot
+  rentPricePerDay: number;
+  quantity: number;
+  days: number;
+  subtotal: number;
+}
 
 export interface Rental {
   id: string;
-  product: Product;
+  rentalCode?: string;
+
   user: User;
+
   startDate: string;
   endDate: string;
+  totalDays: number;
+
   status: RentalStatus;
+
   totalPrice: number;
-  depositPaid: number;
+  totalDeposit: number;
+
+  note?: string | null;
+
+  // shipping
+  shipFullName?: string | null;
+  shipPhone?: string | null;
+  shipAddress: string;
+  shipNote?: string | null;
+
+  items: RentalItem[];
+
   createdAt: string;
+  updatedAt: string;
 }
 
 // Try-On types

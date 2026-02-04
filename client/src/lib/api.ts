@@ -7,15 +7,22 @@ import {
   PaginatedResponse,
   ProductFilters,
   AdminStats,
-} from '@/types';
+} from "@/types";
+
 import type { BEProduct } from "@/types/backend";
 import { mapBEProductToMock } from "@/lib/mappers";
 
-const API_BASE = import.meta.env.VITE_API_BASE; // Replace with actual API URL
+// ✅ NEW: dùng type RentalStatus thay vì string
+import type { RentalStatus } from "@/types/rental-status";
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 // Helper function for API calls
-async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem('auth_token');
+async function fetchApi<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const token = localStorage.getItem("auth_token");
 
   const isFormData = options.body instanceof FormData;
 
@@ -26,12 +33,12 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
 
   // ✅ chỉ set Content-Type JSON khi KHÔNG phải FormData
   if (!isFormData) {
-    if (!('Content-Type' in (headers as any))) {
-      headers['Content-Type'] = 'application/json';
+    if (!("Content-Type" in (headers as any))) {
+      (headers as any)["Content-Type"] = "application/json";
     }
   } else {
     // ✅ FormData: tuyệt đối không set Content-Type
-    if ('Content-Type' in (headers as any)) delete (headers as any)['Content-Type'];
+    if ("Content-Type" in (headers as any)) delete (headers as any)["Content-Type"];
   }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -40,8 +47,10 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || 'Request failed');
+    const error = await response
+      .json()
+      .catch(() => ({ message: "An error occurred" }));
+    throw new Error(error.message || "Request failed");
   }
 
   return response.json();
@@ -53,24 +62,24 @@ export const authApi = {
     fetchApi<{
       access_token: string;
       user: User;
-    }>('/auth/login', {
-      method: 'POST',
+    }>("/auth/login", {
+      method: "POST",
       body: JSON.stringify({ email, password }),
     }),
 
   register: (data: { email: string; password: string; name: string }) =>
-    fetchApi<{ access_token: string; user: User }>('/auth/register', {
-      method: 'POST',
+    fetchApi<{ access_token: string; user: User }>("/auth/register", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
-  logout: () => fetchApi<ApiResponse<null>>('/auth/logout', { method: 'POST' }),
+  logout: () => fetchApi<ApiResponse<null>>("/auth/logout", { method: "POST" }),
 
-  getProfile: () => fetchApi<ApiResponse<User>>('/auth/profile'),
+  getProfile: () => fetchApi<ApiResponse<User>>("/auth/profile"),
 
   updateProfile: (data: Partial<User>) =>
-    fetchApi<ApiResponse<User>>('/auth/profile', {
-      method: 'PUT',
+    fetchApi<ApiResponse<User>>("/auth/profile", {
+      method: "PUT",
       body: JSON.stringify(data),
     }),
 };
@@ -87,7 +96,7 @@ export const productsApi = {
 
     const qs = params.toString();
     const beList = await fetchApi<BEProduct[]>(qs ? `/products?${qs}` : "/products");
-    return beList.map(mapBEProductToMock); // ✅ trả Product[] đúng theo UI mock
+    return beList.map(mapBEProductToMock);
   },
 
   getById: async (id: string) => {
@@ -116,7 +125,7 @@ export const productsApi = {
   // ✅ IMPORT EXCEL
   importExcel: (file: File) => {
     const fd = new FormData();
-    fd.append("file", file); // ✅ đúng key backend
+    fd.append("file", file);
 
     return fetchApi<{
       total: number;
@@ -133,23 +142,23 @@ export const productsApi = {
 
 // Categories API
 export const categoriesApi = {
-  getAll: () => fetchApi<Category[]>('/categories'),
+  getAll: () => fetchApi<Category[]>("/categories"),
 
   create: (data: Partial<Category>) =>
-    fetchApi<ApiResponse<Category>>('/admin/categories', {
-      method: 'POST',
+    fetchApi<ApiResponse<Category>>("/admin/categories", {
+      method: "POST",
       body: JSON.stringify(data),
     }),
 
   update: (id: string, data: Partial<Category>) =>
     fetchApi<ApiResponse<Category>>(`/admin/categories/${id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
     }),
 
   delete: (id: string) =>
     fetchApi<ApiResponse<null>>(`/admin/categories/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     }),
 };
 
@@ -157,10 +166,11 @@ export const categoriesApi = {
 export const rentalsApi = {
   getUserRentals: () => fetchApi<ApiResponse<Rental[]>>("/rentals"),
 
+  // ✅ create rental: items có variantId
   create: (data: {
     startDate: string;
     endDate: string;
-    items: { productId: number; quantity: number }[];
+    items: { productId: number; variantId: number; quantity: number }[]; // ✅ FIX: thêm ;
     note?: string;
 
     shipFullName: string;
@@ -190,13 +200,14 @@ export const rentalsApi = {
       `/admin/rentals?page=${page}&pageSize=${pageSize}`
     ),
 
-  updateStatus: (id: string, status: string) =>
+  // ✅ FIX: status dùng RentalStatus (khớp BE)
+  updateStatus: (id: string, status: RentalStatus) =>
     fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/status`, {
       method: "PATCH",
       body: JSON.stringify({ status }),
     }),
 
-  // ✅ NEW: update shipping info
+  // ✅ update shipping
   updateShipping: (
     id: string,
     data: {
@@ -214,7 +225,7 @@ export const rentalsApi = {
 
 // Admin API
 export const adminApi = {
-  getStats: () => fetchApi<ApiResponse<AdminStats>>('/admin/stats'),
+  getStats: () => fetchApi<ApiResponse<AdminStats>>("/admin/stats"),
 };
 
 // =============================
@@ -251,7 +262,6 @@ export const tryOnApi = {
 
     const safePersonUrl = typeof personUrl === "string" ? personUrl.trim() : "";
 
-    // ✅ FE guard: phải có 1 trong 2
     if (!person && !safePersonUrl) {
       throw new Error("Missing person or personUrl");
     }
@@ -276,4 +286,3 @@ export const tryOnApi = {
     });
   },
 };
-

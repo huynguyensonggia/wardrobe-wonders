@@ -13,8 +13,12 @@ import {
   type DaNangDistrict,
 } from "@/constants/daNangAddress";
 
+// ================= TYPES =================
 type CheckoutItem = {
   productId: number;
+  variantId: number;   // ✅ bắt buộc
+  size?: string;
+
   name: string;
   imageUrl?: string;
   rentPricePerDay: number;
@@ -30,6 +34,9 @@ type CheckoutState =
       source: "rentNow";
       product: {
         productId: number;
+        variantId: number; // ✅ NEW
+        size?: string;
+
         name: string;
         imageUrl?: string;
         rentPricePerDay: number;
@@ -54,13 +61,15 @@ export default function CheckoutPage() {
   const state =
     (location.state as CheckoutState) ?? ({ source: "cart" } as CheckoutState);
 
-  // ✅ Build checkout items
+  // ================= BUILD CHECKOUT ITEMS =================
   const checkoutItems: CheckoutItem[] = useMemo(() => {
     if (state.source === "rentNow") {
       const p = state.product;
       return [
         {
           productId: p.productId,
+          variantId: p.variantId, // ✅
+          size: p.size,
           name: p.name,
           imageUrl: p.imageUrl,
           rentPricePerDay: p.rentPricePerDay,
@@ -75,6 +84,8 @@ export default function CheckoutPage() {
     // source === "cart"
     return items.map((it) => ({
       productId: it.productId,
+      variantId: it.variantId, // ✅
+      size: it.size,
       name: it.name,
       imageUrl: it.imageUrl,
       rentPricePerDay: it.rentPricePerDay,
@@ -85,7 +96,7 @@ export default function CheckoutPage() {
     }));
   }, [state, items]);
 
-  // ✅ Nếu không có item thì back
+  // ================= EMPTY =================
   if (!checkoutItems.length) {
     return (
       <div className="container mx-auto px-4 py-10 text-center">
@@ -100,7 +111,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // ✅ Group theo startDate_endDate vì backend yêu cầu 1 rental có 1 start/end
+  // ================= GROUP BY DATE =================
   const groups = useMemo(() => {
     const map = new Map<string, CheckoutItem[]>();
 
@@ -123,14 +134,10 @@ export default function CheckoutPage() {
     );
   }, [checkoutItems]);
 
-  // =========================
-  // Shipping form (Da Nang)
-  // =========================
+  // ================= SHIPPING FORM =================
   const [shipFullName, setShipFullName] = useState("");
   const [shipPhone, setShipPhone] = useState("");
-
-  // Address parts
-  const [street, setStreet] = useState(""); // số nhà + đường
+  const [street, setStreet] = useState("");
   const [district, setDistrict] = useState<DaNangDistrict | "">("");
   const [ward, setWard] = useState("");
   const [shipNote, setShipNote] = useState("");
@@ -140,7 +147,6 @@ export default function CheckoutPage() {
     return DA_NANG_WARDS[district] ?? [];
   }, [district]);
 
-  // ✅ shipAddress = ghép tự động
   const shipAddress = useMemo(() => {
     const parts = [
       street.trim(),
@@ -160,6 +166,7 @@ export default function CheckoutPage() {
     Boolean(district) &&
     Boolean(ward);
 
+  // ================= CONFIRM =================
   const handleConfirm = async () => {
     try {
       const fullName = shipFullName.trim();
@@ -176,18 +183,16 @@ export default function CheckoutPage() {
 
       setSubmitting(true);
 
-      // ✅ tạo rental theo từng group date
       for (const g of groups) {
         await rentalsApi.create({
           startDate: g.startDate,
           endDate: g.endDate,
           items: g.list.map((x) => ({
             productId: x.productId,
+            variantId: x.variantId, // ✅
             quantity: x.quantity,
           })),
           note: "Created from checkout",
-
-          // ✅ shipping (backend required)
           shipFullName: fullName,
           shipPhone: phone,
           shipAddress: address,
@@ -206,9 +211,10 @@ export default function CheckoutPage() {
     }
   };
 
+  // ================= RENDER =================
   return (
     <div className="container mx-auto px-4 py-10 grid lg:grid-cols-2 gap-8">
-      {/* LEFT: Items summary */}
+      {/* LEFT: Items */}
       <div className="space-y-4">
         <h2 className="text-xl font-medium">Order Summary</h2>
 
@@ -228,7 +234,7 @@ export default function CheckoutPage() {
                 const lineTotal = it.quantity * it.rentPricePerDay * it.days;
                 return (
                   <div
-                    key={`${it.productId}_${it.startDate}_${it.endDate}`}
+                    key={`${it.productId}_${it.variantId}_${it.startDate}_${it.endDate}`}
                     className="flex gap-3"
                   >
                     <div className="w-16 h-16 bg-muted rounded-md overflow-hidden shrink-0">
@@ -243,12 +249,16 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="flex-1">
-                      <div className="font-medium">{it.name}</div>
+                      <div className="font-medium">
+                        {it.name} {it.size ? `(${it.size})` : ""}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         ${it.rentPricePerDay}/day • {it.days} days • Qty{" "}
                         {it.quantity}
                       </div>
-                      <div className="text-sm font-medium">Line: ${lineTotal}</div>
+                      <div className="text-sm font-medium">
+                        Line: ${lineTotal}
+                      </div>
                     </div>
                   </div>
                 );
@@ -275,19 +285,15 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      {/* RIGHT: Shipping form */}
+      {/* RIGHT: Shipping */}
       <div className="border rounded-lg p-5 space-y-4">
         <h2 className="text-xl font-medium">Shipping Information</h2>
-        <p className="text-sm text-muted-foreground">
-          (Da Nang only) Please fill correct address for delivery.
-        </p>
 
         <div className="grid gap-2">
           <Label>Full name</Label>
           <Input
             value={shipFullName}
             onChange={(e) => setShipFullName(e.target.value)}
-            placeholder="Nguyễn Văn A"
           />
         </div>
 
@@ -296,23 +302,18 @@ export default function CheckoutPage() {
           <Input
             value={shipPhone}
             onChange={(e) => setShipPhone(e.target.value)}
-            placeholder="090xxxxxxx"
           />
         </div>
 
         <div className="grid gap-2">
           <Label>Số nhà / Tên đường</Label>
-          <Input
-            value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            placeholder="123 Lê Duẩn"
-          />
+          <Input value={street} onChange={(e) => setStreet(e.target.value)} />
         </div>
 
         <div className="grid gap-2">
-          <Label>Quận / Huyện (Đà Nẵng)</Label>
+          <Label>Quận / Huyện</Label>
           <select
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            className="h-10 rounded-md border px-3 text-sm"
             value={district}
             onChange={(e) => {
               const d = e.target.value as DaNangDistrict | "";
@@ -332,7 +333,7 @@ export default function CheckoutPage() {
         <div className="grid gap-2">
           <Label>Phường / Xã</Label>
           <select
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            className="h-10 rounded-md border px-3 text-sm"
             value={ward}
             onChange={(e) => setWard(e.target.value)}
             disabled={!district}
@@ -349,17 +350,13 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>Địa chỉ ghép (auto)</Label>
+          <Label>Địa chỉ ghép</Label>
           <Input value={shipAddress} readOnly />
         </div>
 
         <div className="grid gap-2">
-          <Label>Note (optional)</Label>
-          <Input
-            value={shipNote}
-            onChange={(e) => setShipNote(e.target.value)}
-            placeholder="Giờ giao, ghi chú..."
-          />
+          <Label>Note</Label>
+          <Input value={shipNote} onChange={(e) => setShipNote(e.target.value)} />
         </div>
 
         <Button

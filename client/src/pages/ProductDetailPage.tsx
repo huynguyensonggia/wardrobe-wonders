@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -23,6 +23,24 @@ import {
 import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
+type VariantLite = {
+  id: number;
+  size: string;
+  stock: number;
+  isActive?: number | boolean | string;
+};
+
+function isVariantActive(x: any): boolean {
+  if (x === true) return true;
+  if (x === false) return false;
+  if (typeof x === "number") return x === 1;
+  if (typeof x === "string") {
+    const s = x.trim().toLowerCase();
+    return s === "1" || s === "true";
+  }
+  return true;
+}
+
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -37,29 +55,173 @@ export default function ProductDetailPage() {
 
   const { addItem } = useCart();
 
-  // ✅ Fetch product detail
-  const {
-    data: product,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data: product, isLoading, isError, error } = useQuery({
     queryKey: ["product", id],
     queryFn: () => productsApi.getById(id!),
     enabled: !!id,
     staleTime: 60_000,
   });
 
+  // ✅ hooks luôn chạy, dù product undefined
   const rentalDays = useMemo(() => {
     return dateRange.from && dateRange.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
   }, [dateRange.from, dateRange.to]);
 
+  const startDate = useMemo(
+    () => (dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : ""),
+    [dateRange.from]
+  );
+  const endDate = useMemo(
+    () => (dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : ""),
+    [dateRange.to]
+  );
+
+  const images = useMemo(() => ((product as any)?.images ?? []) as any[], [product]);
+  const colors = useMemo(() => ((product as any)?.colors ?? []) as string[], [product]);
+
+  const variants: VariantLite[] = useMemo(() => {
+    const raw = (product as any)?.variants ?? [];
+    return raw.map((v: any) => ({
+      id: Number(v.id),
+      size: String(v.size),
+      stock: Number(v.stock ?? 0),
+      isActive: v.isActive ?? 1,
+    }));
+  }, [product]);
+
+  const sizes: string[] = useMemo(() => {
+    const fromVariants = variants.map((v) => v.size);
+    const unique = Array.from(new Set(fromVariants));
+    if (unique.length) return unique;
+    return ((product as any)?.sizes ?? []) as string[];
+  }, [variants, product]);
+
+  const canRent = useMemo(() => {
+    return String((product as any)?.status ?? "").toUpperCase() === "AVAILABLE";
+  }, [product]);
+
+  const selectedVariant = useMemo(() => {
+    if (!selectedSize) return null;
+    return variants.find((v) => v.size === selectedSize && isVariantActive(v.isActive)) ?? null;
+  }, [variants, selectedSize]);
+
+  // nếu user đang chọn size nhưng variant đó inactive/out-of-stock => reset size
+  useEffect(() => {
+    if (!selectedSize) return;
+    const v = variants.find((x) => x.size === selectedSize);
+    if (!v) return;
+    const ok = isVariantActive(v.isActive) && (v.stock ?? 0) > 0;
+    if (!ok) setSelectedSize("");
+  }, [variants, selectedSize]);
+
+  const canAddToCart = useMemo(() => {
+    return (
+      canRent &&
+      !!selectedVariant?.id &&
+      rentalDays > 0 &&
+      (selectedVariant?.stock ?? 0) > 0
+    );
+  }, [canRent, selectedVariant?.id, selectedVariant?.stock, rentalDays]);
+
+  const imageUrl = useMemo(() => {
+    return (
+      (product as any)?.imageUrl ||
+      (product as any)?.image_url ||
+      images?.[0]?.url
+    );
+  }, [product, images]);
+
+  const displayName = useMemo(() => {
+    const base = String((product as any)?.name ?? "");
+    return `${base} (${selectedSize}${selectedColor ? `, ${selectedColor}` : ""})`;
+  }, [product, selectedSize, selectedColor]);
+
   const totalPrice = useMemo(() => {
-    if (!product) return 0;
-    return rentalDays * ((product as any).pricePerDay ?? 0);
+    const pricePerDay = Number((product as any)?.pricePerDay ?? 0);
+    return rentalDays * pricePerDay;
   }, [product, rentalDays]);
 
-  // Loading
+  const mainImage = useMemo(() => {
+    return (
+      images?.[selectedImage]?.url ||
+      (product as any)?.imageUrl ||
+      (product as any)?.image_url ||
+      "https://placehold.co/600x800?text=No+Image"
+    );
+  }, [images, selectedImage, product]);
+
+  const ensureValid = () => {
+    if (!canRent) return false;
+
+    if (!selectedSize) {
+      alert("Please select size");
+      return false;
+    }
+
+    if (!selectedVariant?.id) {
+      alert("Size/variant not found. Please re-select.");
+      return false;
+    }
+
+    if ((selectedVariant.stock ?? 0) <= 0) {
+      alert("This size is out of stock.");
+      return false;
+    }
+
+    if (!dateRange.from || !dateRange.to) {
+      alert("Please select rental dates");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleAddToCart = () => {
+    if (!ensureValid()) return;
+
+    addItem(
+      {
+        productId: Number((product as any).id),
+        variantId: Number(selectedVariant!.id),
+        size: selectedVariant!.size,
+
+        name: displayName,
+        imageUrl,
+        rentPricePerDay: Number((product as any).pricePerDay ?? 0),
+        startDate,
+        endDate,
+        days: rentalDays,
+      },
+      1
+    );
+
+    alert("Added to cart!");
+  };
+
+  const handleRentNow = () => {
+    if (!ensureValid()) return;
+
+    navigate("/checkout", {
+      state: {
+        source: "rentNow",
+        product: {
+          productId: Number((product as any).id),
+          variantId: Number(selectedVariant!.id),
+          size: selectedVariant!.size,
+
+          name: displayName,
+          imageUrl,
+          rentPricePerDay: Number((product as any).pricePerDay ?? 0),
+          startDate,
+          endDate,
+          days: rentalDays,
+          quantity: 1,
+        },
+      },
+    });
+  };
+
+  // ✅ sau khi tất cả hooks đã gọi xong, mới return theo trạng thái
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -68,7 +230,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Error
   if (isError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -83,7 +244,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  // Not found
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -96,78 +256,6 @@ export default function ProductDetailPage() {
       </div>
     );
   }
-
-  // ✅ Support both backend styles
-  const images = (product as any).images ?? [];
-  const sizes = (product as any).sizes ?? [];
-  const colors = (product as any).colors ?? [];
-
-  const canRent = (product as any).status === "AVAILABLE";
-  const canAddToCart = canRent && !!selectedSize && rentalDays > 0;
-
-  const imageUrl =
-    (product as any).imageUrl ||
-    (product as any).image_url ||
-    images?.[0]?.url;
-
-  const displayName =
-    `${(product as any).name} (${selectedSize}` + (selectedColor ? `, ${selectedColor}` : "") + `)`;
-
-  const startDate = dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "";
-  const endDate = dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : "";
-
-  // ✅ Add to cart giữ nguyên
-  const handleAddToCart = () => {
-    if (!canRent) return;
-
-    if (!selectedSize) return alert("Please select size");
-    if (!dateRange.from || !dateRange.to) return alert("Please select rental dates");
-
-    addItem(
-      {
-        productId: Number((product as any).id),
-        name: displayName,
-        imageUrl,
-        rentPricePerDay: (product as any).pricePerDay ?? 0,
-        startDate,
-        endDate,
-        days: rentalDays,
-      },
-      1
-    );
-
-    alert("Added to cart!");
-  };
-
-  // ✅ Rent Now -> đi thẳng sang checkout với 1 group
-  const handleRentNow = () => {
-    if (!canRent) return;
-
-    if (!selectedSize) return alert("Please select size");
-    if (!dateRange.from || !dateRange.to) return alert("Please select rental dates");
-
-    navigate("/checkout", {
-      state: {
-        source: "rentNow",
-        product: {
-          productId: Number((product as any).id),
-          name: displayName,
-          imageUrl,
-          rentPricePerDay: (product as any).pricePerDay ?? 0,
-          startDate,
-          endDate,
-          days: rentalDays,
-          quantity: 1,
-        },
-      },
-    });
-  };
-
-  const mainImage =
-    images?.[selectedImage]?.url ||
-    (product as any).imageUrl ||
-    (product as any).image_url ||
-    "https://placehold.co/600x800?text=No+Image";
 
   return (
     <div className="min-h-screen py-8">
@@ -238,12 +326,8 @@ export default function ProductDetailPage() {
             </div>
 
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-2xl font-medium">
-                ${(product as any).pricePerDay}/day
-              </span>
-              <span className="text-muted-foreground">
-                ${(product as any).deposit} deposit
-              </span>
+              <span className="text-2xl font-medium">${(product as any).pricePerDay}/day</span>
+              <span className="text-muted-foreground">${(product as any).deposit} deposit</span>
             </div>
 
             {!canRent && (
@@ -259,22 +343,45 @@ export default function ProductDetailPage() {
             {/* Size Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium mb-3">Select Size</label>
+
+              {variants.length === 0 && (
+                <div className="text-xs text-destructive mb-2">
+                  ⚠️ Product has no variants from API.
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-2">
-                {sizes.map((size: string) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={cn(
-                      "w-12 h-12 rounded-md border text-sm font-medium transition-all",
-                      selectedSize === size
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-accent"
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {sizes.map((size: string) => {
+                  const v = variants.find((x) => x.size === size);
+                  const stock = v?.stock ?? 0;
+                  const active = v ? isVariantActive(v.isActive) : true;
+                  const disabled = !active || stock <= 0;
+
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={disabled}
+                      title={disabled ? (!active ? "Variant inactive" : "Out of stock") : `Stock: ${stock}`}
+                      className={cn(
+                        "w-12 h-12 rounded-md border text-sm font-medium transition-all",
+                        disabled && "opacity-40 cursor-not-allowed",
+                        selectedSize === size
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:border-accent"
+                      )}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
               </div>
+
+              {selectedVariant && (
+                <div className="text-xs text-muted-foreground mt-2">
+                  Selected variant: #{selectedVariant.id} • Stock: {selectedVariant.stock}
+                </div>
+              )}
             </div>
 
             {/* Color Selection */}
@@ -348,7 +455,7 @@ export default function ProductDetailPage() {
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
                     <span>Total due today</span>
-                    <span>${totalPrice + ((product as any).deposit ?? 0)}</span>
+                    <span>${totalPrice + Number((product as any).deposit ?? 0)}</span>
                   </div>
                 </div>
               </div>
@@ -367,7 +474,6 @@ export default function ProductDetailPage() {
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
 
-              {/* ✅ Add to Cart */}
               <Button
                 variant="outline"
                 size="lg"

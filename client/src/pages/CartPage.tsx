@@ -19,43 +19,23 @@ export default function CartPage() {
   }
 
   // ✅ tổng tiền = sum(subtotal từng item)
-  const total = items.reduce((sum, it) => sum + it.quantity * it.rentPricePerDay * it.days, 0);
+  const total = items.reduce(
+    (sum, it) => sum + it.quantity * it.rentPricePerDay * it.days,
+    0
+  );
 
-  // ✅ Checkout: chuyển sang /checkout để user điền shipping info
-  // Backend cần 1 rental = 1 startDate/endDate => ta group theo date trước, rồi gửi sang checkout
+  // ✅ CheckoutPage (bản bạn dùng) sẽ đọc cart từ context
+  // nên chỉ navigate với state.source = "cart" để đúng CheckoutState
   const handleCheckout = () => {
-    // group items by startDate-endDate
-    const map = new Map<string, typeof items>();
-    for (const it of items) {
-      const key = `${it.startDate}_${it.endDate}`;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(it);
+    // Guard: tất cả items phải có variantId (vì BE CreateRentalDto cần variantId)
+    const missingVariant = items.find((it) => !it.variantId);
+    if (missingVariant) {
+      alert("Bạn chưa chọn size/variant cho một số sản phẩm. Vui lòng chọn lại.");
+      return;
     }
 
-    // Convert map -> array groups
-    const groups = Array.from(map.entries()).map(([key, groupItems]) => {
-      const [startDate, endDate] = key.split("_");
-      return {
-        startDate,
-        endDate,
-        items: groupItems.map((x) => ({
-          productId: x.productId,
-          name: x.name,
-          imageUrl: x.imageUrl,
-          rentPricePerDay: x.rentPricePerDay,
-          quantity: x.quantity,
-          days: x.days,
-        })),
-      };
-    });
-
-    // ✅ điều hướng sang CheckoutPage
     navigate("/checkout", {
-      state: {
-        from: "cart",
-        groups,
-        cartTotal: total,
-      },
+      state: { source: "cart" },
     });
   };
 
@@ -69,7 +49,9 @@ export default function CartPage() {
       <div className="space-y-3">
         {items.map((it) => {
           const lineTotal = it.quantity * it.rentPricePerDay * it.days;
-          const key = `${it.productId}_${it.startDate}_${it.endDate}`;
+
+          // ✅ key phải gồm variantId để tránh “2 children same key”
+          const key = `${it.productId}_${it.variantId}_${it.startDate}_${it.endDate}`;
 
           return (
             <div key={key} className="border rounded-lg p-4 flex gap-4">
@@ -85,12 +67,23 @@ export default function CartPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="font-medium">{it.name}</div>
+
                     <div className="text-sm text-muted-foreground">
                       {it.startDate} → {it.endDate} ({it.days} days)
                     </div>
+
+                    {/* ✅ show size nếu có */}
+                    <div className="text-sm text-muted-foreground">
+                      Size:{" "}
+                      <span className="font-medium">
+                        {it.size ?? `Variant#${it.variantId}`}
+                      </span>
+                    </div>
+
                     <div className="text-sm text-muted-foreground">
                       ${it.rentPricePerDay}/day
                     </div>
+
                     <div className="text-sm font-medium mt-1">
                       Line total: ${lineTotal}
                     </div>
@@ -99,7 +92,9 @@ export default function CartPage() {
                   <Button
                     variant="ghost"
                     className="text-destructive"
-                    onClick={() => removeItem(it.productId, it.startDate, it.endDate)}
+                    onClick={() =>
+                      removeItem(it.productId, it.variantId, it.startDate, it.endDate)
+                    }
                   >
                     Remove
                   </Button>
@@ -110,18 +105,32 @@ export default function CartPage() {
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      updateQty(it.productId, it.startDate, it.endDate, it.quantity - 1)
+                      updateQty(
+                        it.productId,
+                        it.variantId,
+                        it.startDate,
+                        it.endDate,
+                        it.quantity - 1
+                      )
                     }
                     disabled={it.quantity <= 1}
                   >
                     -
                   </Button>
+
                   <div className="w-10 text-center">{it.quantity}</div>
+
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      updateQty(it.productId, it.startDate, it.endDate, it.quantity + 1)
+                      updateQty(
+                        it.productId,
+                        it.variantId,
+                        it.startDate,
+                        it.endDate,
+                        it.quantity + 1
+                      )
                     }
                   >
                     +
