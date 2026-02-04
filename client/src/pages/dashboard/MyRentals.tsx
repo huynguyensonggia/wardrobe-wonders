@@ -6,7 +6,7 @@ import { Package, Calendar, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { rentalsApi } from "@/lib/api";
 
-type RentalStatus = "PENDING" | "APPROVED" | "ACTIVE" | "CANCELLED";
+import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
 
 type RentalItem = {
   id: number;
@@ -18,8 +18,8 @@ type RentalItem = {
     id: number;
     name: string;
     category?: { name: string };
-    imageUrl?: string;   // ✅ backend map từ image_url
-    image_url?: string;  // ✅ fallback nếu backend trả snake_case
+    imageUrl?: string; // ✅ backend map từ image_url
+    image_url?: string; // ✅ fallback nếu backend trả snake_case
   };
 };
 
@@ -33,15 +33,24 @@ type Rental = {
   items?: RentalItem[];
 };
 
+function normalizeStatus(s: Rental["status"]): RentalStatus | string {
+  const raw = String(s ?? "").trim();
+  const lower = raw.toLowerCase();
+
+  if (lower === RentalStatus.PENDING) return RentalStatus.PENDING;
+  if (lower === RentalStatus.SHIPPING) return RentalStatus.SHIPPING;
+  if (lower === RentalStatus.ACTIVE) return RentalStatus.ACTIVE;
+  if (lower === RentalStatus.COMPLETED) return RentalStatus.COMPLETED;
+  if (lower === RentalStatus.REJECTED) return RentalStatus.REJECTED;
+  if (lower === RentalStatus.CANCELLED) return RentalStatus.CANCELLED;
+
+  return raw; // fallback nếu status lạ
+}
+
 export default function MyRentals() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const activeCount = useMemo(
-    () => rentals.filter((r) => String(r.status).toUpperCase() !== "CANCELLED").length,
-    [rentals]
-  );
 
   async function load() {
     setLoading(true);
@@ -70,6 +79,22 @@ export default function MyRentals() {
     }
   }
 
+  // ✅ Current Rentals:
+  // - Ẩn COMPLETED (đã nằm ở Rental History)
+  // - Ẩn REJECTED (user không cần thấy)
+  // - VẪN GIỮ CANCELLED (user chủ động hủy vẫn cần xem)
+  const currentRentals = useMemo(() => {
+    return rentals.filter((r) => {
+      const st = normalizeStatus(r.status);
+      return st !== RentalStatus.COMPLETED && st !== RentalStatus.REJECTED;
+    });
+  }, [rentals]);
+
+  // ✅ Active count: đếm những đơn chưa CANCELLED (nhưng vẫn hiển thị cancelled trong list)
+  const activeCount = useMemo(() => {
+    return currentRentals.filter((r) => normalizeStatus(r.status) !== RentalStatus.CANCELLED).length;
+  }, [currentRentals]);
+
   if (loading) {
     return <div className="py-10 text-muted-foreground">Loading rentals...</div>;
   }
@@ -85,13 +110,13 @@ export default function MyRentals() {
     );
   }
 
-  if (!rentals.length) {
+  if (!currentRentals.length) {
     return (
       <div className="text-center py-16">
         <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-        <h2 className="font-display text-xl font-medium mb-2">No rentals</h2>
+        <h2 className="font-display text-xl font-medium mb-2">No current rentals</h2>
         <p className="text-muted-foreground mb-6">
-          Start exploring our collection to find your perfect piece
+          Your completed rentals are saved in Rental History.
         </p>
         <Button asChild>
           <Link to="/products">
@@ -111,10 +136,10 @@ export default function MyRentals() {
       </div>
 
       <div className="space-y-4">
-        {rentals.map((r) => {
+        {currentRentals.map((r) => {
           const rentalId = String(r.id);
-          const statusText = String(r.status).toUpperCase();
-          const isCancelled = statusText === "CANCELLED";
+          const st = normalizeStatus(r.status);
+          const isCancelled = st === RentalStatus.CANCELLED;
           const items = r.items ?? [];
 
           return (
@@ -127,17 +152,15 @@ export default function MyRentals() {
                     {String(r.startDate).slice(0, 10)} — {String(r.endDate).slice(0, 10)}
                   </div>
 
-                  <Badge variant={statusText === "ACTIVE" ? "default" : "secondary"}>
-                    {statusText}
+                  <Badge variant={st === RentalStatus.ACTIVE ? "default" : "secondary"}>
+                    {formatRentalStatus(st as RentalStatus)}
                   </Badge>
                 </div>
 
-                {/* ✅ Items list */}
+                {/* Items list */}
                 <div className="space-y-3">
                   {items.length === 0 ? (
-                    <div className="text-sm text-muted-foreground">
-                      No items in this rental.
-                    </div>
+                    <div className="text-sm text-muted-foreground">No items in this rental.</div>
                   ) : (
                     items.map((it) => {
                       const p: any = it.product || {};
@@ -170,9 +193,8 @@ export default function MyRentals() {
                                 ) : null}
 
                                 <div className="text-sm text-muted-foreground mt-1">
-                                  Qty: <span className="font-medium">{it.quantity}</span>{" "}
-                                  • Days: <span className="font-medium">{it.days}</span>{" "}
-                                  • /day:{" "}
+                                  Qty: <span className="font-medium">{it.quantity}</span> • Days:{" "}
+                                  <span className="font-medium">{it.days}</span> • /day:{" "}
                                   <span className="font-medium">
                                     ${Number(it.rentPricePerDay || 0)}
                                   </span>
@@ -181,9 +203,7 @@ export default function MyRentals() {
 
                               <div className="text-sm">
                                 Subtotal:{" "}
-                                <span className="font-medium">
-                                  ${Number(it.subtotal || 0)}
-                                </span>
+                                <span className="font-medium">${Number(it.subtotal || 0)}</span>
                               </div>
                             </div>
                           </div>
@@ -196,8 +216,7 @@ export default function MyRentals() {
                 {/* Footer totals + actions */}
                 <div className="flex items-center justify-between pt-2 border-t">
                   <div className="text-sm">
-                    Total:{" "}
-                    <span className="font-medium">${Number(r.totalPrice || 0)}</span>
+                    Total: <span className="font-medium">${Number(r.totalPrice || 0)}</span>
                     <div className="text-xs text-muted-foreground">
                       Deposit: ${Number(r.totalDeposit || 0)}
                     </div>
