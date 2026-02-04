@@ -1,16 +1,19 @@
+// CartContext.tsx
 import { createContext, useContext, useMemo, useState } from "react";
 
 export type CartItem = {
   productId: number;
+  variantId: number;        // ✅ NEW
+  size?: string;            // (optional) để show UI
+
   name: string;
   imageUrl?: string;
   rentPricePerDay: number;
   quantity: number;
 
-  // ✅ LƯU NGÀY THUÊ THEO ITEM
   startDate: string; // yyyy-MM-dd
   endDate: string;   // yyyy-MM-dd
-  days: number;      // số ngày thuê
+  days: number;
 };
 
 type CartContextValue = {
@@ -18,8 +21,23 @@ type CartContextValue = {
   count: number;
 
   addItem: (item: Omit<CartItem, "quantity">, qty?: number) => void;
-  updateQty: (productId: number, startDate: string, endDate: string, qty: number) => void;
-  removeItem: (productId: number, startDate: string, endDate: string) => void;
+
+  // ✅ update theo product + variant + dateRange
+  updateQty: (
+    productId: number,
+    variantId: number,
+    startDate: string,
+    endDate: string,
+    qty: number
+  ) => void;
+
+  removeItem: (
+    productId: number,
+    variantId: number,
+    startDate: string,
+    endDate: string
+  ) => void;
+
   clear: () => void;
 };
 
@@ -28,17 +46,21 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // ✅ count = tổng quantity
-  const count = useMemo(() => items.reduce((s, i) => s + i.quantity, 0), [items]);
+  const count = useMemo(
+    () => items.reduce((s, i) => s + i.quantity, 0),
+    [items]
+  );
 
-  // ✅ Key theo product + dateRange (để cùng product nhưng khác ngày vẫn là 2 dòng)
-  const makeKey = (productId: number, startDate: string, endDate: string) =>
-    `${productId}_${startDate}_${endDate}`;
+  // ✅ Key theo product + variant + dateRange
+  const makeKey = (productId: number, variantId: number, startDate: string, endDate: string) =>
+    `${productId}_${variantId}_${startDate}_${endDate}`;
 
   const addItem: CartContextValue["addItem"] = (item, qty = 1) => {
     setItems((prev) => {
-      const key = makeKey(item.productId, item.startDate, item.endDate);
-      const idx = prev.findIndex((x) => makeKey(x.productId, x.startDate, x.endDate) === key);
+      const key = makeKey(item.productId, item.variantId, item.startDate, item.endDate);
+      const idx = prev.findIndex(
+        (x) => makeKey(x.productId, x.variantId, x.startDate, x.endDate) === key
+      );
 
       if (idx >= 0) {
         const copy = [...prev];
@@ -50,20 +72,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const updateQty: CartContextValue["updateQty"] = (productId, startDate, endDate, qty) => {
+  const updateQty: CartContextValue["updateQty"] = (productId, variantId, startDate, endDate, qty) => {
     setItems((prev) => {
-      const key = makeKey(productId, startDate, endDate);
+      const key = makeKey(productId, variantId, startDate, endDate);
       return prev
         .map((x) =>
-          makeKey(x.productId, x.startDate, x.endDate) === key ? { ...x, quantity: qty } : x
+          makeKey(x.productId, x.variantId, x.startDate, x.endDate) === key
+            ? { ...x, quantity: qty }
+            : x
         )
         .filter((x) => x.quantity > 0);
     });
   };
 
-  const removeItem: CartContextValue["removeItem"] = (productId, startDate, endDate) => {
-    const key = makeKey(productId, startDate, endDate);
-    setItems((prev) => prev.filter((x) => makeKey(x.productId, x.startDate, x.endDate) !== key));
+  const removeItem: CartContextValue["removeItem"] = (productId, variantId, startDate, endDate) => {
+    const key = makeKey(productId, variantId, startDate, endDate);
+    setItems((prev) =>
+      prev.filter((x) => makeKey(x.productId, x.variantId, x.startDate, x.endDate) !== key)
+    );
   };
 
   const clear = () => setItems([]);

@@ -1,3 +1,4 @@
+// pages/admin/AdminRentals.tsx
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { rentalsApi } from "@/lib/api";
@@ -5,58 +6,8 @@ import { rentalsApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+import type { Rental } from "@/types";
 import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
-
-type RentalItem = {
-  id: number;
-  quantity: number;
-  days: number;
-  subtotal: number;
-  rentPricePerDay: number;
-  product?: { id: number; name?: string; imageUrl?: string; image_url?: string };
-};
-
-type UserLite = {
-  id: number;
-  email?: string;
-  fullName?: string;
-  name?: string;
-};
-
-type PaymentLite = {
-  id: number;
-  amount?: number;
-  status?: string;
-  method?: string;
-  createdAt?: string;
-};
-
-type Rental = {
-  id: number;
-  rentalCode?: string;
-
-  startDate: string;
-  endDate: string;
-  totalDays: number;
-
-  totalPrice: number;
-  totalDeposit: number;
-
-  status: RentalStatus;
-  note?: string | null;
-
-  shipFullName?: string;
-  shipPhone?: string;
-  shipAddress?: string;
-  shipNote?: string | null;
-
-  createdAt?: string;
-  updatedAt?: string;
-
-  user?: UserLite;
-  items?: RentalItem[];
-  payments?: PaymentLite[];
-};
 
 function statusBadgeVariant(
   status: RentalStatus
@@ -86,11 +37,9 @@ const ADMIN_ACTIONS: Record<
     { label: "Từ chối", to: RentalStatus.REJECTED, variant: "destructive" },
   ],
   [RentalStatus.SHIPPING]: [
-    { label: "Khách đã nhận", to: RentalStatus.ACTIVE, variant: "default" },
+    { label: "Khách đã nhận", to: RentalStatus.ACTIVE, variant: "default" }, // ✅ ACTIVE mới trừ stock
   ],
-  [RentalStatus.ACTIVE]: [
-    { label: "Hoàn tất", to: RentalStatus.COMPLETED, variant: "default" },
-  ],
+  [RentalStatus.ACTIVE]: [{ label: "Hoàn tất", to: RentalStatus.COMPLETED, variant: "default" }],
   [RentalStatus.COMPLETED]: [],
   [RentalStatus.REJECTED]: [],
   [RentalStatus.CANCELLED]: [],
@@ -117,6 +66,7 @@ export default function AdminRentals() {
     staleTime: 30_000,
   });
 
+  // rentalsApi.getAll() theo BE: { data, total, page, pageSize }
   const rentals: Rental[] = (data as any)?.data ?? [];
   const total: number = (data as any)?.total ?? 0;
 
@@ -130,11 +80,10 @@ export default function AdminRentals() {
       rentalsApi.updateStatus(id, status),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
-      setSelected((prev) => (prev ? { ...prev } : prev));
+      // giữ selected, data sẽ refresh từ query
     },
   });
 
-  // ✅ mutation update shipping (cần rentalsApi.updateShipping)
   const updateShippingMutation = useMutation({
     mutationFn: (args: {
       id: string;
@@ -154,9 +103,16 @@ export default function AdminRentals() {
     },
   });
 
+  // ✅ sync selected with latest list after refetch (when selected exists)
+  useMemo(() => {
+    if (!selected) return;
+    const fresh = rentals.find((r) => String(r.id) === String(selected.id));
+    if (fresh) setSelected(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rentals]);
+
   const canEditShipping =
-    selected?.status === RentalStatus.PENDING ||
-    selected?.status === RentalStatus.SHIPPING;
+    selected?.status === RentalStatus.PENDING || selected?.status === RentalStatus.SHIPPING;
 
   const handlePick = (r: Rental) => {
     setSelected(r);
@@ -168,9 +124,9 @@ export default function AdminRentals() {
     setShipNote(r.shipNote ?? "");
   };
 
-  const handleStatusChange = async (rentalId: number, status: RentalStatus) => {
+  const handleStatusChange = async (rentalId: string, status: RentalStatus) => {
     try {
-      await updateStatusMutation.mutateAsync({ id: String(rentalId), status });
+      await updateStatusMutation.mutateAsync({ id: rentalId, status });
       setSelected((prev) => (prev ? { ...prev, status } : prev));
     } catch (e: any) {
       alert(e?.message || "Update status failed");
@@ -219,12 +175,8 @@ export default function AdminRentals() {
   if (isError) {
     return (
       <div className="container mx-auto px-4 py-10">
-        <div className="text-destructive font-medium mb-2">
-          Failed to load rentals
-        </div>
-        <div className="text-muted-foreground text-sm">
-          {(error as Error)?.message}
-        </div>
+        <div className="text-destructive font-medium mb-2">Failed to load rentals</div>
+        <div className="text-muted-foreground text-sm">{(error as Error)?.message}</div>
       </div>
     );
   }
@@ -270,9 +222,9 @@ export default function AdminRentals() {
           <div className="space-y-3">
             {rentals.map((r) => (
               <button
-                key={r.id}
+                key={String(r.id)}
                 className={`w-full text-left border rounded-lg p-4 hover:bg-secondary/40 transition ${
-                  selected?.id === r.id ? "border-primary" : ""
+                  String(selected?.id) === String(r.id) ? "border-primary" : ""
                 }`}
                 onClick={() => handlePick(r)}
               >
@@ -288,10 +240,10 @@ export default function AdminRentals() {
                     <div className="text-sm text-muted-foreground mt-1">
                       User:{" "}
                       <span className="font-medium">
-                        {r.user?.email ||
-                          r.user?.fullName ||
-                          r.user?.name ||
-                          `User#${r.user?.id ?? "?"}`}
+                        {(r.user as any)?.email ||
+                          (r.user as any)?.fullName ||
+                          (r.user as any)?.name ||
+                          `User#${(r.user as any)?.id ?? "?"}`}
                       </span>
                     </div>
                   </div>
@@ -304,9 +256,7 @@ export default function AdminRentals() {
                       <span className="text-muted-foreground">Total: </span>
                       <span className="font-medium">${r.totalPrice}</span>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      Deposit: ${r.totalDeposit}
-                    </div>
+                    <div className="text-xs text-muted-foreground">Deposit: ${r.totalDeposit}</div>
                   </div>
                 </div>
               </button>
@@ -320,9 +270,7 @@ export default function AdminRentals() {
         <h2 className="text-lg font-medium">Rental Detail</h2>
 
         {!selected ? (
-          <div className="text-sm text-muted-foreground">
-            Select a rental to view details.
-          </div>
+          <div className="text-sm text-muted-foreground">Select a rental to view details.</div>
         ) : (
           <>
             <div className="space-y-1">
@@ -341,7 +289,7 @@ export default function AdminRentals() {
               </div>
             </div>
 
-            {/* ✅ STATUS (không thừa nút) */}
+            {/* ✅ STATUS */}
             <div className="border-t pt-4 space-y-2">
               <div className="text-sm text-muted-foreground">Status</div>
 
@@ -357,7 +305,7 @@ export default function AdminRentals() {
                       size="sm"
                       variant={a.variant ?? "outline"}
                       disabled={updateStatusMutation.isPending}
-                      onClick={() => handleStatusChange(selected.id, a.to)}
+                      onClick={() => handleStatusChange(String(selected.id), a.to)}
                     >
                       {a.label}
                     </Button>
@@ -374,7 +322,7 @@ export default function AdminRentals() {
               )}
             </div>
 
-            {/* ✅ SHIPPING (editable) */}
+            {/* ✅ SHIPPING */}
             <div className="border-t pt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-muted-foreground">Shipping</div>
@@ -484,18 +432,30 @@ export default function AdminRentals() {
               )}
             </div>
 
+            {/* ✅ ITEMS */}
             <div className="border-t pt-4 space-y-2">
               <div className="text-sm text-muted-foreground">Items</div>
+
               {selected.items?.length ? (
                 <div className="space-y-2">
                   {selected.items.map((it) => (
-                    <div key={it.id} className="border rounded-md p-3">
+                    <div key={String(it.id)} className="border rounded-md p-3">
                       <div className="font-medium">
-                        {it.product?.name || `Product#${it.product?.id ?? "?"}`}
+                        {(it as any).product?.name || `Product#${(it as any).product?.id ?? "?"}`}
                       </div>
+
+                      <div className="text-sm text-muted-foreground">
+                        Size:{" "}
+                        <span className="font-medium">
+                          {(it as any).variant?.size ?? `#${(it as any).variantId ?? "-"}`
+                          }
+                        </span>
+                      </div>
+
                       <div className="text-sm text-muted-foreground">
                         ${it.rentPricePerDay}/day • {it.days} days • Qty {it.quantity}
                       </div>
+
                       <div className="text-sm">
                         <span className="text-muted-foreground">Subtotal: </span>
                         <span className="font-medium">${it.subtotal}</span>

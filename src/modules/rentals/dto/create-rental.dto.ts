@@ -16,6 +16,12 @@ class CreateRentalItemDto {
   @IsPositive()
   productId: number;
 
+  // ✅ NEW
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  variantId: number;
+
   @Type(() => Number)
   @IsInt()
   @IsPositive()
