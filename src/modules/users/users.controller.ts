@@ -6,6 +6,8 @@ import {
   Delete,
   Body,
   UseGuards,
+  ForbiddenException,
+  Request,
 } from "@nestjs/common";
 
 import { UsersService } from "./users.service";
@@ -27,16 +29,25 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // USER: xem profile
+  // USER: xem profile theo id (nếu muốn chặt hơn: chỉ cho xem chính mình)
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(Number(id));
   }
 
-  // USER: update profile
+  // ✅ USER: update profile (chỉ update chính mình), ADMIN update ai cũng được
   @Patch(":id")
-  update(@Param("id") id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(Number(id), dto);
+  update(@Param("id") id: string, @Body() dto: UpdateUserDto, @Request() req: any) {
+    const targetId = Number(id);
+    const meId = Number(req.user?.id);
+    const role = req.user?.role;
+
+    const isAdmin = String(role).toUpperCase() === Role.ADMIN;
+    if (!isAdmin && targetId !== meId) {
+      throw new ForbiddenException("You can only update your own profile");
+    }
+
+    return this.usersService.update(targetId, dto);
   }
 
   // ADMIN: xoá user

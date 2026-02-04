@@ -12,9 +12,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    // payload.sub là user id (theo chuẩn JWT)
     return {
-      userId: payload.sub,
+      id: payload.sub,          // ✅ quan trọng: để controller dùng req.user.id
+      userId: payload.sub,      // ✅ giữ lại nếu code cũ đang dùng userId
       role: payload.role,
+      email: payload.email,     // ✅ nếu token có email thì dùng được luôn
     };
   }
 }

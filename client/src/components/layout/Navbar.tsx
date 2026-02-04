@@ -76,13 +76,13 @@ export function Navbar() {
               Outerwear
             </Link>
             <Link
-              to="/try-on"
+              to="/try-on-suggest"
               className="flex items-center gap-1.5 text-sm font-medium text-gold hover:text-gold/80 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
               AI Try-On
             </Link>
-          </div>
+          </div>  
 
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center gap-4">
@@ -219,7 +219,7 @@ export function Navbar() {
               </Link>
 
               <Link
-                to="/try-on"
+                to="/try-on-suggest"
                 className="flex items-center gap-1.5 text-sm font-medium py-2 text-gold"
                 onClick={() => setIsOpen(false)}
               >

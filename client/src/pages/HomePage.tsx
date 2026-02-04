@@ -51,7 +51,7 @@ export default function HomePage() {
                 </Link>
               </Button>
               <Button variant="hero-outline" size="xl" asChild>
-                <Link to="/try-on">
+                <Link to="/try-on-suggest">
                   <Sparkles className="w-5 h-5 mr-2" />
                   AI Try-On
                 </Link>
@@ -182,7 +182,7 @@ export default function HomePage() {
               Upload your photo and discover your perfect fit.
             </p>
             <Button variant="gold" size="xl" asChild>
-              <Link to="/try-on">
+              <Link to="/try-on-suggest">
                 Try It Now
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>

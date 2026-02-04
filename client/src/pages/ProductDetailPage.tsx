@@ -1,3 +1,11 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
 import { useMemo, useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +28,16 @@ import {
   ArrowRight,
   ShoppingBag,
 } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+
+import {
+  format,
+  differenceInDays,
+  addDays,
+  isAfter,
+  isBefore,
+  startOfDay,
+} from "date-fns";
+
 import { cn } from "@/lib/utils";
 
 type VariantLite = {
@@ -42,12 +59,17 @@ function isVariantActive(x: any): boolean {
 }
 
 export default function ProductDetailPage() {
+  const MIN_RENTAL_DAYS = 3;
+
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
     from: undefined,
     to: undefined,
   });
@@ -62,9 +84,10 @@ export default function ProductDetailPage() {
     staleTime: 60_000,
   });
 
-  // ✅ hooks luôn chạy, dù product undefined
   const rentalDays = useMemo(() => {
-    return dateRange.from && dateRange.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 0;
+    return dateRange.from && dateRange.to
+      ? differenceInDays(dateRange.to, dateRange.from) + 1
+      : 0;
   }, [dateRange.from, dateRange.to]);
 
   const startDate = useMemo(
@@ -105,7 +128,6 @@ export default function ProductDetailPage() {
     return variants.find((v) => v.size === selectedSize && isVariantActive(v.isActive)) ?? null;
   }, [variants, selectedSize]);
 
-  // nếu user đang chọn size nhưng variant đó inactive/out-of-stock => reset size
   useEffect(() => {
     if (!selectedSize) return;
     const v = variants.find((x) => x.size === selectedSize);
@@ -118,17 +140,13 @@ export default function ProductDetailPage() {
     return (
       canRent &&
       !!selectedVariant?.id &&
-      rentalDays > 0 &&
+      rentalDays >= MIN_RENTAL_DAYS &&
       (selectedVariant?.stock ?? 0) > 0
     );
   }, [canRent, selectedVariant?.id, selectedVariant?.stock, rentalDays]);
 
   const imageUrl = useMemo(() => {
-    return (
-      (product as any)?.imageUrl ||
-      (product as any)?.image_url ||
-      images?.[0]?.url
-    );
+    return (product as any)?.imageUrl || (product as any)?.image_url || images?.[0]?.url;
   }, [product, images]);
 
   const displayName = useMemo(() => {
@@ -150,6 +168,41 @@ export default function ProductDetailPage() {
     );
   }, [images, selectedImage, product]);
 
+  // ✅ Disable days: past dates + (from+1) when picking end date to enforce min 3 days
+  const disabledDays = useMemo(() => {
+    const today = startOfDay(new Date());
+    const from = dateRange.from ? startOfDay(dateRange.from) : undefined;
+
+    // inclusive min days => to must be >= from + (MIN_DAYS - 1)
+    const minTo = from ? addDays(from, MIN_RENTAL_DAYS - 1) : undefined;
+
+    return (date: Date) => {
+      const d = startOfDay(date);
+
+      // disable past
+      if (d < today) return true;
+
+      // if selecting "to" (from chosen, to not yet), disable dates that make range < MIN
+      if (from && !dateRange.to && minTo) {
+        // disable (from, minTo) => i.e. from+1 when MIN=3
+        return isAfter(d, from) && isBefore(d, minTo);
+      }
+
+      return false;
+    };
+  }, [dateRange.from, dateRange.to]);
+
+  // ✅ Bonus: auto-suggest a valid range (from -> from+2) for instant highlight
+  useEffect(() => {
+    if (!dateRange.from) return;
+    if (dateRange.to) return;
+
+    const suggestedTo = addDays(dateRange.from, MIN_RENTAL_DAYS - 1);
+    setDateRange((prev) => ({ ...prev, to: suggestedTo }));
+    // If you DON'T want auto-suggest/highlight, delete this effect block.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateRange.from]);
+
   const ensureValid = () => {
     if (!canRent) return false;
 
@@ -170,6 +223,12 @@ export default function ProductDetailPage() {
 
     if (!dateRange.from || !dateRange.to) {
       alert("Please select rental dates");
+      return false;
+    }
+
+    const days = differenceInDays(dateRange.to, dateRange.from) + 1;
+    if (days < MIN_RENTAL_DAYS) {
+      alert(`Minimum rental is ${MIN_RENTAL_DAYS} days`);
       return false;
     }
 
@@ -221,7 +280,6 @@ export default function ProductDetailPage() {
     });
   };
 
-  // ✅ sau khi tất cả hooks đã gọi xong, mới return theo trạng thái
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -342,7 +400,34 @@ export default function ProductDetailPage() {
 
             {/* Size Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-3">Select Size</label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium">Select Size</label>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-xs italic text-muted-foreground hover:text-foreground underline underline-offset-4"
+                    >
+                      Size guide
+                    </button>
+                  </DialogTrigger>
+
+                  <DialogContent className="max-w-3xl">
+                    <DialogHeader>
+                      <DialogTitle>Women&apos;s Size Chart</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="overflow-auto">
+                      <img
+                        src="/size-chart.png"
+                        alt="Women’s size chart"
+                        className="w-full h-auto rounded-md"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
 
               {variants.length === 0 && (
                 <div className="text-xs text-destructive mb-2">
@@ -362,7 +447,13 @@ export default function ProductDetailPage() {
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       disabled={disabled}
-                      title={disabled ? (!active ? "Variant inactive" : "Out of stock") : `Stock: ${stock}`}
+                      title={
+                        disabled
+                          ? !active
+                            ? "Variant inactive"
+                            : "Out of stock"
+                          : `Stock: ${stock}`
+                      }
                       className={cn(
                         "w-12 h-12 rounded-md border text-sm font-medium transition-all",
                         disabled && "opacity-40 cursor-not-allowed",
@@ -428,19 +519,45 @@ export default function ProductDetailPage() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
+                  <div className="p-3 pb-2 text-xs text-muted-foreground">
+                    Minimum rental period: <span className="font-medium">{MIN_RENTAL_DAYS} days</span>
+                  </div>
                   <Calendar
                     mode="range"
                     selected={dateRange}
-                    onSelect={(range) => setDateRange({ from: range?.from, to: range?.to })}
-                    disabled={{ before: new Date() }}
+                    onSelect={(range) => {
+                      if (!range?.from) {
+                        setDateRange({ from: undefined, to: undefined });
+                        return;
+                      }
+
+                      // allow selecting start date
+                      if (!range.to) {
+                        setDateRange({ from: range.from, to: undefined });
+                        return;
+                      }
+
+                      // last safety check (should be prevented by disabledDays already)
+                      const days = differenceInDays(range.to, range.from) + 1;
+                      if (days < MIN_RENTAL_DAYS) return;
+
+                      setDateRange({ from: range.from, to: range.to });
+                    }}
+                    disabled={disabledDays}
                     numberOfMonths={2}
                   />
                 </PopoverContent>
               </Popover>
+
+              {rentalDays > 0 && rentalDays < MIN_RENTAL_DAYS && (
+                <p className="text-xs text-destructive mt-2">
+                  Minimum rental is {MIN_RENTAL_DAYS} days.
+                </p>
+              )}
             </div>
 
             {/* Price Summary */}
-            {rentalDays > 0 && (
+            {rentalDays >= MIN_RENTAL_DAYS && (
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
