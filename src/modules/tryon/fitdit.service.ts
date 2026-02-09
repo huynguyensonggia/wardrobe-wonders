@@ -107,7 +107,7 @@ function pickMaskPreviewUrl(client: any, preMaskRaw: any): string | null {
   return resolveGradioFileUrl(client, maybe);
 }
 
-// ✅ đo mask “dính xuống thấp” hay không bằng alpha bottom
+// ✅ đo mask “dính xuống thấp” hay không bằng alpha bottom (fallback / categories khác)
 async function getMaskBottomRatio(maskUrl: string): Promise<number | null> {
   try {
     const res = await fetch(maskUrl);
@@ -144,6 +144,70 @@ async function getMaskBottomRatio(maskUrl: string): Promise<number | null> {
   }
 }
 
+/**
+ * ✅ FIX “áo xòe/peplum bị cắt mất phần xòe”
+ * - Đo bottomY + độ RỘNG mask trong 12% vùng đáy của ảnh.
+ * - Nếu vùng đáy rộng => flare/peplum hợp lệ => nới ngưỡng, đừng cắt.
+ */
+async function getMaskBottomBandStats(maskUrl: string): Promise<{
+  bottomYRatio: number; // 0..1
+  bottomBandMaxWidthRatio: number; // 0..1
+} | null> {
+  try {
+    const res = await fetch(maskUrl);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+
+    const img = sharp(buf).ensureAlpha();
+    const meta = await img.metadata();
+    if (!meta.width || !meta.height) return null;
+
+    const { data, info } = await img.raw().toBuffer({ resolveWithObject: true });
+    const w = info.width;
+    const h = info.height;
+
+    const alphaTh = 10;
+
+    // 1) bottomY: pixel thấp nhất có alpha
+    let bottomY = -1;
+    for (let y = h - 1; y >= 0; y--) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        if (data[idx + 3] > alphaTh) {
+          bottomY = y;
+          break;
+        }
+      }
+      if (bottomY !== -1) break;
+    }
+
+    if (bottomY === -1) {
+      return { bottomYRatio: 0, bottomBandMaxWidthRatio: 0 };
+    }
+
+    // 2) max width trong 12% chiều cao cuối (tránh đo 1 dòng bị fail)
+    const bandHeight = Math.max(8, Math.floor(h * 0.12));
+    const yMin = Math.max(0, h - bandHeight);
+
+    let bestWidth = 0;
+    for (let y = h - 1; y >= yMin; y--) {
+      let cnt = 0;
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        if (data[idx + 3] > alphaTh) cnt++;
+      }
+      if (cnt > bestWidth) bestWidth = cnt;
+    }
+
+    return {
+      bottomYRatio: bottomY / h,
+      bottomBandMaxWidthRatio: bestWidth / w,
+    };
+  } catch {
+    return null;
+  }
+}
+
 // =========================
 // ✅ ZeroGPU retry helpers
 // =========================
@@ -174,7 +238,7 @@ function backoffMs(attempt: number) {
 export class FitditService {
   private clientPromise: Promise<any> | null = null;
 
-  constructor(private readonly cloudinary: CloudinaryService) { }
+  constructor(private readonly cloudinary: CloudinaryService) {}
 
   private async getClient() {
     if (!this.clientPromise) {
@@ -189,10 +253,7 @@ export class FitditService {
             ? (envToken as `hf_${string}`)
             : undefined;
 
-        return Client.connect(
-          "BoyuanJiang/FitDiT",
-          token ? { token } : undefined
-        );
+        return Client.connect("BoyuanJiang/FitDiT", token ? { token } : undefined);
       })();
     }
     return this.clientPromise;
@@ -239,7 +300,7 @@ export class FitditService {
   // ✅ SUPPORT: person file OR personUrl
   async process(args: {
     person?: Express.Multer.File; // ✅ optional
-    personUrl?: string; // ✅ NEW
+    personUrl?: string; // ✅ optional
     garmentUrl: string;
     category: VtonCategory;
     offsets: { top: number; bottom: number; left: number; right: number };
@@ -295,12 +356,22 @@ export class FitditService {
     // =========================
     // ✅ STEP 1 (ẨN): generate_mask (AUTO-FIT bottom)
     // =========================
+    // ✅ IMPORTANT: thử từ "thoáng" (giữ áo) -> rồi mới cắt dần để tránh cắt mất phần xòe ngay từ đầu
     const bottomCandidates =
       args.category === VtonCategory.UPPER_BODY
-        ? [-140, -260, -360] // ✅ giảm số lần gọi để đỡ queue
+        ? [
+            args.offsets.bottom, // ✅ candidate “giữ áo”
+            -40,
+            -80,
+            -140,
+            -220,
+            -300,
+          ]
         : [args.offsets.bottom];
 
-    const MAX_BOTTOM_RATIO = 0.62;
+    const BASE_MAX_BOTTOM_RATIO = 0.62; // áo bình thường: tránh ăn xuống quần
+    const FLARE_WIDTH_RATIO = 0.32; // đáy đủ rộng => flare/peplum (tune 0.28..0.40)
+    const FLARE_MAX_BOTTOM_RATIO = 0.88; // flare cho phép xuống thấp hơn (tune 0.82..0.92)
 
     let bestPreMaskRaw: any = null;
     let bestPoseRaw: any = null;
@@ -308,14 +379,19 @@ export class FitditService {
     let bestPosePreviewUrl: string | null = null;
 
     for (const bottom of bottomCandidates) {
-      const maskRes = await this.predictWithRetry(client, "/generate_mask", [
-        vtonBlob,
-        args.category,
-        args.offsets.top,
-        bottom,
-        args.offsets.left,
-        args.offsets.right,
-      ], { maxRetries: 2 }); // ✅ mask retry ít hơn
+      const maskRes = await this.predictWithRetry(
+        client,
+        "/generate_mask",
+        [
+          vtonBlob,
+          args.category,
+          args.offsets.top,
+          bottom,
+          args.offsets.left,
+          args.offsets.right,
+        ],
+        { maxRetries: 2 } // ✅ mask retry ít hơn
+      );
 
       const preMaskRaw = maskRes?.data?.[0]; // ImageEditor object
       const poseRaw = maskRes?.data?.[1]; // FileData object
@@ -333,13 +409,24 @@ export class FitditService {
 
       if (!maskPreviewUrl) continue;
 
-      const ratio = await getMaskBottomRatio(maskPreviewUrl);
+      if (args.category === VtonCategory.UPPER_BODY) {
+        const stats = await getMaskBottomBandStats(maskPreviewUrl);
+        if (!stats) break;
 
-      // không đo được thì thôi, dùng fallback hiện tại
-      if (ratio === null) break;
+        const { bottomYRatio, bottomBandMaxWidthRatio } = stats;
 
-      // ok rồi thì dừng
-      if (ratio <= MAX_BOTTOM_RATIO) break;
+        const isFlareLike = bottomBandMaxWidthRatio >= FLARE_WIDTH_RATIO;
+        const dynamicMax = isFlareLike ? FLARE_MAX_BOTTOM_RATIO : BASE_MAX_BOTTOM_RATIO;
+
+        // ok rồi thì dừng
+        if (bottomYRatio <= dynamicMax) break;
+      } else {
+        // categories khác: giữ logic cũ
+        const ratio = await getMaskBottomRatio(maskPreviewUrl);
+
+        if (ratio === null) break;
+        if (ratio <= BASE_MAX_BOTTOM_RATIO) break;
+      }
     }
 
     if (!bestPreMaskRaw || !bestPoseRaw) {
@@ -349,17 +436,22 @@ export class FitditService {
     // =========================
     // ✅ STEP 2: process try-on
     // =========================
-    const outRes = await this.predictWithRetry(client, "/process", [
-      vtonBlob,
-      garmBlob,
-      bestPreMaskRaw,
-      bestPoseRaw,
-      args.nSteps,
-      args.imageScale,
-      args.seed,
-      args.numImages,
-      args.resolution,
-    ], { maxRetries: 5 }); // ✅ process retry nhiều hơn
+    const outRes = await this.predictWithRetry(
+      client,
+      "/process",
+      [
+        vtonBlob,
+        garmBlob,
+        bestPreMaskRaw,
+        bestPoseRaw,
+        args.nSteps,
+        args.imageScale,
+        args.seed,
+        args.numImages,
+        args.resolution,
+      ],
+      { maxRetries: 5 } // ✅ process retry nhiều hơn
+    );
 
     const gallery = outRes?.data?.[0] ?? outRes?.data ?? outRes;
     const items = Array.isArray(gallery) ? gallery : [gallery];

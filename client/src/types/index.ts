@@ -158,12 +158,3 @@ export interface ProductFilters {
   maxPrice?: number;
   search?: string;
 }
-
-// Dashboard stats
-export interface AdminStats {
-  totalProducts: number;
-  activeRentals: number;
-  totalRevenue: number;
-  totalUsers: number;
-  recentRentals: Rental[];
-}
