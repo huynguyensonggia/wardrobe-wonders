@@ -27,19 +27,19 @@ function statusBadgeVariant(
   }
 }
 
-// ✅ Chỉ những nút admin cần (không thừa)
+// ✅ Admin actions only (no extra)
 const ADMIN_ACTIONS: Record<
   RentalStatus,
   { label: string; to: RentalStatus; variant?: "default" | "outline" | "destructive" }[]
 > = {
   [RentalStatus.PENDING]: [
-    { label: "Bắt đầu giao hàng", to: RentalStatus.SHIPPING, variant: "default" },
-    { label: "Từ chối", to: RentalStatus.REJECTED, variant: "destructive" },
+    { label: "Start shipping", to: RentalStatus.SHIPPING, variant: "default" },
+    { label: "Reject", to: RentalStatus.REJECTED, variant: "destructive" },
   ],
   [RentalStatus.SHIPPING]: [
-    { label: "Khách đã nhận", to: RentalStatus.ACTIVE, variant: "default" }, // ✅ ACTIVE mới trừ stock
+    { label: "Customer received", to: RentalStatus.ACTIVE, variant: "default" }, // ✅ ACTIVE deducts stock
   ],
-  [RentalStatus.ACTIVE]: [{ label: "Hoàn tất", to: RentalStatus.COMPLETED, variant: "default" }],
+  [RentalStatus.ACTIVE]: [{ label: "Complete", to: RentalStatus.COMPLETED, variant: "default" }],
   [RentalStatus.COMPLETED]: [],
   [RentalStatus.REJECTED]: [],
   [RentalStatus.CANCELLED]: [],
@@ -66,7 +66,7 @@ export default function AdminRentals() {
     staleTime: 30_000,
   });
 
-  // rentalsApi.getAll() theo BE: { data, total, page, pageSize }
+  // rentalsApi.getAll() as BE: { data, total, page, pageSize }
   const rentals: Rental[] = (data as any)?.data ?? [];
   const total: number = (data as any)?.total ?? 0;
 
@@ -80,7 +80,7 @@ export default function AdminRentals() {
       rentalsApi.updateStatus(id, status),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
-      // giữ selected, data sẽ refresh từ query
+      // keep selected, data will refresh from query
     },
   });
 
@@ -145,7 +145,7 @@ export default function AdminRentals() {
         shipNote: shipNote.trim(),
       });
 
-      // update selected ngay
+      // update selected immediately
       setSelected((prev) =>
         prev
           ? {
@@ -333,7 +333,7 @@ export default function AdminRentals() {
                     variant="outline"
                     disabled={!canEditShipping}
                     onClick={() => setEditingShip(true)}
-                    title={!canEditShipping ? "Chỉ sửa khi PENDING/SHIPPING" : "Edit shipping"}
+                    title={!canEditShipping ? "Editable only in PENDING/SHIPPING" : "Edit shipping"}
                   >
                     Edit
                   </Button>
@@ -447,8 +447,7 @@ export default function AdminRentals() {
                       <div className="text-sm text-muted-foreground">
                         Size:{" "}
                         <span className="font-medium">
-                          {(it as any).variant?.size ?? `#${(it as any).variantId ?? "-"}`
-                          }
+                          {(it as any).variant?.size ?? `#${(it as any).variantId ?? "-"}`}
                         </span>
                       </div>
 

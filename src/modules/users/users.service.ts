@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
@@ -15,8 +15,9 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly repo: Repository<User>,
-  ) {}
+  ) { }
 
+  // ✅ Register/create user: luôn USER (không cho tự set role)
   async create(dto: CreateUserDto): Promise<UserWithoutPassword> {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
 
@@ -24,7 +25,7 @@ export class UsersService {
       name: dto.name,
       email: dto.email,
       password: hashedPassword,
-      role: dto.role || Role.USER,
+      role: Role.USER, // ✅ FIX: không dùng dto.role
       phone: dto.phone,
     });
 
@@ -32,9 +33,10 @@ export class UsersService {
     return this.excludePassword(savedUser);
   }
 
+  // ✅ Admin panel: chỉ lấy USER => không bao giờ thấy ADMIN
   async findAll(): Promise<UserWithoutPassword[]> {
     const users = await this.repo.find({
-      // Optional: load relations nếu cần
+      where: { role: Role.USER },
       relations: ["rentals"],
     });
     return users.map((u) => this.excludePassword(u));
@@ -43,7 +45,6 @@ export class UsersService {
   async findOne(id: number): Promise<UserWithoutPassword> {
     const user = await this.repo.findOne({
       where: { id },
-      // Optional: load relations nếu cần
       relations: ["rentals"],
     });
     if (!user) throw new NotFoundException("User not found");
@@ -61,6 +62,9 @@ export class UsersService {
     const user = await this.repo.findOne({ where: { id } });
     if (!user) throw new NotFoundException("User not found");
 
+    // ✅ Optional: nếu user là ADMIN thì có thể chặn update luôn (tuỳ bạn)
+    if (user.role === Role.ADMIN) throw new BadRequestException("Cannot update admin account");
+
     if (dto.password) {
       dto.password = await bcrypt.hash(dto.password, 10);
     }
@@ -72,8 +76,20 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<{ message: string }> {
-    const user = await this.repo.findOne({ where: { id } });
+    const user = await this.repo.findOne({
+      where: { id },
+      relations: ["rentals"], // ✅ cần load rentals để check
+    });
     if (!user) throw new NotFoundException("User not found");
+
+    if (user.role === Role.ADMIN) {
+      throw new BadRequestException("Cannot delete admin account");
+    }
+
+    // ✅ chặn delete nếu có rentals
+    if (user.rentals && user.rentals.length > 0) {
+      throw new BadRequestException("Cannot delete user who has rentals");
+    }
 
     await this.repo.remove(user);
     return { message: "User deleted successfully" };

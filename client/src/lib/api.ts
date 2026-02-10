@@ -6,9 +6,8 @@ import {
   ApiResponse,
   PaginatedResponse,
   ProductFilters,
-  AdminStats,
 } from "@/types";
-
+import type { AdminStats } from "@/types/admin-stats";
 import type { BEProduct } from "@/types/backend";
 import { mapBEProductToMock } from "@/lib/mappers";
 
@@ -97,6 +96,19 @@ export const productsApi = {
     const qs = params.toString();
     const beList = await fetchApi<BEProduct[]>(qs ? `/products?${qs}` : "/products");
     return beList.map(mapBEProductToMock);
+  },
+
+  // ✅ NEW: Featured (nếu BE support query featured + limit)
+  getFeatured: async (limit = 4) => {
+    // ưu tiên gọi thẳng server để nhẹ
+    try {
+      const beList = await fetchApi<BEProduct[]>(`/products?featured=true&limit=${limit}`);
+      return beList.map(mapBEProductToMock);
+    } catch {
+      // fallback: nếu BE chưa support featured query => lấy all rồi filter
+      const all = await productsApi.getAll();
+      return all.filter((p: any) => p.featured).slice(0, limit);
+    }
   },
 
   getById: async (id: string) => {
@@ -223,9 +235,35 @@ export const rentalsApi = {
     }),
 };
 
-// Admin API
 export const adminApi = {
-  getStats: () => fetchApi<ApiResponse<AdminStats>>("/admin/stats"),
+  // BE trả object thô, không bọc {data:...}
+  getStats: () => fetchApi<AdminStats>("/admin/stats"),
+};
+
+
+// =============================
+// ✅ Admin Users API
+// endpoint BE: /admin/users
+// =============================
+export const adminUsersApi = {
+  // GET /admin/users
+  getAll: () => fetchApi<User[]>("/admin/users"),
+
+  // GET /admin/users/:id (nếu bạn có làm)
+  getById: (id: number | string) => fetchApi<User>(`/admin/users/${id}`),
+
+  // PATCH /admin/users/:id
+  update: (id: number | string, data: Partial<User> & { password?: string }) =>
+    fetchApi<User>(`/admin/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  // DELETE /admin/users/:id
+  delete: (id: number | string) =>
+    fetchApi<{ message: string }>(`/admin/users/${id}`, {
+      method: "DELETE",
+    }),
 };
 
 // =============================
