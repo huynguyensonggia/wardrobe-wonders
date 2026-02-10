@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Facebook } from 'lucide-react';
+import { Link } from "react-router-dom";
+import { Instagram, Twitter, Facebook } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-16">
@@ -11,18 +14,31 @@ export function Footer() {
             <Link to="/" className="font-display text-2xl font-semibold tracking-tight">
               WARDROBE WONDERS
             </Link>
+
             <p className="mt-4 text-sm text-primary-foreground/70 leading-relaxed">
-              Luxury fashion rental for the modern woman. Access designer pieces 
-              without the commitment.
+              {t("footer.tagline")}
             </p>
+
             <div className="flex gap-4 mt-6">
-              <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              <a
+                href="#"
+                className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                aria-label="Instagram"
+              >
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              <a
+                href="#"
+                className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                aria-label="Twitter"
+              >
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors">
+              <a
+                href="#"
+                className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                aria-label="Facebook"
+              >
                 <Facebook className="w-5 h-5" />
               </a>
             </div>
@@ -30,26 +46,38 @@ export function Footer() {
 
           {/* Shop */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">Shop</h4>
+            <h4 className="font-display text-lg font-medium mb-4">{t("footer.shop")}</h4>
             <ul className="space-y-3">
               <li>
-                <Link to="/products" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  All Collection
+                <Link
+                  to="/products"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.allCollections")}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=dresses" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Dresses
+                <Link
+                  to="/products?category=dresses"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.dresses")}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=outerwear" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Outerwear
+                <Link
+                  to="/products?category=outerwear"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.outerwear")}
                 </Link>
               </li>
               <li>
-                <Link to="/products?category=tops" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Tops
+                <Link
+                  to="/products?category=tops"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.tops")}
                 </Link>
               </li>
             </ul>
@@ -57,54 +85,78 @@ export function Footer() {
 
           {/* Help */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">Help</h4>
+            <h4 className="font-display text-lg font-medium mb-4">{t("footer.help")}</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  How It Works
-                </a>
+                <Link
+                  to="/how-it-works"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.howItWorks")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Sizing Guide
-                </a>
+                <Link
+                  to="/size-guide"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.sizeGuide")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Shipping & Returns
-                </a>
+                <Link
+                  to="/shipping-returns"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.shippingReturns")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  FAQ
-                </a>
+                <Link
+                  to="/faq"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.faq")}
+                </Link>
               </li>
             </ul>
           </div>
 
           {/* Company */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">Company</h4>
+            <h4 className="font-display text-lg font-medium mb-4">{t("footer.company")}</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  About Us
-                </a>
+                <Link
+                  to="/about"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.about")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Sustainability
-                </a>
+                <Link
+                  to="/sustainability"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.sustainability")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Careers
-                </a>
+                <Link
+                  to="/careers"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.careers")}
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-                  Contact
-                </a>
+                <Link
+                  to="/contact"
+                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                >
+                  {t("footer.contact")}
+                </Link>
               </li>
             </ul>
           </div>
@@ -113,15 +165,22 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-primary-foreground/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-xs text-primary-foreground/50">
-              © {new Date().getFullYear()} Élégance. All rights reserved.
+              {t("footer.copyright", { year: new Date().getFullYear() })}
             </p>
+
             <div className="flex gap-6">
-              <a href="#" className="text-xs text-primary-foreground/50 hover:text-primary-foreground transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-xs text-primary-foreground/50 hover:text-primary-foreground transition-colors">
-                Terms of Service
-              </a>
+              <Link
+                to="/privacy"
+                className="text-xs text-primary-foreground/50 hover:text-primary-foreground transition-colors"
+              >
+                {t("footer.privacy")}
+              </Link>
+              <Link
+                to="/terms"
+                className="text-xs text-primary-foreground/50 hover:text-primary-foreground transition-colors"
+              >
+                {t("footer.terms")}
+              </Link>
             </div>
           </div>
         </div>

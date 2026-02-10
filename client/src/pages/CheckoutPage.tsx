@@ -13,10 +13,12 @@ import {
   type DaNangDistrict,
 } from "@/constants/daNangAddress";
 
+import { useTranslation } from "react-i18next";
+
 // ================= TYPES =================
 type CheckoutItem = {
   productId: number;
-  variantId: number;   // ✅ bắt buộc
+  variantId: number; // ✅ required
   size?: string;
 
   name: string;
@@ -34,7 +36,7 @@ type CheckoutState =
       source: "rentNow";
       product: {
         productId: number;
-        variantId: number; // ✅ NEW
+        variantId: number; // ✅
         size?: string;
 
         name: string;
@@ -54,6 +56,8 @@ function normalizePhone(s: string) {
 }
 
 export default function CheckoutPage() {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const location = useLocation();
   const { items, clear } = useCart();
@@ -68,7 +72,7 @@ export default function CheckoutPage() {
       return [
         {
           productId: p.productId,
-          variantId: p.variantId, // ✅
+          variantId: p.variantId,
           size: p.size,
           name: p.name,
           imageUrl: p.imageUrl,
@@ -84,7 +88,7 @@ export default function CheckoutPage() {
     // source === "cart"
     return items.map((it) => ({
       productId: it.productId,
-      variantId: it.variantId, // ✅
+      variantId: it.variantId,
       size: it.size,
       name: it.name,
       imageUrl: it.imageUrl,
@@ -100,12 +104,14 @@ export default function CheckoutPage() {
   if (!checkoutItems.length) {
     return (
       <div className="container mx-auto px-4 py-10 text-center">
-        <h2 className="text-xl font-medium mb-2">No items to checkout</h2>
+        <h2 className="text-xl font-medium mb-2">
+          {t("checkout.empty.title")}
+        </h2>
         <p className="text-muted-foreground mb-6">
-          Please add products before checkout.
+          {t("checkout.empty.desc")}
         </p>
         <Button asChild>
-          <Link to="/products">Browse products</Link>
+          <Link to="/products">{t("checkout.empty.browse")}</Link>
         </Button>
       </div>
     );
@@ -150,12 +156,13 @@ export default function CheckoutPage() {
   const shipAddress = useMemo(() => {
     const parts = [
       street.trim(),
-      ward ? `Phường/Xã ${ward}` : "",
-      district ? `Quận/Huyện ${district}` : "",
-      "Đà Nẵng",
+      ward ? t("checkout.address.wardPrefix", { ward }) : "",
+      district ? t("checkout.address.districtPrefix", { district }) : "",
+      t("checkout.address.city"),
     ].filter(Boolean);
+
     return parts.join(", ");
-  }, [street, ward, district]);
+  }, [street, ward, district, t]);
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -174,12 +181,12 @@ export default function CheckoutPage() {
       const address = shipAddress.trim();
       const note = shipNote.trim();
 
-      if (!fullName) return alert("Please input full name");
-      if (!phone) return alert("Please input phone number");
-      if (!street.trim()) return alert("Please input street/house number");
-      if (!district) return alert("Please select district");
-      if (!ward) return alert("Please select ward");
-      if (!address) return alert("Please input address");
+      if (!fullName) return alert(t("checkout.alert.fullName"));
+      if (!phone) return alert(t("checkout.alert.phone"));
+      if (!street.trim()) return alert(t("checkout.alert.street"));
+      if (!district) return alert(t("checkout.alert.district"));
+      if (!ward) return alert(t("checkout.alert.ward"));
+      if (!address) return alert(t("checkout.alert.address"));
 
       setSubmitting(true);
 
@@ -189,10 +196,10 @@ export default function CheckoutPage() {
           endDate: g.endDate,
           items: g.list.map((x) => ({
             productId: x.productId,
-            variantId: x.variantId, // ✅
+            variantId: x.variantId,
             quantity: x.quantity,
           })),
-          note: "Created from checkout",
+          note: t("checkout.order.note"),
           shipFullName: fullName,
           shipPhone: phone,
           shipAddress: address,
@@ -202,10 +209,10 @@ export default function CheckoutPage() {
 
       if (state.source === "cart") clear();
 
-      alert("Order created successfully!");
+      alert(t("checkout.alert.success"));
       navigate("/dashboard");
     } catch (e: any) {
-      alert(e?.message || "Create rental failed");
+      alert(e?.message || t("checkout.alert.failed"));
     } finally {
       setSubmitting(false);
     }
@@ -216,7 +223,7 @@ export default function CheckoutPage() {
     <div className="container mx-auto px-4 py-10 grid lg:grid-cols-2 gap-8">
       {/* LEFT: Items */}
       <div className="space-y-4">
-        <h2 className="text-xl font-medium">Order Summary</h2>
+        <h2 className="text-xl font-medium">{t("checkout.summary.title")}</h2>
 
         {groups.map((g) => {
           const groupTotal = g.list.reduce(
@@ -227,11 +234,13 @@ export default function CheckoutPage() {
           return (
             <div key={g.key} className="border rounded-lg p-4 space-y-3">
               <div className="text-sm text-muted-foreground">
-                Rental period: <b>{g.startDate}</b> → <b>{g.endDate}</b>
+                {t("checkout.summary.rentalPeriod")}{" "}
+                <b>{g.startDate}</b> → <b>{g.endDate}</b>
               </div>
 
               {g.list.map((it) => {
                 const lineTotal = it.quantity * it.rentPricePerDay * it.days;
+
                 return (
                   <div
                     key={`${it.productId}_${it.variantId}_${it.startDate}_${it.endDate}`}
@@ -252,12 +261,15 @@ export default function CheckoutPage() {
                       <div className="font-medium">
                         {it.name} {it.size ? `(${it.size})` : ""}
                       </div>
+
                       <div className="text-sm text-muted-foreground">
-                        ${it.rentPricePerDay}/day • {it.days} days • Qty{" "}
-                        {it.quantity}
+                        ${it.rentPricePerDay}/{t("checkout.summary.perDay")} •{" "}
+                        {t("checkout.summary.days", { days: it.days })} •{" "}
+                        {t("checkout.summary.qty")} {it.quantity}
                       </div>
+
                       <div className="text-sm font-medium">
-                        Line: ${lineTotal}
+                        {t("checkout.summary.line")}: ${lineTotal}
                       </div>
                     </div>
                   </div>
@@ -265,7 +277,9 @@ export default function CheckoutPage() {
               })}
 
               <div className="border-t pt-3 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Group total</span>
+                <span className="text-muted-foreground">
+                  {t("checkout.summary.groupTotal")}
+                </span>
                 <span className="font-medium">${groupTotal}</span>
               </div>
             </div>
@@ -274,12 +288,13 @@ export default function CheckoutPage() {
 
         <div className="border-t pt-4 flex items-center justify-between">
           <div className="text-sm">
-            Total: <span className="font-medium">${total}</span>
+            {t("checkout.summary.total")}:{" "}
+            <span className="font-medium">${total}</span>
           </div>
 
           {state.source === "cart" && (
             <Button variant="outline" asChild>
-              <Link to="/cart">Back to cart</Link>
+              <Link to="/cart">{t("checkout.summary.backToCart")}</Link>
             </Button>
           )}
         </div>
@@ -287,10 +302,10 @@ export default function CheckoutPage() {
 
       {/* RIGHT: Shipping */}
       <div className="border rounded-lg p-5 space-y-4">
-        <h2 className="text-xl font-medium">Shipping Information</h2>
+        <h2 className="text-xl font-medium">{t("checkout.shipping.title")}</h2>
 
         <div className="grid gap-2">
-          <Label>Full name</Label>
+          <Label>{t("checkout.shipping.fullName")}</Label>
           <Input
             value={shipFullName}
             onChange={(e) => setShipFullName(e.target.value)}
@@ -298,7 +313,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>Phone</Label>
+          <Label>{t("checkout.shipping.phone")}</Label>
           <Input
             value={shipPhone}
             onChange={(e) => setShipPhone(e.target.value)}
@@ -306,12 +321,12 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>Số nhà / Tên đường</Label>
+          <Label>{t("checkout.shipping.street")}</Label>
           <Input value={street} onChange={(e) => setStreet(e.target.value)} />
         </div>
 
         <div className="grid gap-2">
-          <Label>Quận / Huyện</Label>
+          <Label>{t("checkout.shipping.district")}</Label>
           <select
             className="h-10 rounded-md border px-3 text-sm"
             value={district}
@@ -321,7 +336,7 @@ export default function CheckoutPage() {
               setWard("");
             }}
           >
-            <option value="">-- Chọn quận/huyện --</option>
+            <option value="">{t("checkout.shipping.districtPlaceholder")}</option>
             {DA_NANG_DISTRICTS.map((d) => (
               <option key={d} value={d}>
                 {d}
@@ -331,7 +346,7 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>Phường / Xã</Label>
+          <Label>{t("checkout.shipping.ward")}</Label>
           <select
             className="h-10 rounded-md border px-3 text-sm"
             value={ward}
@@ -339,7 +354,9 @@ export default function CheckoutPage() {
             disabled={!district}
           >
             <option value="">
-              {district ? "-- Chọn phường/xã --" : "Chọn quận/huyện trước"}
+              {district
+                ? t("checkout.shipping.wardPlaceholder")
+                : t("checkout.shipping.wardNeedDistrict")}
             </option>
             {wardOptions.map((w) => (
               <option key={w} value={w}>
@@ -350,13 +367,17 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>Địa chỉ ghép</Label>
+          <Label>{t("checkout.shipping.combinedAddress")}</Label>
           <Input value={shipAddress} readOnly />
         </div>
 
         <div className="grid gap-2">
-          <Label>Note</Label>
-          <Input value={shipNote} onChange={(e) => setShipNote(e.target.value)} />
+          <Label>{t("checkout.shipping.note")}</Label>
+          <Input
+            value={shipNote}
+            onChange={(e) => setShipNote(e.target.value)}
+            placeholder={t("checkout.shipping.notePlaceholder")}
+          />
         </div>
 
         <Button
@@ -364,7 +385,7 @@ export default function CheckoutPage() {
           onClick={handleConfirm}
           disabled={submitting || !canSubmit}
         >
-          {submitting ? "Creating..." : "Confirm & Create Rental"}
+          {submitting ? t("checkout.button.creating") : t("checkout.button.confirm")}
         </Button>
       </div>
     </div>

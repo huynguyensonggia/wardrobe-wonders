@@ -33,13 +33,10 @@ import type { Product, Category } from "@/types";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Pencil, Trash2, Upload } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
 /* ===== ENUM MIRROR FROM BE ===== */
 type ProductOccasion = "party" | "wedding" | "casual";
-const OCCASIONS: { value: ProductOccasion; label: string }[] = [
-  { value: "party", label: "Party" },
-  { value: "wedding", label: "Wedding" },
-  { value: "casual", label: "Casual" },
-];
 
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 
@@ -54,7 +51,6 @@ type Mode = "create" | "edit";
 
 /** Generate stable id for UI rows */
 const makeRowId = () => {
-  // browser supports crypto.randomUUID in modern envs
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return (crypto as any).randomUUID() as string;
   }
@@ -63,6 +59,17 @@ const makeRowId = () => {
 
 export default function AdminProducts() {
   const { toast } = useToast();
+  const { t } = useTranslation();
+
+  // occasions with translation
+  const OCCASIONS: { value: ProductOccasion; label: string }[] = useMemo(
+    () => [
+      { value: "party", label: t("adminProducts.occasions.party") },
+      { value: "wedding", label: t("adminProducts.occasions.wedding") },
+      { value: "casual", label: t("adminProducts.occasions.casual") },
+    ],
+    [t]
+  );
 
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("create");
@@ -98,13 +105,13 @@ export default function AdminProducts() {
         if ((list || []).length) setCategoryId(String((list as any[])[0]?.id));
       } catch (e: any) {
         toast({
-          title: "Load categories failed",
-          description: e?.message || "Error",
+          title: t("adminProducts.toasts.loadCategoriesFailed.title"),
+          description: e?.message || t("common.error"),
         });
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [t]);
 
   /* ===== PRODUCTS LIST ===== */
   const [products, setProducts] = useState<Product[]>([]);
@@ -117,8 +124,8 @@ export default function AdminProducts() {
       setProducts(list || []);
     } catch (e: any) {
       toast({
-        title: "Load products failed",
-        description: e?.message || "Error",
+        title: t("adminProducts.toasts.loadProductsFailed.title"),
+        description: e?.message || t("common.error"),
       });
     } finally {
       setLoadingProducts(false);
@@ -182,7 +189,7 @@ export default function AdminProducts() {
           id: String(v.id ?? makeRowId()), // ✅ use DB id as key
           size: (v.size ?? "M") as any,
           stock: String(v.stock ?? 0),
-        })),
+        }))
       );
     } else {
       setVariants([{ id: makeRowId(), size: "M", stock: "1" }]);
@@ -192,8 +199,11 @@ export default function AdminProducts() {
   };
 
   const dialogTitle = useMemo(
-    () => (mode === "create" ? "Create product" : "Update product"),
-    [mode],
+    () =>
+      mode === "create"
+        ? t("adminProducts.dialog.createTitle")
+        : t("adminProducts.dialog.updateTitle"),
+    [mode, t]
   );
 
   const sizesDuplicate = useMemo(() => {
@@ -210,33 +220,39 @@ export default function AdminProducts() {
     try {
       if (!name.trim()) {
         toast({
-          title: "Missing name",
-          description: "Please input product name.",
+          title: t("adminProducts.validation.missingName.title"),
+          description: t("adminProducts.validation.missingName.desc"),
         });
         return;
       }
       if (!categoryId) {
         toast({
-          title: "Missing category",
-          description: "Please select a category.",
+          title: t("adminProducts.validation.missingCategory.title"),
+          description: t("adminProducts.validation.missingCategory.desc"),
         });
         return;
       }
 
       if (mode === "create" && !image) {
-        toast({ title: "Missing image", description: "Please choose an image." });
+        toast({
+          title: t("adminProducts.validation.missingImage.title"),
+          description: t("adminProducts.validation.missingImage.desc"),
+        });
         return;
       }
 
       if (!variants.length) {
-        toast({ title: "Missing variants", description: "Add at least 1 size." });
+        toast({
+          title: t("adminProducts.validation.missingVariants.title"),
+          description: t("adminProducts.validation.missingVariants.desc"),
+        });
         return;
       }
 
       if (sizesDuplicate) {
         toast({
-          title: "Duplicate size",
-          description: "Each size should appear once.",
+          title: t("adminProducts.validation.duplicateSize.title"),
+          description: t("adminProducts.validation.duplicateSize.desc"),
         });
         return;
       }
@@ -247,8 +263,8 @@ export default function AdminProducts() {
       });
       if (invalid) {
         toast({
-          title: "Invalid variants",
-          description: "Stock must be a number >= 0.",
+          title: t("adminProducts.validation.invalidVariants.title"),
+          description: t("adminProducts.validation.invalidVariants.desc"),
         });
         return;
       }
@@ -266,21 +282,28 @@ export default function AdminProducts() {
       // IMPORTANT: multipart/form-data -> variants as JSON string
       form.append(
         "variants",
-        JSON.stringify(
-          variants.map((v) => ({ size: v.size, stock: Number(v.stock) })),
-        ),
+        JSON.stringify(variants.map((v) => ({ size: v.size, stock: Number(v.stock) })))
       );
 
       if (mode === "create") {
         await productsApi.create(form);
-        toast({ title: "Success", description: "Product created" });
+        toast({
+          title: t("common.success"),
+          description: t("adminProducts.toasts.created.desc"),
+        });
       } else {
         if (!editingProduct?.id) {
-          toast({ title: "Update failed", description: "Missing product id" });
+          toast({
+            title: t("adminProducts.toasts.updateFailedMissingId.title"),
+            description: t("adminProducts.toasts.updateFailedMissingId.desc"),
+          });
           return;
         }
         await productsApi.update(String(editingProduct.id), form);
-        toast({ title: "Success", description: "Product updated" });
+        toast({
+          title: t("common.success"),
+          description: t("adminProducts.toasts.updated.desc"),
+        });
       }
 
       setOpen(false);
@@ -288,8 +311,11 @@ export default function AdminProducts() {
       await fetchProducts();
     } catch (e: any) {
       toast({
-        title: mode === "create" ? "Create failed" : "Update failed",
-        description: e?.message || "Error",
+        title:
+          mode === "create"
+            ? t("adminProducts.toasts.createFailed.title")
+            : t("adminProducts.toasts.updateFailed.title"),
+        description: e?.message || t("common.error"),
       });
     }
   };
@@ -298,10 +324,16 @@ export default function AdminProducts() {
   const handleDelete = async (id: string) => {
     try {
       await productsApi.delete(id);
-      toast({ title: "Deleted", description: "Product removed" });
+      toast({
+        title: t("adminProducts.toasts.deleted.title"),
+        description: t("adminProducts.toasts.deleted.desc"),
+      });
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: "Delete failed", description: e?.message || "Error" });
+      toast({
+        title: t("adminProducts.toasts.deleteFailed.title"),
+        description: e?.message || t("common.error"),
+      });
     }
   };
 
@@ -313,13 +345,19 @@ export default function AdminProducts() {
       const res = await productsApi.importExcel(file);
 
       toast({
-        title: "Import done",
-        description: `Imported: ${res?.imported ?? 0} | Failed: ${res?.failedCount ?? 0}`,
+        title: t("adminProducts.toasts.importDone.title"),
+        description: t("adminProducts.toasts.importDone.desc", {
+          imported: res?.imported ?? 0,
+          failed: res?.failedCount ?? 0,
+        }),
       });
 
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: "Import failed", description: e?.message || "Error" });
+      toast({
+        title: t("adminProducts.toasts.importFailed.title"),
+        description: e?.message || t("common.error"),
+      });
     } finally {
       setImporting(false);
       if (importInputRef.current) importInputRef.current.value = "";
@@ -331,8 +369,8 @@ export default function AdminProducts() {
       {/* Header + Create + Import */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-semibold">Products</h2>
-          <p className="text-muted-foreground">Manage products</p>
+          <h2 className="font-display text-2xl font-semibold">{t("adminProducts.header.title")}</h2>
+          <p className="text-muted-foreground">{t("adminProducts.header.subtitle")}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -354,11 +392,11 @@ export default function AdminProducts() {
             disabled={importing}
           >
             <Upload className="h-4 w-4 mr-2" />
-            {importing ? "Importing..." : "Import Excel"}
+            {importing ? t("adminProducts.buttons.importing") : t("adminProducts.buttons.importExcel")}
           </Button>
 
           {/* ✅ Create */}
-          <Button onClick={openCreate}>Create product</Button>
+          <Button onClick={openCreate}>{t("adminProducts.buttons.create")}</Button>
         </div>
 
         {/* Shared Dialog for Create/Update */}
@@ -371,17 +409,16 @@ export default function AdminProducts() {
             <div className="grid gap-4">
               {/* IMAGE PREVIEW */}
               <div className="grid gap-2">
-                <Label>Image {mode === "edit" ? "(optional)" : ""}</Label>
+                <Label>
+                  {t("adminProducts.form.image")} {mode === "edit" ? t("adminProducts.form.optional") : ""}
+                </Label>
+
                 <div className="flex gap-4 items-start">
                   <div className="w-28 h-28 border rounded-md overflow-hidden flex items-center justify-center">
                     {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="preview"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={imagePreview} alt={t("adminProducts.form.previewAlt")} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-xs text-muted-foreground">No image</span>
+                      <span className="text-xs text-muted-foreground">{t("adminProducts.form.noImage")}</span>
                     )}
                   </div>
 
@@ -394,24 +431,24 @@ export default function AdminProducts() {
 
                 {mode === "edit" && (
                   <p className="text-xs text-muted-foreground">
-                    Nếu không chọn ảnh mới, hệ thống sẽ giữ ảnh cũ.
+                    {t("adminProducts.form.keepOldImageHint")}
                   </p>
                 )}
               </div>
 
               {/* NAME */}
               <div className="grid gap-2">
-                <Label>Name</Label>
+                <Label>{t("adminProducts.form.name")}</Label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
               {/* CATEGORY + OCCASION */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
-                  <Label>Category</Label>
+                  <Label>{t("adminProducts.form.category")}</Label>
                   <Select value={categoryId} onValueChange={setCategoryId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
+                      <SelectValue placeholder={t("adminProducts.form.selectCategory")} />
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((c) => (
@@ -424,13 +461,10 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label>Occasion</Label>
-                  <Select
-                    value={occasion}
-                    onValueChange={(v) => setOccasion(v as ProductOccasion)}
-                  >
+                  <Label>{t("adminProducts.form.occasion")}</Label>
+                  <Select value={occasion} onValueChange={(v) => setOccasion(v as ProductOccasion)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select occasion" />
+                      <SelectValue placeholder={t("adminProducts.form.selectOccasion")} />
                     </SelectTrigger>
                     <SelectContent>
                       {OCCASIONS.map((o) => (
@@ -446,7 +480,7 @@ export default function AdminProducts() {
               {/* PRICE */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
-                  <Label>Rent / Day</Label>
+                  <Label>{t("adminProducts.form.rentPerDay")}</Label>
                   <Input
                     value={rentPricePerDay}
                     onChange={(e) => setRentPricePerDay(e.target.value)}
@@ -454,58 +488,49 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Deposit</Label>
-                  <Input
-                    value={deposit}
-                    onChange={(e) => setDeposit(e.target.value)}
-                    inputMode="numeric"
-                  />
+                  <Label>{t("adminProducts.form.deposit")}</Label>
+                  <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
                 </div>
               </div>
 
               {/* VARIANTS + COLOR */}
               <div className="grid gap-3">
                 <div className="flex items-center justify-between">
-                  <Label>Variants (Size + Stock)</Label>
+                  <Label>{t("adminProducts.form.variants")}</Label>
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
                     onClick={() =>
-                      setVariants((prev) => [
-                        ...prev,
-                        { id: makeRowId(), size: "M", stock: "0" },
-                      ])
+                      setVariants((prev) => [...prev, { id: makeRowId(), size: "M", stock: "0" }])
                     }
                   >
-                    + Add size
+                    {t("adminProducts.buttons.addSize")}
                   </Button>
                 </div>
 
                 {sizesDuplicate && (
                   <div className="text-xs text-destructive">
-                    Duplicate size detected. Please keep each size unique.
+                    {t("adminProducts.validation.duplicateSize.inline")}
                   </div>
                 )}
 
                 <div className="space-y-2">
                   {variants.map((v) => (
                     <div
-                      key={v.id} // ✅ FIX: stable key
+                      key={v.id}
                       className="grid grid-cols-[140px_1fr_40px] gap-2 items-center"
                     >
                       <Select
                         value={v.size}
                         onValueChange={(val) =>
                           setVariants((prev) =>
-                            prev.map((x) =>
-                              x.id === v.id ? { ...x, size: val as any } : x,
-                            ),
+                            prev.map((x) => (x.id === v.id ? { ...x, size: val as any } : x))
                           )
                         }
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Size" />
+                          <SelectValue placeholder={t("adminProducts.form.size")} />
                         </SelectTrigger>
                         <SelectContent>
                           {SIZES.map((s) => (
@@ -520,24 +545,20 @@ export default function AdminProducts() {
                         value={v.stock}
                         onChange={(e) =>
                           setVariants((prev) =>
-                            prev.map((x) =>
-                              x.id === v.id ? { ...x, stock: e.target.value } : x,
-                            ),
+                            prev.map((x) => (x.id === v.id ? { ...x, stock: e.target.value } : x))
                           )
                         }
                         inputMode="numeric"
-                        placeholder="Stock"
+                        placeholder={t("adminProducts.form.stock")}
                       />
 
                       <Button
                         type="button"
                         size="icon"
                         variant="destructive"
-                        onClick={() =>
-                          setVariants((prev) => prev.filter((x) => x.id !== v.id))
-                        }
+                        onClick={() => setVariants((prev) => prev.filter((x) => x.id !== v.id))}
                         disabled={variants.length === 1}
-                        title="Remove"
+                        title={t("adminProducts.buttons.remove")}
                       >
                         ✕
                       </Button>
@@ -546,13 +567,13 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="grid gap-2 max-w-[260px]">
-                  <Label>Color</Label>
+                  <Label>{t("adminProducts.form.color")}</Label>
                   <Input value={color} onChange={(e) => setColor(e.target.value)} />
                 </div>
               </div>
 
               <Button onClick={handleSubmit}>
-                {mode === "create" ? "Submit" : "Update"}
+                {mode === "create" ? t("adminProducts.buttons.submit") : t("adminProducts.buttons.update")}
               </Button>
             </div>
           </DialogContent>
@@ -561,7 +582,7 @@ export default function AdminProducts() {
 
       {/* ===== GRID LIST ===== */}
       {loadingProducts ? (
-        <div className="text-sm text-muted-foreground">Loading products...</div>
+        <div className="text-sm text-muted-foreground">{t("adminProducts.loadingProducts")}</div>
       ) : products.length > 0 ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
           {products.map((product, i) => (
@@ -576,7 +597,7 @@ export default function AdminProducts() {
                   variant="secondary"
                   className="h-8 w-8"
                   onClick={() => openEdit(product)}
-                  title="Edit"
+                  title={t("common.edit")}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -587,7 +608,7 @@ export default function AdminProducts() {
                       size="icon"
                       variant="destructive"
                       className="h-8 w-8"
-                      title="Delete"
+                      title={t("common.delete")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -595,15 +616,15 @@ export default function AdminProducts() {
 
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete product?</AlertDialogTitle>
+                      <AlertDialogTitle>{t("adminProducts.deleteDialog.title")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm này?
+                        {t("adminProducts.deleteDialog.desc")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                       <AlertDialogAction onClick={() => handleDelete(String(product.id))}>
-                        Delete
+                        {t("common.delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -615,7 +636,7 @@ export default function AdminProducts() {
           ))}
         </div>
       ) : (
-        <div className="text-sm text-muted-foreground">No products yet.</div>
+        <div className="text-sm text-muted-foreground">{t("adminProducts.empty")}</div>
       )}
     </div>
   );

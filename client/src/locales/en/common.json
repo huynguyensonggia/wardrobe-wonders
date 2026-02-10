@@ -1,0 +1,882 @@
+{
+    "footer": {
+        "tagline": "Premium fashion rental for the modern woman. Rent designer pieces without the long-term commitment.",
+        "shop": "Shop",
+        "allCollections": "All Collections",
+        "dresses": "Dresses",
+        "outerwear": "Outerwear",
+        "tops": "Tops",
+        "help": "Help",
+        "howItWorks": "How Renting Works",
+        "sizeGuide": "Size Guide",
+        "shippingReturns": "Shipping & Returns",
+        "faq": "FAQ",
+        "company": "Company",
+        "about": "About Wardrobe Wonders",
+        "sustainability": "Sustainability",
+        "careers": "Careers",
+        "contact": "Contact",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "copyright": "© {{year}} Wardrobe Wonders. All rights reserved."
+    },
+    "language": {
+        "label": "Language",
+        "en": "English",
+        "vi": "Vietnamese",
+        "ja": "Japanese"
+    },
+    "navbar": {
+        "collection": "Collection",
+        "dresses": "Dresses",
+        "tops": "Tops",
+        "pants": "Pants",
+        "outerwear": "Outerwear",
+        "aiTryOn": "AI Try-On",
+        "cart": "Cart",
+        "myRentals": "My Rentals",
+        "adminDashboard": "Admin Dashboard",
+        "settings": "Settings",
+        "signOut": "Sign Out",
+        "signIn": "Sign In",
+        "joinNow": "Join Now",
+        "menu": "Menu"
+    },
+    "products": {
+        "title": "Our Collection",
+        "piecesAvailable": "{{count}} pieces available",
+        "searchPlaceholder": "Search products...",
+        "filters": "Filters",
+        "category": "Category",
+        "allCategories": "All Categories",
+        "size": "Size",
+        "allSizes": "All Sizes",
+        "color": "Color",
+        "allColors": "All Colors",
+        "availability": "Availability",
+        "allStatus": "All Status",
+        "status": {
+            "available": "Available",
+            "rented": "Rented"
+        },
+        "clear": "Clear",
+        "loading": "Loading...",
+        "error": "Failed to load products",
+        "noProducts": "No products found",
+        "clearFilters": "Clear Filters"
+    },
+    "productDetail": {
+        "loading": "Loading product...",
+        "errorTitle": "Failed to load product",
+        "notFoundTitle": "Product not found",
+        "backToCollection": "Back to Collection",
+        "perDay": "/day",
+        "deposit": "deposit",
+        "unavailable": "Currently Unavailable",
+        "selectSize": "Select Size",
+        "sizeGuide": "Size guide",
+        "sizeChartTitle": "Women's Size Chart",
+        "sizeChartAlt": "Women’s size chart",
+        "noVariantsWarning": "⚠️ Product has no variants from API.",
+        "selectColor": "Select Color",
+        "rentalPeriod": "Rental Period",
+        "selectDates": "Select dates",
+        "minimumRentalHint": "Minimum rental period:",
+        "minimumDays": "{{days}} days",
+        "minimumRentalError": "Minimum rental is {{days}} days.",
+        "days": "days",
+        "refundableDeposit": "Refundable deposit",
+        "totalDueToday": "Total due today",
+        "rentNow": "Rent Now",
+        "addToCart": "Add to Cart",
+        "tryOnVirtually": "Try On Virtually",
+        "galleryImage": "Gallery image {{index}}",
+        "actions": {
+            "favorite": "Add to favorites",
+            "share": "Share"
+        },
+        "tooltips": {
+            "variantInactive": "Variant inactive",
+            "outOfStock": "Out of stock",
+            "stock": "Stock: {{stock}}"
+        },
+        "selectedVariant": "Selected variant: #{{id}} • Stock: {{stock}}",
+        "features": {
+            "freeShipping": "Free shipping over $100",
+            "damageProtection": "Damage protection included"
+        },
+        "alerts": {
+            "selectSize": "Please select size",
+            "variantNotFound": "Size/variant not found. Please re-select.",
+            "outOfStock": "This size is out of stock.",
+            "selectDates": "Please select rental dates",
+            "minimumRental": "Minimum rental is {{days}} days",
+            "addedToCart": "Added to cart!"
+        }
+    },
+    "home": {
+        "loading": "Loading...",
+        "errors": {
+            "loadHomepage": "Failed to load homepage data"
+        },
+        "hero": {
+            "imageAlt": "Elegant fashion",
+            "titleLine1": "Rent Luxury,",
+            "titleHighlight": "Own the Moment",
+            "subtitle": "Access designer fashion without the commitment. Sustainable, affordable, and always in style.",
+            "ctaExplore": "Explore Collection",
+            "ctaTryOn": "AI Try-On"
+        },
+        "features": {
+            "ai": {
+                "title": "AI Try-On",
+                "desc": "See how pieces look on you before renting"
+            },
+            "delivery": {
+                "title": "Free Delivery",
+                "desc": "Complimentary shipping on orders over $100"
+            },
+            "insured": {
+                "title": "Fully Insured",
+                "desc": "Wear worry-free with our damage protection"
+            },
+            "returns": {
+                "title": "Easy Returns",
+                "desc": "Hassle-free returns with prepaid labels"
+            }
+        },
+        "categories": {
+            "title": "Shop by Category",
+            "subtitle": "Discover curated collections for every occasion"
+        },
+        "featured": {
+            "title": "Featured Pieces",
+            "subtitle": "Hand-picked selections from our latest collection",
+            "viewAll": "View All",
+            "viewAllMobile": "View All Products"
+        },
+        "tryOnCta": {
+            "title": "Try Before You Rent",
+            "desc": "Our AI-powered virtual try-on lets you see how any piece looks on you. Upload your photo and discover your perfect fit.",
+            "button": "Try It Now"
+        },
+        "testimonial": {
+            "quote": "“Wardrobe Wonders changed the way I dress. Thanks to AI virtual try-on, I can see how outfits fit before renting—so I always choose the right look for every event.”",
+            "name": "Sarah Mitchell",
+            "title": "Fashion Editor, Vogue"
+        }
+    },
+    "tryOn": {
+        "header": {
+            "title": "AI Virtual Try-On",
+            "subtitle": "Upload your photo and generate the final try-on in one step."
+        },
+        "steps": {
+            "1": {
+                "title": "Upload Photo",
+                "desc": "Full-body photo with good lighting"
+            },
+            "2": {
+                "title": "Generate Try-On",
+                "desc": "AI will process and generate result"
+            },
+            "3": {
+                "title": "Save & Rent",
+                "desc": "Save result and rent the piece you love"
+            }
+        },
+        "upload": {
+            "yourPhotoAlt": "Your photo",
+            "change": "Change",
+            "title": "Upload your photo",
+            "subtitle": "Full-body photo, front-facing, arms visible"
+        },
+        "tips": {
+            "title": "Tips for best results:",
+            "1": "• Stand in a well-lit area",
+            "2": "• Wear form-fitting clothing",
+            "3": "• Face the camera directly",
+            "4": "• Ensure full body is visible"
+        },
+        "processing": {
+            "title": "Generating try-on...",
+            "subtitle": "This may take a few seconds"
+        },
+        "actions": {
+            "save": "Save"
+        },
+        "preview": {
+            "result": "Result",
+            "selectedProduct": "Selected Product",
+            "preview": "Preview",
+            "productFallback": "Product #{{id}}",
+            "loadingProduct": "Loading product...",
+            "failedProduct": "Failed to load product",
+            "noProductImage": "No product image",
+            "browseProducts": "Browse products"
+        },
+        "mix": {
+            "title": "Mix & Match",
+            "restoreBase": "Restore base",
+            "hintPickUpper": "You tried on a lower-body item. Pick a Top/Outerwear to mix.",
+            "hintPickLower": "You tried on an upper-body item. Pick a Pant to mix.",
+            "unavailable": "Mix is unavailable for this category (e.g. Dresses).",
+            "noCandidates": "No matching items to mix yet.",
+            "noCandidatesHint": "Tip: check API",
+            "noCandidatesHint2": "returns correct",
+            "noCandidatesHint3": "or category name (Tops/Pants/Outerwear).",
+            "category": "Category",
+            "selected": "Selected",
+            "footerHint": "Select one item above then press “Mix & Generate Again”.",
+            "onlyUpperLower": "Currently, we only recommend mixing Upper-body ↔ Lower-body."
+        },
+        "buttons": {
+            "processing": "Processing...",
+            "generate": "Generate Try-On",
+            "mixGenerate": "Mix & Generate Again"
+        },
+        "rentCta": {
+            "question": "Love how it looks?",
+            "button": "Rent This Piece"
+        },
+        "errors": {
+            "imageOnly": "Please upload an image file",
+            "imageTooLarge": "Image must be less than 10MB",
+            "selectMixItem": "Please select an item to mix",
+            "noResultUrl": "No resultUrl returned from server",
+            "generateFailed": "Failed to generate try-on image. Please try again."
+        }
+    },
+    "auth": {
+        "register": {
+            "backHome": "Back to home",
+            "title": "Join Wardrobe Wonders",
+            "subtitle": "Create an account to start renting designer fashion.",
+            "fullName": {
+                "label": "Full Name",
+                "placeholder": "Your name"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "you@example.com"
+            },
+            "password": {
+                "label": "Password",
+                "placeholder": "••••••••",
+                "hint": "Must be at least 6 characters",
+                "show": "Show password",
+                "hide": "Hide password"
+            },
+            "terms": {
+                "prefix": "I agree to the",
+                "tos": "Terms of Service",
+                "and": "and",
+                "privacy": "Privacy Policy"
+            },
+            "button": {
+                "loading": "Creating account...",
+                "submit": "Create Account"
+            },
+            "haveAccount": "Already have an account?",
+            "signIn": "Sign in",
+            "toast": {
+                "termsRequired": {
+                    "title": "Terms Required",
+                    "desc": "Please agree to the terms and conditions."
+                },
+                "success": {
+                    "title": "Welcome to Wardrobe Wonders!",
+                    "desc": "Your account has been created successfully."
+                },
+                "error": {
+                    "title": "Error",
+                    "desc": "Failed to create account"
+                }
+            },
+            "quote": {
+                "text": "\"Style is a way to say who you are without having to speak.\"",
+                "author": "— Rachel Zoe"
+            }
+        }
+    },
+    "login": {
+        "backHome": "Back to home",
+        "title": "Welcome Back",
+        "subtitle": "Sign in to access your rentals and continue exploring.",
+        "email": {
+            "label": "Email",
+            "placeholder": "you@example.com"
+        },
+        "password": {
+            "label": "Password",
+            "placeholder": "••••••••",
+            "show": "Show password",
+            "hide": "Hide password"
+        },
+        "forgot": "Forgot password?",
+        "button": {
+            "loading": "Signing in...",
+            "submit": "Sign In"
+        },
+        "noAccount": "Don't have an account?",
+        "createOne": "Create one",
+        "demo": {
+            "title": "Demo Credentials",
+            "body": "User: user@demo.com / demo123\nAdmin: admin@demo.com / admin123"
+        },
+        "toast": {
+            "success": {
+                "title": "Welcome back!",
+                "desc": "You have successfully signed in."
+            },
+            "error": {
+                "title": "Error",
+                "desc": "Failed to sign in"
+            }
+        },
+        "quote": {
+            "text": "\"Fashion is about dreaming and making other people dream.\"",
+            "author": "— Donatella Versace"
+        }
+    },
+    "cart": {
+        "title": "Your Cart",
+        "itemsCount": "{{count}} items",
+        "empty": {
+            "title": "Cart is empty",
+            "desc": "Add some items to rent.",
+            "browse": "Browse products"
+        },
+        "alert": {
+            "missingVariant": "You haven't selected size/variant for some items. Please re-select."
+        },
+        "days": "{{days}} days",
+        "size": "Size:",
+        "variantFallback": "Variant#{{id}}",
+        "perDay": "day",
+        "lineTotal": "Line total",
+        "remove": "Remove",
+        "qty": {
+            "decrease": "Decrease quantity",
+            "increase": "Increase quantity"
+        },
+        "clear": "Clear cart",
+        "total": "Total",
+        "checkout": "Checkout"
+    },
+    "checkout": {
+        "empty": {
+            "title": "No items to checkout",
+            "desc": "Please add products before checkout.",
+            "browse": "Browse products"
+        },
+        "summary": {
+            "title": "Order Summary",
+            "rentalPeriod": "Rental period:",
+            "perDay": "day",
+            "days": "{{days}} days",
+            "qty": "Qty",
+            "line": "Line",
+            "groupTotal": "Group total",
+            "total": "Total",
+            "backToCart": "Back to cart"
+        },
+        "shipping": {
+            "title": "Shipping Information",
+            "fullName": "Full name",
+            "phone": "Phone",
+            "street": "House number / Street",
+            "district": "District",
+            "ward": "Ward",
+            "districtPlaceholder": "-- Select district --",
+            "wardPlaceholder": "-- Select ward --",
+            "wardNeedDistrict": "Select district first",
+            "combinedAddress": "Combined address",
+            "note": "Note",
+            "notePlaceholder": "Optional note for delivery"
+        },
+        "address": {
+            "wardPrefix": "Ward {{ward}}",
+            "districtPrefix": "District {{district}}",
+            "city": "Da Nang"
+        },
+        "order": {
+            "note": "Created from checkout"
+        },
+        "button": {
+            "creating": "Creating...",
+            "confirm": "Confirm & Create Rental"
+        },
+        "alert": {
+            "fullName": "Please input full name",
+            "phone": "Please input phone number",
+            "street": "Please input street/house number",
+            "district": "Please select district",
+            "ward": "Please select ward",
+            "address": "Please input address",
+            "success": "Order created successfully!",
+            "failed": "Create rental failed"
+        }
+    },
+    "admin": {
+        "title": "Admin Dashboard",
+        "subtitle": "Manage your rental platform",
+        "backHome": "Back to home",
+        "sidebar": {
+            "aria": "Admin navigation",
+            "overview": "Overview",
+            "users": "Users",
+            "products": "Products",
+            "categories": "Categories",
+            "rentals": "Rentals"
+        }
+    },
+    "common": {
+        "refresh": "Refresh",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel",
+        "dash": "-",
+        "loading": {
+            "rentals": "Loading rentals...",
+            "rentalHistory": "Loading rental history..."
+        },
+        "errors": {
+            "prefix": "Error",
+            "loadRentalsFailed": "Load rentals failed",
+            "cancelFailed": "Cancel failed",
+            "loadRentalHistoryFailed": "Load rental history failed"
+        },
+        "retry": "Retry",
+        "browseCollection": "Browse Collection",
+        "product": "Product"
+    },
+    "rentals": {
+        "current": {
+            "title": "Current Rentals",
+            "activeCount": "{{count}} active",
+            "emptyTitle": "No current rentals",
+            "emptyDesc": "Your completed rentals are saved in Rental History.",
+            "noItems": "No items in this rental."
+        },
+        "itemLine": "Qty: {{qty}} • Days: {{days}} • /day: ${{pricePerDay}}",
+        "subtotal": "Subtotal",
+        "total": "Total",
+        "deposit": "Deposit",
+        "actions": {
+            "extend": "Extend Rental",
+            "cancel": "Cancel"
+        },
+        "history": {
+            "title": "Rental History",
+            "emptyTitle": "No rental history",
+            "emptyDesc": "Your completed rentals will appear here",
+            "noItems": "No items in this rental."
+        }
+    },
+    "pagination": {
+        "prev": "Prev",
+        "next": "Next",
+        "page": "Page"
+    },
+    "adminRentals": {
+        "title": "Rentals",
+        "loading": "Loading rentals...",
+        "empty": "No rentals yet.",
+        "total": "Total",
+        "days": "days",
+        "perDay": "day",
+        "user": "User",
+        "userFallback": "User",
+        "productFallback": "Product",
+        "totalLabel": "Total",
+        "deposit": "Deposit",
+        "detailTitle": "Rental Detail",
+        "selectHint": "Select a rental to view details.",
+        "noActions": "No actions",
+        "updatingStatus": "Updating status...",
+        "savingShipping": "Saving shipping...",
+        "noItems": "No items.",
+        "errors": {
+            "loadFailedTitle": "Failed to load rentals",
+            "updateStatusFailed": "Update status failed",
+            "updateShippingFailed": "Update shipping failed"
+        },
+        "actions": {
+            "startShipping": "Start shipping",
+            "reject": "Reject",
+            "customerReceived": "Customer received",
+            "complete": "Complete"
+        },
+        "detail": {
+            "rental": "Rental",
+            "status": "Status",
+            "shipping": "Shipping",
+            "items": "Items",
+            "note": "Note"
+        },
+        "shipping": {
+            "edit": "Edit shipping",
+            "editableOnlyPendingShipping": "Editable only in PENDING/SHIPPING",
+            "name": "Name",
+            "phone": "Phone",
+            "address": "Address",
+            "note": "Note"
+        },
+        "placeholders": {
+            "fullName": "Full name",
+            "phone": "Phone",
+            "address": "Address",
+            "noteOptional": "Note (optional)"
+        },
+        "item": {
+            "size": "Size",
+            "qty": "Qty",
+            "subtotal": "Subtotal"
+        },
+        "success": "Success",
+        "error": "Error",
+        "edit": "Edit",
+        "delete": "Delete",
+        "cancel": "Cancel"
+    },
+    "adminProducts": {
+        "header": {
+            "title": "Products",
+            "subtitle": "Manage products"
+        },
+        "buttons": {
+            "importExcel": "Import Excel",
+            "importing": "Importing...",
+            "create": "Create product",
+            "addSize": "+ Add size",
+            "remove": "Remove",
+            "submit": "Submit",
+            "update": "Update"
+        },
+        "dialog": {
+            "createTitle": "Create product",
+            "updateTitle": "Update product"
+        },
+        "form": {
+            "image": "Image",
+            "optional": "(optional)",
+            "previewAlt": "preview",
+            "noImage": "No image",
+            "keepOldImageHint": "If you don't choose a new image, the system will keep the old one.",
+            "name": "Name",
+            "category": "Category",
+            "selectCategory": "Select category",
+            "occasion": "Occasion",
+            "selectOccasion": "Select occasion",
+            "rentPerDay": "Rent / Day",
+            "deposit": "Deposit",
+            "variants": "Variants (Size + Stock)",
+            "size": "Size",
+            "stock": "Stock",
+            "color": "Color"
+        },
+        "occasions": {
+            "party": "Party",
+            "wedding": "Wedding",
+            "casual": "Casual"
+        },
+        "loadingProducts": "Loading products...",
+        "empty": "No products yet.",
+        "validation": {
+            "missingName": {
+                "title": "Missing name",
+                "desc": "Please input product name."
+            },
+            "missingCategory": {
+                "title": "Missing category",
+                "desc": "Please select a category."
+            },
+            "missingImage": {
+                "title": "Missing image",
+                "desc": "Please choose an image."
+            },
+            "missingVariants": {
+                "title": "Missing variants",
+                "desc": "Add at least 1 size."
+            },
+            "duplicateSize": {
+                "title": "Duplicate size",
+                "desc": "Each size should appear once.",
+                "inline": "Duplicate size detected. Please keep each size unique."
+            },
+            "invalidVariants": {
+                "title": "Invalid variants",
+                "desc": "Stock must be a number >= 0."
+            }
+        },
+        "deleteDialog": {
+            "title": "Delete product?",
+            "desc": "This action cannot be undone. Are you sure you want to delete this product?"
+        },
+        "toasts": {
+            "loadCategoriesFailed": {
+                "title": "Load categories failed"
+            },
+            "loadProductsFailed": {
+                "title": "Load products failed"
+            },
+            "created": {
+                "desc": "Product created"
+            },
+            "updated": {
+                "desc": "Product updated"
+            },
+            "createFailed": {
+                "title": "Create failed"
+            },
+            "updateFailed": {
+                "title": "Update failed"
+            },
+            "updateFailedMissingId": {
+                "title": "Update failed",
+                "desc": "Missing product id"
+            },
+            "deleted": {
+                "title": "Deleted",
+                "desc": "Product removed"
+            },
+            "deleteFailed": {
+                "title": "Delete failed"
+            },
+            "importDone": {
+                "title": "Import done",
+                "desc": "Imported: {{imported}} | Failed: {{failed}}"
+            },
+            "importFailed": {
+                "title": "Import failed"
+            }
+        }
+    },
+    "adminCategories": {
+        "header": {
+            "title": "Categories",
+            "subtitle": "Manage categories"
+        },
+        "buttons": {
+            "create": "Create category",
+            "submit": "Submit",
+            "update": "Update"
+        },
+        "dialog": {
+            "createTitle": "Create category",
+            "updateTitle": "Update category"
+        },
+        "loading": "Loading categories...",
+        "empty": "No categories yet.",
+        "list": {
+            "vton": "VTON"
+        },
+        "form": {
+            "name": "Name",
+            "slug": "Slug",
+            "slugPlaceholder": "e.g. dresses",
+            "slugHint": "Backend DTO requires slug, so it cannot be empty.",
+            "vtonLabel": "VTON Category (AI Try-On)",
+            "vtonPlaceholder": "Select VTON category",
+            "vtonHint": "Used to tell AI which body region to mask during Try-On.",
+            "descriptionOptional": "Description (optional)",
+            "descriptionPlaceholder": "Short description..."
+        },
+        "validation": {
+            "missingName": {
+                "title": "Missing name",
+                "desc": "Please input category name."
+            },
+            "missingSlug": {
+                "title": "Missing slug",
+                "desc": "Slug is required (CreateCategoryDto.slug)."
+            }
+        },
+        "deleteDialog": {
+            "title": "Delete category?",
+            "desc": "This action cannot be undone. If this category is used by products, the backend may block deletion."
+        },
+        "toasts": {
+            "loadFailed": {
+                "title": "Load categories failed"
+            },
+            "created": {
+                "desc": "Category created"
+            },
+            "updated": {
+                "desc": "Category updated"
+            },
+            "createFailed": {
+                "title": "Create failed"
+            },
+            "updateFailed": {
+                "title": "Update failed"
+            },
+            "updateFailedMissingId": {
+                "title": "Update failed",
+                "desc": "Missing category id"
+            },
+            "deleted": {
+                "title": "Deleted",
+                "desc": "Category removed"
+            },
+            "deleteFailed": {
+                "title": "Delete failed"
+            }
+        }
+    },
+    "adminUsers": {
+        "title": "Admin Users",
+        "buttons": {
+            "refresh": "Refresh"
+        },
+        "table": {
+            "id": "ID",
+            "name": "Name",
+            "email": "Email",
+            "phone": "Phone",
+            "rentals": "Rentals",
+            "actions": "Actions"
+        },
+        "placeholders": {
+            "name": "Name",
+            "phone": "Phone",
+            "newPasswordOptional": "New password (optional)"
+        },
+        "hints": {
+            "keepPasswordIfEmpty": "Leave empty to keep current password.",
+            "cannotDeleteHasRentals": "Has rentals → cannot delete"
+        },
+        "tooltips": {
+            "cannotDeleteHasRentals": "User has rentals → cannot delete",
+            "deleteUser": "Delete user"
+        },
+        "confirm": {
+            "deleteUser": "Delete user #{{id}}?"
+        },
+        "errors": {
+            "loadFailed": "Failed to load users",
+            "updateFailed": "Update failed",
+            "deleteFailed": "Delete failed",
+            "cannotDeleteHasRentals": "User has rentals → cannot delete."
+        },
+        "empty": "No users found."
+    },
+    "adminOverview": {
+        "title": "Overview",
+        "subtitle": "Live data from server",
+        "loading": "Loading dashboard...",
+        "live": "Live",
+        "cards": {
+            "totalProducts": "Total Products",
+            "activeRentals": "Active Rentals",
+            "revenue": "Revenue",
+            "totalUsers": "Total Users"
+        },
+        "charts": {
+            "weeklyRentals": {
+                "title": "Weekly Rentals",
+                "subtitle": "Last 7 days",
+                "empty": "No rentals in last 7 days."
+            },
+            "monthlyRevenue": {
+                "title": "Monthly Revenue",
+                "subtitle": "Last 6 months",
+                "empty": "No revenue data yet."
+            }
+        },
+        "errors": {
+            "loadFailed": "Failed to load stats"
+        }
+    },
+    "productCard": {
+        "featured": "Featured",
+        "perDay": "/day",
+        "deposit": "deposit",
+        "status": {
+            "currentlyRented": "Currently Rented",
+            "unavailable": "Unavailable"
+        },
+        "fallback": {
+            "product": "Product",
+            "category": "Category"
+        }
+    },
+    "dashboard": {
+        "header": {
+            "welcomeBack": "Welcome back, {{name}}",
+            "subtitle": "Manage your rentals and account settings"
+        },
+        "sidebar": {
+            "aria": "Dashboard navigation",
+            "myRentals": "My Rentals",
+            "rentalHistory": "Rental History",
+            "profile": "Profile",
+            "settings": "Settings"
+        },
+        "fallback": {
+            "firstName": "there"
+        }
+    },
+    "tryOnSuggest": {
+        "header": {
+            "title": "Virtual Try-On (Suggest)",
+            "subtitle": "Upload your photo and we suggest the best product for you."
+        },
+        "upload": {
+            "aria": "Upload your photo",
+            "yourPhotoAlt": "Your photo",
+            "title": "Upload your photo",
+            "hint": "Full-body photo, front-facing, arms visible",
+            "change": "Change"
+        },
+        "categories": {
+            "top": "Top",
+            "pants": "Pants",
+            "dress": "Dress",
+            "outerwear": "Outerwear"
+        },
+        "preview": {
+            "yourPhoto": "Your Photo",
+            "suggested": "Suggested Product",
+            "empty": "No preview"
+        },
+        "buttons": {
+            "generate": "Generate Try-On",
+            "rentThisPiece": "Rent This Piece"
+        },
+        "errors": {
+            "imageOnly": "Please upload an image file",
+            "uploadYourPhoto": "Please upload your photo",
+            "noProductForCategory": "No product found for this category"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "notifications": {
+            "title": "Notifications",
+            "desc": "Manage how you receive updates about your rentals",
+            "email": {
+                "title": "Email Notifications",
+                "desc": "Receive rental updates via email"
+            },
+            "sms": {
+                "title": "SMS Notifications",
+                "desc": "Receive rental reminders via text"
+            },
+            "marketing": {
+                "title": "Marketing Emails",
+                "desc": "Receive news about new collections"
+            }
+        },
+        "privacy": {
+            "title": "Privacy",
+            "desc": "Control your data and privacy settings",
+            "publicProfile": {
+                "title": "Public Profile",
+                "desc": "Allow others to see your profile"
+            }
+        }
+    }
+}

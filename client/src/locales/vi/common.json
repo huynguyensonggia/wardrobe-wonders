@@ -1,0 +1,900 @@
+{
+    "footer": {
+        "tagline": "Dịch vụ thuê thời trang cao cấp dành cho phụ nữ hiện đại. Thuê đồ thiết kế mà không cần cam kết dài hạn.",
+        "shop": "Mua sắm",
+        "allCollections": "Tất cả bộ sưu tập",
+        "dresses": "Đầm/Váy",
+        "outerwear": "Áo khoác",
+        "tops": "Áo",
+        "help": "Hỗ trợ",
+        "howItWorks": "Cách thuê hoạt động",
+        "sizeGuide": "Hướng dẫn chọn size",
+        "shippingReturns": "Giao hàng & Đổi trả",
+        "faq": "Câu hỏi thường gặp",
+        "company": "Về chúng tôi",
+        "about": "Về Wardrobe Wonders",
+        "sustainability": "Bền vững",
+        "careers": "Tuyển dụng",
+        "contact": "Liên hệ",
+        "privacy": "Chính sách bảo mật",
+        "terms": "Điều khoản dịch vụ",
+        "copyright": "© {{year}} Wardrobe Wonders. Bảo lưu mọi quyền."
+    },
+    "language": {
+        "label": "Ngôn ngữ",
+        "en": "Tiếng Anh",
+        "vi": "Tiếng Việt",
+        "ja": "Tiếng Nhật"
+    },
+    "navbar": {
+        "collection": "Bộ sưu tập",
+        "dresses": "Váy/Đầm",
+        "tops": "Áo",
+        "pants": "Quần",
+        "outerwear": "Áo khoác",
+        "aiTryOn": "AI Thử đồ",
+        "cart": "Giỏ hàng",
+        "myRentals": "Đơn thuê của tôi",
+        "adminDashboard": "Bảng điều khiển Admin",
+        "settings": "Cài đặt",
+        "signOut": "Đăng xuất",
+        "signIn": "Đăng nhập",
+        "joinNow": "Đăng ký",
+        "menu": "Menu"
+    },
+    "products": {
+        "title": "Bộ sưu tập",
+        "piecesAvailable": "Có {{count}} sản phẩm",
+        "searchPlaceholder": "Tìm sản phẩm...",
+        "filters": "Bộ lọc",
+        "category": "Danh mục",
+        "allCategories": "Tất cả danh mục",
+        "size": "Size",
+        "allSizes": "Tất cả size",
+        "color": "Màu",
+        "allColors": "Tất cả màu",
+        "availability": "Tình trạng",
+        "allStatus": "Tất cả",
+        "status": {
+            "available": "Còn hàng",
+            "rented": "Đang thuê"
+        },
+        "clear": "Xoá",
+        "loading": "Đang tải...",
+        "error": "Tải sản phẩm thất bại",
+        "noProducts": "Không tìm thấy sản phẩm",
+        "clearFilters": "Xoá bộ lọc"
+    },
+    "productDetail": {
+        "loading": "Đang tải sản phẩm...",
+        "errorTitle": "Tải sản phẩm thất bại",
+        "notFoundTitle": "Không tìm thấy sản phẩm",
+        "backToCollection": "Quay lại bộ sưu tập",
+        "perDay": "/ngày",
+        "deposit": "tiền cọc",
+        "unavailable": "Tạm thời không khả dụng",
+        "selectSize": "Chọn size",
+        "sizeGuide": "Bảng size",
+        "sizeChartTitle": "Bảng size nữ",
+        "sizeChartAlt": "Bảng size nữ",
+        "noVariantsWarning": "⚠️ Sản phẩm không có biến thể từ API.",
+        "selectColor": "Chọn màu",
+        "rentalPeriod": "Thời gian thuê",
+        "selectDates": "Chọn ngày",
+        "minimumRentalHint": "Thời gian thuê tối thiểu:",
+        "minimumDays": "{{days}} ngày",
+        "minimumRentalError": "Tối thiểu {{days}} ngày.",
+        "days": "ngày",
+        "refundableDeposit": "Tiền cọc hoàn lại",
+        "totalDueToday": "Tổng thanh toán hôm nay",
+        "rentNow": "Thuê ngay",
+        "addToCart": "Thêm vào giỏ",
+        "tryOnVirtually": "Thử đồ ảo",
+        "galleryImage": "Ảnh thư viện {{index}}",
+        "actions": {
+            "favorite": "Thêm vào yêu thích",
+            "share": "Chia sẻ"
+        },
+        "tooltips": {
+            "variantInactive": "Biến thể đang tắt",
+            "outOfStock": "Hết hàng",
+            "stock": "Tồn kho: {{stock}}"
+        },
+        "selectedVariant": "Biến thể đã chọn: #{{id}} • Tồn: {{stock}}",
+        "features": {
+            "freeShipping": "Miễn phí ship cho đơn từ $100",
+            "damageProtection": "Bao gồm bảo vệ hư hỏng"
+        },
+        "alerts": {
+            "selectSize": "Vui lòng chọn size",
+            "variantNotFound": "Không tìm thấy biến thể. Vui lòng chọn lại.",
+            "outOfStock": "Size này đã hết hàng.",
+            "selectDates": "Vui lòng chọn ngày thuê",
+            "minimumRental": "Thời gian thuê tối thiểu {{days}} ngày",
+            "addedToCart": "Đã thêm vào giỏ hàng!"
+        }
+    },
+    "home": {
+        "loading": "Đang tải...",
+        "errors": {
+            "loadHomepage": "Không thể tải dữ liệu trang chủ"
+        },
+        "hero": {
+            "imageAlt": "Thời trang sang trọng",
+            "titleLine1": "Thuê đồ sang trọng,",
+            "titleHighlight": "Tỏa sáng mọi khoảnh khắc",
+            "subtitle": "Trải nghiệm thời trang hàng hiệu mà không cần sở hữu. Bền vững, hợp túi tiền và luôn hợp mốt.",
+            "ctaExplore": "Khám phá bộ sưu tập",
+            "ctaTryOn": "Thử đồ AI"
+        },
+        "features": {
+            "ai": {
+                "title": "Thử đồ AI",
+                "desc": "Xem đồ lên dáng trước khi thuê"
+            },
+            "delivery": {
+                "title": "Giao hàng miễn phí",
+                "desc": "Miễn phí ship cho đơn hàng từ $100"
+            },
+            "insured": {
+                "title": "Bảo hiểm đầy đủ",
+                "desc": "Yên tâm mặc với gói bảo vệ hư hỏng"
+            },
+            "returns": {
+                "title": "Đổi trả dễ dàng",
+                "desc": "Đổi trả nhanh gọn với nhãn gửi trả có sẵn"
+            }
+        },
+        "categories": {
+            "title": "Mua theo danh mục",
+            "subtitle": "Khám phá bộ sưu tập được tuyển chọn cho mọi dịp"
+        },
+        "featured": {
+            "title": "Sản phẩm nổi bật",
+            "subtitle": "Lựa chọn được tuyển chọn từ bộ sưu tập mới nhất",
+            "viewAll": "Xem tất cả",
+            "viewAllMobile": "Xem tất cả sản phẩm"
+        },
+        "tryOnCta": {
+            "title": "Thử trước khi thuê",
+            "desc": "Tính năng thử đồ ảo bằng AI giúp bạn xem đồ lên dáng ra sao. Tải ảnh lên và tìm ngay lựa chọn phù hợp nhất.",
+            "button": "Thử ngay"
+        },
+        "testimonial": {
+            "quote": "“Wardrobe Wonders đã thay đổi cách tôi ăn mặc. Nhờ thử đồ ảo AI, tôi có thể xem đồ có hợp không trước khi thuê—nên lúc nào cũng chọn đúng outfit cho mọi sự kiện.”",
+            "name": "Sarah Mitchell",
+            "title": "Biên tập thời trang, Vogue"
+        }
+    },
+    "tryOn": {
+        "header": {
+            "title": "Thử đồ ảo bằng AI",
+            "subtitle": "Tải ảnh của bạn lên và tạo kết quả thử đồ chỉ trong 1 bước."
+        },
+        "steps": {
+            "1": {
+                "title": "Tải ảnh lên",
+                "desc": "Ảnh toàn thân, ánh sáng tốt"
+            },
+            "2": {
+                "title": "Tạo kết quả",
+                "desc": "AI sẽ xử lý và tạo hình"
+            },
+            "3": {
+                "title": "Lưu & Thuê",
+                "desc": "Lưu kết quả và thuê món bạn thích"
+            }
+        },
+        "upload": {
+            "yourPhotoAlt": "Ảnh của bạn",
+            "change": "Đổi ảnh",
+            "title": "Tải ảnh của bạn lên",
+            "subtitle": "Ảnh toàn thân, chụp chính diện, thấy rõ tay"
+        },
+        "tips": {
+            "title": "Mẹo để ra kết quả tốt nhất:",
+            "1": "• Đứng nơi đủ sáng",
+            "2": "• Mặc đồ ôm dáng",
+            "3": "• Nhìn thẳng vào camera",
+            "4": "• Đảm bảo thấy toàn thân"
+        },
+        "processing": {
+            "title": "Đang tạo kết quả...",
+            "subtitle": "Có thể mất vài giây"
+        },
+        "actions": {
+            "save": "Lưu"
+        },
+        "preview": {
+            "result": "Kết quả",
+            "selectedProduct": "Sản phẩm đã chọn",
+            "preview": "Xem trước",
+            "productFallback": "Sản phẩm #{{id}}",
+            "loadingProduct": "Đang tải sản phẩm...",
+            "failedProduct": "Tải sản phẩm thất bại",
+            "noProductImage": "Không có ảnh sản phẩm",
+            "browseProducts": "Xem sản phẩm"
+        },
+        "mix": {
+            "title": "Mix & Match",
+            "restoreBase": "Khôi phục bản gốc",
+            "hintPickUpper": "Bạn vừa thử đồ phần dưới. Hãy chọn Áo/Outerwear để mix.",
+            "hintPickLower": "Bạn vừa thử đồ phần trên. Hãy chọn Quần để mix.",
+            "unavailable": "Không hỗ trợ mix cho danh mục này (ví dụ: Váy liền).",
+            "noCandidates": "Chưa có sản phẩm phù hợp để mix.",
+            "noCandidatesHint": "Gợi ý: kiểm tra API",
+            "noCandidatesHint2": "trả đúng",
+            "noCandidatesHint3": "hoặc tên category (Tops/Pants/Outerwear).",
+            "category": "Danh mục",
+            "selected": "Đã chọn",
+            "footerHint": "Chọn 1 item ở trên rồi bấm “Mix & Generate Again”.",
+            "onlyUpperLower": "Hiện tại chỉ gợi ý mix Upper-body ↔ Lower-body."
+        },
+        "buttons": {
+            "processing": "Đang xử lý...",
+            "generate": "Tạo thử đồ",
+            "mixGenerate": "Mix & Tạo lại"
+        },
+        "rentCta": {
+            "question": "Bạn thấy hợp chứ?",
+            "button": "Thuê món này"
+        },
+        "errors": {
+            "imageOnly": "Vui lòng tải lên file ảnh",
+            "imageTooLarge": "Ảnh phải nhỏ hơn 10MB",
+            "selectMixItem": "Vui lòng chọn 1 item để mix",
+            "noResultUrl": "Server không trả về resultUrl",
+            "generateFailed": "Không tạo được ảnh thử đồ. Vui lòng thử lại."
+        }
+    },
+    "auth": {
+        "register": {
+            "backHome": "Về trang chủ",
+            "title": "Tham gia Wardrobe Wonders",
+            "subtitle": "Tạo tài khoản để bắt đầu thuê thời trang thiết kế.",
+            "fullName": {
+                "label": "Họ và tên",
+                "placeholder": "Tên của bạn"
+            },
+            "email": {
+                "label": "Email",
+                "placeholder": "you@example.com"
+            },
+            "password": {
+                "label": "Mật khẩu",
+                "placeholder": "••••••••",
+                "hint": "Ít nhất 6 ký tự",
+                "show": "Hiện mật khẩu",
+                "hide": "Ẩn mật khẩu"
+            },
+            "terms": {
+                "prefix": "Tôi đồng ý với",
+                "tos": "Điều khoản dịch vụ",
+                "and": "và",
+                "privacy": "Chính sách bảo mật"
+            },
+            "button": {
+                "loading": "Đang tạo tài khoản...",
+                "submit": "Tạo tài khoản"
+            },
+            "haveAccount": "Bạn đã có tài khoản?",
+            "signIn": "Đăng nhập",
+            "toast": {
+                "termsRequired": {
+                    "title": "Cần đồng ý điều khoản",
+                    "desc": "Vui lòng đồng ý với điều khoản và điều kiện."
+                },
+                "success": {
+                    "title": "Chào mừng đến Wardrobe Wonders!",
+                    "desc": "Tạo tài khoản thành công."
+                },
+                "error": {
+                    "title": "Lỗi",
+                    "desc": "Không thể tạo tài khoản"
+                }
+            },
+            "quote": {
+                "text": "\"Phong cách là cách nói bạn là ai mà không cần lên tiếng.\"",
+                "author": "— Rachel Zoe"
+            }
+        },
+        "login": {
+            "backHome": "Về trang chủ",
+            "title": "Chào mừng quay lại",
+            "subtitle": "Đăng nhập để xem đơn thuê và tiếp tục khám phá.",
+            "email": {
+                "label": "Email",
+                "placeholder": "you@example.com"
+            },
+            "password": {
+                "label": "Mật khẩu",
+                "placeholder": "••••••••",
+                "show": "Hiện mật khẩu",
+                "hide": "Ẩn mật khẩu"
+            },
+            "forgot": "Quên mật khẩu?",
+            "button": {
+                "loading": "Đang đăng nhập...",
+                "submit": "Đăng nhập"
+            },
+            "noAccount": "Chưa có tài khoản?",
+            "createOne": "Tạo tài khoản",
+            "demo": {
+                "title": "Tài khoản demo",
+                "body": "User: user@demo.com / demo123\nAdmin: admin@demo.com / admin123"
+            },
+            "toast": {
+                "success": {
+                    "title": "Chào mừng bạn!",
+                    "desc": "Bạn đã đăng nhập thành công."
+                },
+                "error": {
+                    "title": "Lỗi",
+                    "desc": "Đăng nhập thất bại"
+                }
+            },
+            "quote": {
+                "text": "\"Thời trang là giấc mơ và khiến người khác cũng mơ theo.\"",
+                "author": "— Donatella Versace"
+            }
+        }
+    },
+    "cart": {
+        "title": "Giỏ hàng",
+        "itemsCount": "{{count}} sản phẩm",
+        "empty": {
+            "title": "Giỏ hàng đang trống",
+            "desc": "Hãy thêm sản phẩm để thuê.",
+            "browse": "Xem sản phẩm"
+        },
+        "alert": {
+            "missingVariant": "Bạn chưa chọn size/variant cho một số sản phẩm. Vui lòng chọn lại."
+        },
+        "days": "{{days}} ngày",
+        "size": "Size:",
+        "variantFallback": "Variant#{{id}}",
+        "perDay": "ngày",
+        "lineTotal": "Tổng dòng",
+        "remove": "Xoá",
+        "qty": {
+            "decrease": "Giảm số lượng",
+            "increase": "Tăng số lượng"
+        },
+        "clear": "Xoá giỏ hàng",
+        "total": "Tổng",
+        "checkout": "Thanh toán"
+    },
+    "checkout": {
+        "empty": {
+            "title": "Không có sản phẩm để thanh toán",
+            "desc": "Vui lòng thêm sản phẩm trước khi thanh toán.",
+            "browse": "Xem sản phẩm"
+        },
+        "summary": {
+            "title": "Tóm tắt đơn hàng",
+            "rentalPeriod": "Thời gian thuê:",
+            "perDay": "ngày",
+            "days": "{{days}} ngày",
+            "qty": "SL",
+            "line": "Dòng",
+            "groupTotal": "Tổng nhóm",
+            "total": "Tổng",
+            "backToCart": "Quay lại giỏ hàng"
+        },
+        "shipping": {
+            "title": "Thông tin giao hàng",
+            "fullName": "Họ và tên",
+            "phone": "Số điện thoại",
+            "street": "Số nhà / Tên đường",
+            "district": "Quận / Huyện",
+            "ward": "Phường / Xã",
+            "districtPlaceholder": "-- Chọn quận/huyện --",
+            "wardPlaceholder": "-- Chọn phường/xã --",
+            "wardNeedDistrict": "Chọn quận/huyện trước",
+            "combinedAddress": "Địa chỉ ghép",
+            "note": "Ghi chú",
+            "notePlaceholder": "Ghi chú giao hàng (tuỳ chọn)"
+        },
+        "address": {
+            "wardPrefix": "Phường/Xã {{ward}}",
+            "districtPrefix": "Quận/Huyện {{district}}",
+            "city": "Đà Nẵng"
+        },
+        "order": {
+            "note": "Tạo từ checkout"
+        },
+        "button": {
+            "creating": "Đang tạo...",
+            "confirm": "Xác nhận & Tạo đơn thuê"
+        },
+        "alert": {
+            "fullName": "Vui lòng nhập họ và tên",
+            "phone": "Vui lòng nhập số điện thoại",
+            "street": "Vui lòng nhập số nhà/tên đường",
+            "district": "Vui lòng chọn quận/huyện",
+            "ward": "Vui lòng chọn phường/xã",
+            "address": "Vui lòng nhập địa chỉ",
+            "success": "Tạo đơn thành công!",
+            "failed": "Tạo đơn thuê thất bại"
+        }
+    },
+    "admin": {
+        "title": "Bảng điều khiển Admin",
+        "subtitle": "Quản lý nền tảng cho thuê",
+        "backHome": "Về trang chủ",
+        "sidebar": {
+            "aria": "Điều hướng quản trị",
+            "overview": "Tổng quan",
+            "users": "Người dùng",
+            "products": "Sản phẩm",
+            "categories": "Danh mục",
+            "rentals": "Đơn thuê"
+        }
+    },
+    "common": {
+        "refresh": "Tải lại",
+        "edit": "Sửa",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "dash": "-",
+        "loading": {
+            "rentals": "Đang tải đơn thuê...",
+            "rentalHistory": "Đang tải lịch sử thuê..."
+        },
+        "errors": {
+            "prefix": "Lỗi",
+            "loadRentalsFailed": "Tải đơn thuê thất bại",
+            "cancelFailed": "Hủy đơn thất bại",
+            "loadRentalHistoryFailed": "Tải lịch sử thuê thất bại"
+        },
+        "retry": "Thử lại",
+        "browseCollection": "Xem sản phẩm",
+        "product": "Sản phẩm"
+    },
+    "rentals": {
+        "current": {
+            "title": "Đơn thuê hiện tại",
+            "activeCount": "{{count}} đơn đang hoạt động",
+            "emptyTitle": "Không có đơn thuê hiện tại",
+            "emptyDesc": "Các đơn đã hoàn tất được lưu trong Lịch sử thuê.",
+            "noItems": "Đơn thuê này không có sản phẩm."
+        },
+        "itemLine": "SL: {{qty}} • Số ngày: {{days}} • /ngày: ${{pricePerDay}}",
+        "subtotal": "Tạm tính",
+        "total": "Tổng",
+        "deposit": "Tiền cọc",
+        "actions": {
+            "extend": "Gia hạn",
+            "cancel": "Hủy"
+        },
+        "history": {
+            "title": "Lịch sử thuê",
+            "emptyTitle": "Chưa có lịch sử thuê",
+            "emptyDesc": "Các đơn đã hoàn tất sẽ hiển thị ở đây",
+            "noItems": "Đơn thuê này không có sản phẩm."
+        }
+    },
+    "pagination": {
+        "prev": "Trước",
+        "next": "Sau",
+        "page": "Trang"
+    },
+    "adminRentals": {
+        "title": "Đơn thuê",
+        "loading": "Đang tải đơn thuê...",
+        "empty": "Chưa có đơn thuê nào.",
+        "total": "Tổng",
+        "days": "ngày",
+        "perDay": "ngày",
+        "user": "Người dùng",
+        "userFallback": "Người dùng",
+        "productFallback": "Sản phẩm",
+        "totalLabel": "Tổng",
+        "deposit": "Cọc",
+        "detailTitle": "Chi tiết đơn thuê",
+        "selectHint": "Chọn một đơn để xem chi tiết.",
+        "noActions": "Không có thao tác",
+        "updatingStatus": "Đang cập nhật trạng thái...",
+        "savingShipping": "Đang lưu thông tin giao hàng...",
+        "noItems": "Không có sản phẩm.",
+        "errors": {
+            "loadFailedTitle": "Tải danh sách đơn thuê thất bại",
+            "updateStatusFailed": "Cập nhật trạng thái thất bại",
+            "updateShippingFailed": "Cập nhật giao hàng thất bại"
+        },
+        "actions": {
+            "startShipping": "Bắt đầu giao",
+            "reject": "Từ chối",
+            "customerReceived": "Khách đã nhận",
+            "complete": "Hoàn tất"
+        },
+        "detail": {
+            "rental": "Đơn thuê",
+            "status": "Trạng thái",
+            "shipping": "Giao hàng",
+            "items": "Sản phẩm",
+            "note": "Ghi chú"
+        },
+        "shipping": {
+            "edit": "Sửa giao hàng",
+            "editableOnlyPendingShipping": "Chỉ sửa được khi PENDING/SHIPPING",
+            "name": "Tên",
+            "phone": "SĐT",
+            "address": "Địa chỉ",
+            "note": "Ghi chú"
+        },
+        "placeholders": {
+            "fullName": "Họ và tên",
+            "phone": "Số điện thoại",
+            "address": "Địa chỉ",
+            "noteOptional": "Ghi chú (không bắt buộc)"
+        },
+        "item": {
+            "size": "Size",
+            "qty": "SL",
+            "subtotal": "Tạm tính"
+        },
+        "success": "Thành công",
+        "error": "Lỗi",
+        "edit": "Sửa",
+        "delete": "Xoá",
+        "cancel": "Huỷ"
+    },
+    "adminProducts": {
+        "header": {
+            "title": "Sản phẩm",
+            "subtitle": "Quản lý sản phẩm"
+        },
+        "buttons": {
+            "importExcel": "Nhập Excel",
+            "importing": "Đang nhập...",
+            "create": "Tạo sản phẩm",
+            "addSize": "+ Thêm size",
+            "remove": "Xoá",
+            "submit": "Tạo",
+            "update": "Cập nhật"
+        },
+        "dialog": {
+            "createTitle": "Tạo sản phẩm",
+            "updateTitle": "Cập nhật sản phẩm"
+        },
+        "form": {
+            "image": "Ảnh",
+            "optional": "(không bắt buộc)",
+            "previewAlt": "xem trước",
+            "noImage": "Chưa có ảnh",
+            "keepOldImageHint": "Nếu không chọn ảnh mới, hệ thống sẽ giữ ảnh cũ.",
+            "name": "Tên",
+            "category": "Danh mục",
+            "selectCategory": "Chọn danh mục",
+            "occasion": "Dịp sử dụng",
+            "selectOccasion": "Chọn dịp",
+            "rentPerDay": "Giá thuê / ngày",
+            "deposit": "Tiền cọc",
+            "variants": "Biến thể (Size + Tồn kho)",
+            "size": "Size",
+            "stock": "Tồn kho",
+            "color": "Màu"
+        },
+        "occasions": {
+            "party": "Tiệc",
+            "wedding": "Cưới",
+            "casual": "Thường ngày"
+        },
+        "loadingProducts": "Đang tải sản phẩm...",
+        "empty": "Chưa có sản phẩm.",
+        "validation": {
+            "missingName": {
+                "title": "Thiếu tên",
+                "desc": "Vui lòng nhập tên sản phẩm."
+            },
+            "missingCategory": {
+                "title": "Thiếu danh mục",
+                "desc": "Vui lòng chọn danh mục."
+            },
+            "missingImage": {
+                "title": "Thiếu ảnh",
+                "desc": "Vui lòng chọn ảnh."
+            },
+            "missingVariants": {
+                "title": "Thiếu size",
+                "desc": "Thêm ít nhất 1 size."
+            },
+            "duplicateSize": {
+                "title": "Trùng size",
+                "desc": "Mỗi size chỉ được xuất hiện một lần.",
+                "inline": "Đang bị trùng size. Vui lòng để mỗi size chỉ xuất hiện 1 lần."
+            },
+            "invalidVariants": {
+                "title": "Variant không hợp lệ",
+                "desc": "Tồn kho phải là số >= 0."
+            }
+        },
+        "deleteDialog": {
+            "title": "Xoá sản phẩm?",
+            "desc": "Hành động này không thể hoàn tác. Bạn chắc chắn muốn xoá sản phẩm này?"
+        },
+        "toasts": {
+            "loadCategoriesFailed": {
+                "title": "Tải danh mục thất bại"
+            },
+            "loadProductsFailed": {
+                "title": "Tải sản phẩm thất bại"
+            },
+            "created": {
+                "desc": "Đã tạo sản phẩm"
+            },
+            "updated": {
+                "desc": "Đã cập nhật sản phẩm"
+            },
+            "createFailed": {
+                "title": "Tạo thất bại"
+            },
+            "updateFailed": {
+                "title": "Cập nhật thất bại"
+            },
+            "updateFailedMissingId": {
+                "title": "Cập nhật thất bại",
+                "desc": "Thiếu id sản phẩm"
+            },
+            "deleted": {
+                "title": "Đã xoá",
+                "desc": "Đã xoá sản phẩm"
+            },
+            "deleteFailed": {
+                "title": "Xoá thất bại"
+            },
+            "importDone": {
+                "title": "Nhập xong",
+                "desc": "Nhập: {{imported}} | Lỗi: {{failed}}"
+            },
+            "importFailed": {
+                "title": "Nhập thất bại"
+            }
+        }
+    },
+    "adminCategories": {
+        "header": {
+            "title": "Danh mục",
+            "subtitle": "Quản lý danh mục"
+        },
+        "buttons": {
+            "create": "Tạo danh mục",
+            "submit": "Tạo",
+            "update": "Cập nhật"
+        },
+        "dialog": {
+            "createTitle": "Tạo danh mục",
+            "updateTitle": "Cập nhật danh mục"
+        },
+        "loading": "Đang tải danh mục...",
+        "empty": "Chưa có danh mục.",
+        "list": {
+            "vton": "VTON"
+        },
+        "form": {
+            "name": "Tên",
+            "slug": "Slug",
+            "slugPlaceholder": "vd: dresses",
+            "slugHint": "DTO backend đang require slug, nên không được để trống.",
+            "vtonLabel": "VTON Category (AI Try-On)",
+            "vtonPlaceholder": "Chọn VTON category",
+            "vtonHint": "Dùng để AI biết vùng cơ thể cần mask khi Try-On.",
+            "descriptionOptional": "Mô tả (không bắt buộc)",
+            "descriptionPlaceholder": "Mô tả ngắn..."
+        },
+        "validation": {
+            "missingName": {
+                "title": "Thiếu tên",
+                "desc": "Vui lòng nhập tên danh mục."
+            },
+            "missingSlug": {
+                "title": "Thiếu slug",
+                "desc": "Slug là bắt buộc (CreateCategoryDto.slug)."
+            }
+        },
+        "deleteDialog": {
+            "title": "Xoá danh mục?",
+            "desc": "Hành động này không thể hoàn tác. Nếu category đang được dùng bởi products, backend có thể sẽ chặn xoá."
+        },
+        "toasts": {
+            "loadFailed": {
+                "title": "Tải danh mục thất bại"
+            },
+            "created": {
+                "desc": "Đã tạo danh mục"
+            },
+            "updated": {
+                "desc": "Đã cập nhật danh mục"
+            },
+            "createFailed": {
+                "title": "Tạo thất bại"
+            },
+            "updateFailed": {
+                "title": "Cập nhật thất bại"
+            },
+            "updateFailedMissingId": {
+                "title": "Cập nhật thất bại",
+                "desc": "Thiếu id danh mục"
+            },
+            "deleted": {
+                "title": "Đã xoá",
+                "desc": "Đã xoá danh mục"
+            },
+            "deleteFailed": {
+                "title": "Xoá thất bại"
+            }
+        }
+    },
+    "adminUsers": {
+        "title": "Quản trị người dùng",
+        "buttons": {
+            "refresh": "Tải lại"
+        },
+        "table": {
+            "id": "ID",
+            "name": "Tên",
+            "email": "Email",
+            "phone": "SĐT",
+            "rentals": "Đơn thuê",
+            "actions": "Thao tác"
+        },
+        "placeholders": {
+            "name": "Tên",
+            "phone": "Số điện thoại",
+            "newPasswordOptional": "Mật khẩu mới (không bắt buộc)"
+        },
+        "hints": {
+            "keepPasswordIfEmpty": "Để trống để giữ mật khẩu hiện tại.",
+            "cannotDeleteHasRentals": "Có đơn thuê → không thể xoá"
+        },
+        "tooltips": {
+            "cannotDeleteHasRentals": "User có đơn thuê → không thể xoá",
+            "deleteUser": "Xoá người dùng"
+        },
+        "confirm": {
+            "deleteUser": "Xoá user #{{id}}?"
+        },
+        "errors": {
+            "loadFailed": "Không tải được danh sách người dùng",
+            "updateFailed": "Cập nhật thất bại",
+            "deleteFailed": "Xoá thất bại",
+            "cannotDeleteHasRentals": "User có đơn thuê → không thể xoá."
+        },
+        "empty": "Không có người dùng."
+    },
+    "adminOverview": {
+        "title": "Tổng quan",
+        "subtitle": "Dữ liệu live từ server",
+        "loading": "Đang tải dashboard...",
+        "live": "Live",
+        "cards": {
+            "totalProducts": "Tổng sản phẩm",
+            "activeRentals": "Đơn thuê đang chạy",
+            "revenue": "Doanh thu",
+            "totalUsers": "Tổng người dùng"
+        },
+        "charts": {
+            "weeklyRentals": {
+                "title": "Đơn thuê theo tuần",
+                "subtitle": "7 ngày gần nhất",
+                "empty": "Không có đơn thuê trong 7 ngày gần nhất."
+            },
+            "monthlyRevenue": {
+                "title": "Doanh thu theo tháng",
+                "subtitle": "6 tháng gần nhất",
+                "empty": "Chưa có dữ liệu doanh thu."
+            }
+        },
+        "errors": {
+            "loadFailed": "Không tải được thống kê"
+        }
+    },
+    "profile": {
+        "title": "Hồ sơ cá nhân",
+        "updatedTitle": "Cập nhật thành công",
+        "updatedDesc": "Thông tin cá nhân đã được cập nhật.",
+        "errorTitle": "Lỗi",
+        "updateFailed": "Cập nhật hồ sơ thất bại",
+        "avatarAlt": "Ảnh đại diện"
+    },
+    "form": {
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "VD: 0901 234 567"
+    },
+    "actions": {
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu..."
+    },
+    "productCard": {
+        "featured": "Nổi bật",
+        "perDay": "/ngày",
+        "deposit": "tiền cọc",
+        "status": {
+            "currentlyRented": "Đang được thuê",
+            "unavailable": "Không khả dụng"
+        },
+        "fallback": {
+            "product": "Sản phẩm",
+            "category": "Danh mục"
+        }
+    },
+    "dashboard": {
+        "header": {
+            "welcomeBack": "Chào mừng bạn quay lại, {{name}}",
+            "subtitle": "Quản lý đơn thuê và cài đặt tài khoản của bạn"
+        },
+        "sidebar": {
+            "aria": "Điều hướng bảng điều khiển",
+            "myRentals": "Đơn thuê của tôi",
+            "rentalHistory": "Lịch sử thuê",
+            "profile": "Hồ sơ",
+            "settings": "Cài đặt"
+        },
+        "fallback": {
+            "firstName": "bạn"
+        }
+    },
+    "tryOnSuggest": {
+        "header": {
+            "title": "Thử đồ ảo (Gợi ý)",
+            "subtitle": "Tải ảnh của bạn lên và hệ thống sẽ gợi ý sản phẩm phù hợp."
+        },
+        "upload": {
+            "aria": "Tải ảnh của bạn lên",
+            "yourPhotoAlt": "Ảnh của bạn",
+            "title": "Tải ảnh của bạn lên",
+            "hint": "Ảnh toàn thân, chính diện, nhìn rõ tay",
+            "change": "Đổi ảnh"
+        },
+        "categories": {
+            "top": "Áo",
+            "pants": "Quần",
+            "dress": "Váy/Đầm",
+            "outerwear": "Áo khoác"
+        },
+        "preview": {
+            "yourPhoto": "Ảnh của bạn",
+            "suggested": "Sản phẩm gợi ý",
+            "empty": "Chưa có xem trước"
+        },
+        "buttons": {
+            "generate": "Tạo Try-On",
+            "rentThisPiece": "Thuê sản phẩm này"
+        },
+        "errors": {
+            "imageOnly": "Vui lòng tải lên một file hình ảnh",
+            "uploadYourPhoto": "Vui lòng tải ảnh của bạn lên",
+            "noProductForCategory": "Không tìm thấy sản phẩm cho danh mục này"
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "notifications": {
+            "title": "Thông báo",
+            "desc": "Quản lý cách bạn nhận cập nhật về đơn thuê",
+            "email": {
+                "title": "Thông báo qua Email",
+                "desc": "Nhận cập nhật đơn thuê qua email"
+            },
+            "sms": {
+                "title": "Thông báo qua SMS",
+                "desc": "Nhận nhắc nhở đơn thuê qua tin nhắn"
+            },
+            "marketing": {
+                "title": "Email marketing",
+                "desc": "Nhận tin tức về bộ sưu tập mới"
+            }
+        },
+        "privacy": {
+            "title": "Quyền riêng tư",
+            "desc": "Kiểm soát dữ liệu và cài đặt quyền riêng tư của bạn",
+            "publicProfile": {
+                "title": "Hồ sơ công khai",
+                "desc": "Cho phép người khác xem hồ sơ của bạn"
+            }
+        }
+    }
+}

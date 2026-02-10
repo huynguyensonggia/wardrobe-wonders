@@ -1,22 +1,18 @@
-import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  ShoppingBag, 
-  User, 
-  Clock,
-  Settings,
-  ChevronRight
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { ShoppingBag, User, Clock, Settings, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const sidebarLinks = [
-  { to: '/dashboard', icon: ShoppingBag, label: 'My Rentals', exact: true },
-  { to: '/dashboard/history', icon: Clock, label: 'Rental History' },
-  { to: '/dashboard/profile', icon: User, label: 'Profile' },
-  { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
+  { to: "/dashboard", icon: ShoppingBag, labelKey: "dashboard.sidebar.myRentals", exact: true },
+  { to: "/dashboard/history", icon: Clock, labelKey: "dashboard.sidebar.rentalHistory" },
+  { to: "/dashboard/profile", icon: User, labelKey: "dashboard.sidebar.profile" },
+  { to: "/dashboard/settings", icon: Settings, labelKey: "dashboard.sidebar.settings" },
 ];
 
 export default function UserDashboard() {
+  const { t } = useTranslation();
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -29,8 +25,11 @@ export default function UserDashboard() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
+
+  const firstName =
+    (user as any)?.name?.trim()?.split(/\s+/)?.[0] || t("dashboard.fallback.firstName");
 
   return (
     <div className="min-h-screen py-8">
@@ -38,38 +37,37 @@ export default function UserDashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-display text-3xl font-semibold mb-2">
-            Welcome back, {user?.name?.split(' ')[0]}
+            {t("dashboard.header.welcomeBack", { name: firstName })}
           </h1>
-          <p className="text-muted-foreground">
-            Manage your rentals and account settings
-          </p>
+          <p className="text-muted-foreground">{t("dashboard.header.subtitle")}</p>
         </div>
 
         <div className="grid lg:grid-cols-[250px_1fr] gap-8">
           {/* Sidebar */}
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label={t("dashboard.sidebar.aria")}>
             {sidebarLinks.map((link) => {
-              const isActive = link.exact 
+              const isActive = link.exact
                 ? location.pathname === link.to
                 : location.pathname.startsWith(link.to);
-              
+
+              const Icon = link.icon;
+
               return (
                 <Link
                   key={link.to}
                   to={link.to}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-primary text-primary-foreground" 
+                    isActive
+                      ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   )}
                 >
-                  <link.icon className="w-5 h-5" />
-                  {link.label}
-                  <ChevronRight className={cn(
-                    "w-4 h-4 ml-auto transition-transform",
-                    isActive && "rotate-90"
-                  )} />
+                  <Icon className="w-5 h-5" />
+                  {t(link.labelKey)}
+                  <ChevronRight
+                    className={cn("w-4 h-4 ml-auto transition-transform", isActive && "rotate-90")}
+                  />
                 </Link>
               );
             })}

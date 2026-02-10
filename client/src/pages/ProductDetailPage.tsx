@@ -39,6 +39,7 @@ import {
 } from "date-fns";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type VariantLite = {
   id: number;
@@ -59,6 +60,7 @@ function isVariantActive(x: any): boolean {
 }
 
 export default function ProductDetailPage() {
+  const { t } = useTranslation();
   const MIN_RENTAL_DAYS = 3;
 
   const { id } = useParams<{ id: string }>();
@@ -168,23 +170,18 @@ export default function ProductDetailPage() {
     );
   }, [images, selectedImage, product]);
 
-  // ✅ Disable days: past dates + (from+1) when picking end date to enforce min 3 days
+  // disable days: past + enforce min days when selecting end
   const disabledDays = useMemo(() => {
     const today = startOfDay(new Date());
     const from = dateRange.from ? startOfDay(dateRange.from) : undefined;
-
-    // inclusive min days => to must be >= from + (MIN_DAYS - 1)
     const minTo = from ? addDays(from, MIN_RENTAL_DAYS - 1) : undefined;
 
     return (date: Date) => {
       const d = startOfDay(date);
 
-      // disable past
       if (d < today) return true;
 
-      // if selecting "to" (from chosen, to not yet), disable dates that make range < MIN
       if (from && !dateRange.to && minTo) {
-        // disable (from, minTo) => i.e. from+1 when MIN=3
         return isAfter(d, from) && isBefore(d, minTo);
       }
 
@@ -192,14 +189,13 @@ export default function ProductDetailPage() {
     };
   }, [dateRange.from, dateRange.to]);
 
-  // ✅ Bonus: auto-suggest a valid range (from -> from+2) for instant highlight
+  // auto-suggest a valid range (from -> from+2)
   useEffect(() => {
     if (!dateRange.from) return;
     if (dateRange.to) return;
 
     const suggestedTo = addDays(dateRange.from, MIN_RENTAL_DAYS - 1);
     setDateRange((prev) => ({ ...prev, to: suggestedTo }));
-    // If you DON'T want auto-suggest/highlight, delete this effect block.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange.from]);
 
@@ -207,28 +203,28 @@ export default function ProductDetailPage() {
     if (!canRent) return false;
 
     if (!selectedSize) {
-      alert("Please select size");
+      alert(t("productDetail.alerts.selectSize"));
       return false;
     }
 
     if (!selectedVariant?.id) {
-      alert("Size/variant not found. Please re-select.");
+      alert(t("productDetail.alerts.variantNotFound"));
       return false;
     }
 
     if ((selectedVariant.stock ?? 0) <= 0) {
-      alert("This size is out of stock.");
+      alert(t("productDetail.alerts.outOfStock"));
       return false;
     }
 
     if (!dateRange.from || !dateRange.to) {
-      alert("Please select rental dates");
+      alert(t("productDetail.alerts.selectDates"));
       return false;
     }
 
     const days = differenceInDays(dateRange.to, dateRange.from) + 1;
     if (days < MIN_RENTAL_DAYS) {
-      alert(`Minimum rental is ${MIN_RENTAL_DAYS} days`);
+      alert(t("productDetail.alerts.minimumRental", { days: MIN_RENTAL_DAYS }));
       return false;
     }
 
@@ -243,7 +239,6 @@ export default function ProductDetailPage() {
         productId: Number((product as any).id),
         variantId: Number(selectedVariant!.id),
         size: selectedVariant!.size,
-
         name: displayName,
         imageUrl,
         rentPricePerDay: Number((product as any).pricePerDay ?? 0),
@@ -254,7 +249,7 @@ export default function ProductDetailPage() {
       1
     );
 
-    alert("Added to cart!");
+    alert(t("productDetail.alerts.addedToCart"));
   };
 
   const handleRentNow = () => {
@@ -267,7 +262,6 @@ export default function ProductDetailPage() {
           productId: Number((product as any).id),
           variantId: Number(selectedVariant!.id),
           size: selectedVariant!.size,
-
           name: displayName,
           imageUrl,
           rentPricePerDay: Number((product as any).pricePerDay ?? 0),
@@ -283,7 +277,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-muted-foreground">Loading product...</div>
+        <div className="text-center text-muted-foreground">{t("productDetail.loading")}</div>
       </div>
     );
   }
@@ -292,10 +286,10 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-2xl mb-2">Failed to load product</h1>
+          <h1 className="font-display text-2xl mb-2">{t("productDetail.errorTitle")}</h1>
           <p className="text-muted-foreground mb-4">{(error as Error)?.message}</p>
           <Button asChild>
-            <Link to="/products">Back to Collection</Link>
+            <Link to="/products">{t("productDetail.backToCollection")}</Link>
           </Button>
         </div>
       </div>
@@ -306,9 +300,9 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-2xl mb-4">Product not found</h1>
+          <h1 className="font-display text-2xl mb-4">{t("productDetail.notFoundTitle")}</h1>
           <Button asChild>
-            <Link to="/products">Back to Collection</Link>
+            <Link to="/products">{t("productDetail.backToCollection")}</Link>
           </Button>
         </div>
       </div>
@@ -325,7 +319,7 @@ export default function ProductDetailPage() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
-            Back to Collection
+            {t("productDetail.backToCollection")}
           </Link>
         </div>
 
@@ -350,6 +344,7 @@ export default function ProductDetailPage() {
                       "w-20 h-24 rounded-md overflow-hidden border-2 transition-colors",
                       selectedImage === i ? "border-accent" : "border-transparent"
                     )}
+                    aria-label={t("productDetail.galleryImage", { index: i + 1 })}
                   >
                     <img
                       src={img.url}
@@ -374,23 +369,27 @@ export default function ProductDetailPage() {
                 </h1>
               </div>
               <div className="flex gap-2">
-                <Button variant="icon" size="icon">
+                <Button variant="icon" size="icon" aria-label={t("productDetail.actions.favorite")}>
                   <Heart className="w-5 h-5" />
                 </Button>
-                <Button variant="icon" size="icon">
+                <Button variant="icon" size="icon" aria-label={t("productDetail.actions.share")}>
                   <Share2 className="w-5 h-5" />
                 </Button>
               </div>
             </div>
 
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-2xl font-medium">${(product as any).pricePerDay}/day</span>
-              <span className="text-muted-foreground">${(product as any).deposit} deposit</span>
+              <span className="text-2xl font-medium">
+                ${Number((product as any).pricePerDay)}{t("productDetail.perDay")}
+              </span>
+              <span className="text-muted-foreground">
+                ${Number((product as any).deposit)} {t("productDetail.deposit")}
+              </span>
             </div>
 
             {!canRent && (
               <Badge variant="secondary" className="mb-4">
-                Currently Unavailable
+                {t("productDetail.unavailable")}
               </Badge>
             )}
 
@@ -401,7 +400,7 @@ export default function ProductDetailPage() {
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium">Select Size</label>
+                <label className="block text-sm font-medium">{t("productDetail.selectSize")}</label>
 
                 <Dialog>
                   <DialogTrigger asChild>
@@ -409,19 +408,19 @@ export default function ProductDetailPage() {
                       type="button"
                       className="text-xs italic text-muted-foreground hover:text-foreground underline underline-offset-4"
                     >
-                      Size guide
+                      {t("productDetail.sizeGuide")}
                     </button>
                   </DialogTrigger>
 
                   <DialogContent className="max-w-3xl">
                     <DialogHeader>
-                      <DialogTitle>Women&apos;s Size Chart</DialogTitle>
+                      <DialogTitle>{t("productDetail.sizeChartTitle")}</DialogTitle>
                     </DialogHeader>
 
                     <div className="overflow-auto">
                       <img
                         src="/size-chart.png"
-                        alt="Women’s size chart"
+                        alt={t("productDetail.sizeChartAlt")}
                         className="w-full h-auto rounded-md"
                       />
                     </div>
@@ -431,7 +430,7 @@ export default function ProductDetailPage() {
 
               {variants.length === 0 && (
                 <div className="text-xs text-destructive mb-2">
-                  ⚠️ Product has no variants from API.
+                  {t("productDetail.noVariantsWarning")}
                 </div>
               )}
 
@@ -442,18 +441,18 @@ export default function ProductDetailPage() {
                   const active = v ? isVariantActive(v.isActive) : true;
                   const disabled = !active || stock <= 0;
 
+                  const title = disabled
+                    ? !active
+                      ? t("productDetail.tooltips.variantInactive")
+                      : t("productDetail.tooltips.outOfStock")
+                    : t("productDetail.tooltips.stock", { stock });
+
                   return (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       disabled={disabled}
-                      title={
-                        disabled
-                          ? !active
-                            ? "Variant inactive"
-                            : "Out of stock"
-                          : `Stock: ${stock}`
-                      }
+                      title={title}
                       className={cn(
                         "w-12 h-12 rounded-md border text-sm font-medium transition-all",
                         disabled && "opacity-40 cursor-not-allowed",
@@ -470,7 +469,10 @@ export default function ProductDetailPage() {
 
               {selectedVariant && (
                 <div className="text-xs text-muted-foreground mt-2">
-                  Selected variant: #{selectedVariant.id} • Stock: {selectedVariant.stock}
+                  {t("productDetail.selectedVariant", {
+                    id: selectedVariant.id,
+                    stock: selectedVariant.stock,
+                  })}
                 </div>
               )}
             </div>
@@ -478,7 +480,9 @@ export default function ProductDetailPage() {
             {/* Color Selection */}
             {colors.length > 1 && (
               <div className="mb-6">
-                <label className="block text-sm font-medium mb-3">Select Color</label>
+                <label className="block text-sm font-medium mb-3">
+                  {t("productDetail.selectColor")}
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color: string) => (
                     <button
@@ -500,7 +504,9 @@ export default function ProductDetailPage() {
 
             {/* Date Selection */}
             <div className="mb-8">
-              <label className="block text-sm font-medium mb-3">Rental Period</label>
+              <label className="block text-sm font-medium mb-3">
+                {t("productDetail.rentalPeriod")}
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -508,19 +514,23 @@ export default function ProductDetailPage() {
                     {dateRange.from ? (
                       dateRange.to ? (
                         <>
-                          {format(dateRange.from, "MMM d")} - {format(dateRange.to, "MMM d, yyyy")}
+                          {format(dateRange.from, "MMM d")} -{" "}
+                          {format(dateRange.to, "MMM d, yyyy")}
                         </>
                       ) : (
                         format(dateRange.from, "MMM d, yyyy")
                       )
                     ) : (
-                      "Select dates"
+                      t("productDetail.selectDates")
                     )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <div className="p-3 pb-2 text-xs text-muted-foreground">
-                    Minimum rental period: <span className="font-medium">{MIN_RENTAL_DAYS} days</span>
+                    {t("productDetail.minimumRentalHint")}{" "}
+                    <span className="font-medium">
+                      {t("productDetail.minimumDays", { days: MIN_RENTAL_DAYS })}
+                    </span>
                   </div>
                   <Calendar
                     mode="range"
@@ -531,13 +541,11 @@ export default function ProductDetailPage() {
                         return;
                       }
 
-                      // allow selecting start date
                       if (!range.to) {
                         setDateRange({ from: range.from, to: undefined });
                         return;
                       }
 
-                      // last safety check (should be prevented by disabledDays already)
                       const days = differenceInDays(range.to, range.from) + 1;
                       if (days < MIN_RENTAL_DAYS) return;
 
@@ -551,7 +559,7 @@ export default function ProductDetailPage() {
 
               {rentalDays > 0 && rentalDays < MIN_RENTAL_DAYS && (
                 <p className="text-xs text-destructive mt-2">
-                  Minimum rental is {MIN_RENTAL_DAYS} days.
+                  {t("productDetail.minimumRentalError", { days: MIN_RENTAL_DAYS })}
                 </p>
               )}
             </div>
@@ -561,18 +569,21 @@ export default function ProductDetailPage() {
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
-                    ${(product as any).pricePerDay} × {rentalDays} days
+                    ${Number((product as any).pricePerDay)} × {rentalDays}{" "}
+                    {t("productDetail.days")}
                   </span>
                   <span>${totalPrice}</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span>Refundable deposit</span>
-                  <span>${(product as any).deposit}</span>
+                  <span>{t("productDetail.refundableDeposit")}</span>
+                  <span>${Number((product as any).deposit)}</span>
                 </div>
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
-                    <span>Total due today</span>
-                    <span>${totalPrice + Number((product as any).deposit ?? 0)}</span>
+                    <span>{t("productDetail.totalDueToday")}</span>
+                    <span>
+                      ${totalPrice + Number((product as any).deposit ?? 0)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -587,7 +598,7 @@ export default function ProductDetailPage() {
                 disabled={!canAddToCart}
                 onClick={handleRentNow}
               >
-                Rent Now
+                {t("productDetail.rentNow")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
 
@@ -599,13 +610,13 @@ export default function ProductDetailPage() {
                 disabled={!canAddToCart}
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
-                Add to Cart
+                {t("productDetail.addToCart")}
               </Button>
 
               <Button variant="hero-outline" size="lg" className="w-full" asChild>
                 <Link to={`/try-on?product=${(product as any).id}`}>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Try On Virtually
+                  {t("productDetail.tryOnVirtually")}
                 </Link>
               </Button>
             </div>
@@ -614,11 +625,11 @@ export default function ProductDetailPage() {
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="flex items-center gap-3 text-sm">
                 <Truck className="w-5 h-5 text-accent" />
-                <span>Free shipping over $100</span>
+                <span>{t("productDetail.features.freeShipping")}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Shield className="w-5 h-5 text-accent" />
-                <span>Damage protection included</span>
+                <span>{t("productDetail.features.damageProtection")}</span>
               </div>
             </div>
           </div>

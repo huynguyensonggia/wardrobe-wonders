@@ -1,17 +1,21 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { t } = useTranslation();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -23,15 +27,16 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast({
-        title: 'Welcome back!',
-        description: 'You have successfully signed in.',
+        title: t("auth.login.toast.success.title"),
+        description: t("auth.login.toast.success.desc"),
       });
-      navigate('/');
+      navigate("/");
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to sign in',
-        variant: 'destructive',
+        title: t("auth.login.toast.error.title"),
+        description:
+          error instanceof Error ? error.message : t("auth.login.toast.error.desc"),
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -43,28 +48,28 @@ export default function LoginPage() {
       {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
         <div className="w-full max-w-md mx-auto">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to home
+            {t("auth.login.backHome")}
           </Link>
 
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">
-            Welcome Back
+            {t("auth.login.title")}
           </h1>
           <p className="text-muted-foreground mb-8">
-            Sign in to access your rentals and continue exploring.
+            {t("auth.login.subtitle")}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.login.email.label")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.login.email.placeholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -73,16 +78,17 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.login.password.label")}</Label>
                 <a href="#" className="text-sm text-accent hover:underline">
-                  Forgot password?
+                  {t("auth.login.forgot")}
                 </a>
               </div>
+
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={t("auth.login.password.placeholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -91,30 +97,44 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={
+                    showPassword
+                      ? t("auth.login.password.hide")
+                      : t("auth.login.password.show")
+                  }
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
 
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+            <Button
+              type="submit"
+              variant="hero"
+              size="lg"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? t("auth.login.button.loading") : t("auth.login.button.submit")}
             </Button>
           </form>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
+            {t("auth.login.noAccount")}{" "}
             <Link to="/register" className="text-accent hover:underline font-medium">
-              Create one
+              {t("auth.login.createOne")}
             </Link>
           </p>
 
           {/* Demo Credentials */}
           <div className="mt-8 p-4 bg-secondary rounded-lg">
-            <p className="text-sm font-medium mb-2">Demo Credentials</p>
-            <p className="text-xs text-muted-foreground">
-              User: user@demo.com / demo123<br />
-              Admin: admin@demo.com / admin123
+            <p className="text-sm font-medium mb-2">{t("auth.login.demo.title")}</p>
+            <p className="text-xs text-muted-foreground whitespace-pre-line">
+              {t("auth.login.demo.body")}
             </p>
           </div>
         </div>
@@ -125,9 +145,11 @@ export default function LoginPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-12">
           <blockquote className="font-display text-2xl italic text-foreground/80">
-            "Fashion is about dreaming and making other people dream."
+            {t("auth.login.quote.text")}
           </blockquote>
-          <p className="mt-4 text-sm text-muted-foreground">— Donatella Versace</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {t("auth.login.quote.author")}
+          </p>
         </div>
       </div>
     </div>

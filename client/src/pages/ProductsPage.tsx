@@ -16,10 +16,12 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 
 import { productsApi, categoriesApi } from "@/lib/api";
 import type { ProductStatus } from "@/types";
+import { useTranslation } from "react-i18next";
 
 const ALL_VALUE = "all";
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
@@ -30,11 +32,10 @@ export default function ProductsPage() {
     size: searchParams.get("size") || "",
     color: searchParams.get("color") || "",
     status:
-      (searchParams.get("status") as ProductStatus) ||
-      ("" as ProductStatus | ""),
+      (searchParams.get("status") as ProductStatus) || ("" as ProductStatus | ""),
   });
 
-  // ✅ QUAN TRỌNG: Sync URL -> state (khi click nav đổi query)
+  // ✅ Sync URL -> state
   const sp = searchParams.toString();
   useEffect(() => {
     setFilters({
@@ -43,21 +44,15 @@ export default function ProductsPage() {
       size: searchParams.get("size") || "",
       color: searchParams.get("color") || "",
       status:
-        (searchParams.get("status") as ProductStatus) ||
-        ("" as ProductStatus | ""),
+        (searchParams.get("status") as ProductStatus) || ("" as ProductStatus | ""),
     });
-
-    // optional: đổi category thì đóng mobile filter cho gọn
-    // setShowFilters(false);
   }, [sp, searchParams]);
 
   const updateFilter = (key: keyof typeof filters, value: string) => {
     const actualValue = value === ALL_VALUE ? "" : value;
 
-    // update state
     setFilters((prev) => ({ ...prev, [key]: actualValue }));
 
-    // update URL
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       if (actualValue) next.set(key, actualValue);
@@ -80,7 +75,7 @@ export default function ProductsPage() {
   const hasActiveFilters = Object.values(filters).some((v) => v);
   const getSelectValue = (value: string) => value || ALL_VALUE;
 
-  // 1) Fetch categories (để map slug -> id)
+  // 1) Fetch categories
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: () => categoriesApi.getAll(),
@@ -94,14 +89,13 @@ export default function ProductsPage() {
     return cat?.id ? Number(cat.id) : undefined;
   }, [filters.category, categories]);
 
-  // 2) Fetch products từ backend theo đúng query hỗ trợ: categoryId + status
+  // 2) Fetch products
   const {
     data: productsFromApi = [],
     isLoading,
     isError,
     error,
   } = useQuery({
-    // ✅ thêm filters.category để chắc chắn đổi slug là refetch
     queryKey: ["products", filters.category, categoryId, filters.status],
     queryFn: () =>
       productsApi.getAll({
@@ -109,10 +103,10 @@ export default function ProductsPage() {
         status: (filters.status as ProductStatus) || undefined,
       } as any),
     staleTime: 60_000,
-    enabled: filters.category ? categoryId !== undefined : true, // nếu có category slug mà chưa map ra id thì chờ
+    enabled: filters.category ? categoryId !== undefined : true,
   });
 
-  // 3) Lọc client-side cho search/size/color (backend chưa có)
+  // 3) Client-side filter
   const filteredProducts = useMemo(() => {
     const list = productsFromApi as any[];
 
@@ -132,7 +126,6 @@ export default function ProductsPage() {
         if (!colors.includes(filters.color)) return false;
       }
 
-      // status đã filter server-side rồi, nhưng giữ lại cũng không sao
       if (filters.status && product?.status !== filters.status) return false;
 
       return true;
@@ -151,7 +144,7 @@ export default function ProductsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen py-8">
-        <div className="container mx-auto px-4 py-24">Loading...</div>
+        <div className="container mx-auto px-4 py-24">{t("products.loading")}</div>
       </div>
     );
   }
@@ -160,7 +153,7 @@ export default function ProductsPage() {
     return (
       <div className="min-h-screen py-8">
         <div className="container mx-auto px-4 py-24 text-destructive">
-          {(error as Error)?.message || "Failed to load products"}
+          {(error as Error)?.message || t("products.error")}
         </div>
       </div>
     );
@@ -172,10 +165,10 @@ export default function ProductsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">
-            Our Collection
+            {t("products.title")}
           </h1>
           <p className="text-muted-foreground">
-            {filteredProducts.length} pieces available
+            {t("products.piecesAvailable", { count: filteredProducts.length })}
           </p>
         </div>
 
@@ -184,7 +177,7 @@ export default function ProductsPage() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search products..."
+              placeholder={t("products.searchPlaceholder")}
               value={filters.search}
               onChange={(e) => updateFilter("search", e.target.value)}
               className="pl-10"
@@ -198,7 +191,7 @@ export default function ProductsPage() {
               className="lg:hidden"
             >
               <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              {t("products.filters")}
             </Button>
 
             {/* Desktop Filters */}
@@ -208,10 +201,10 @@ export default function ProductsPage() {
                 onValueChange={(v) => updateFilter("category", v)}
               >
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Category" />
+                  <SelectValue placeholder={t("products.category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Categories</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allCategories")}</SelectItem>
                   {(categories as any[]).map((cat) => (
                     <SelectItem key={cat.id} value={cat.slug}>
                       {cat.name}
@@ -220,15 +213,12 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={getSelectValue(filters.size)}
-                onValueChange={(v) => updateFilter("size", v)}
-              >
+              <Select value={getSelectValue(filters.size)} onValueChange={(v) => updateFilter("size", v)}>
                 <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Size" />
+                  <SelectValue placeholder={t("products.size")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Sizes</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allSizes")}</SelectItem>
                   {allSizes.map((size) => (
                     <SelectItem key={size} value={size}>
                       {size}
@@ -237,15 +227,12 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={getSelectValue(filters.color)}
-                onValueChange={(v) => updateFilter("color", v)}
-              >
+              <Select value={getSelectValue(filters.color)} onValueChange={(v) => updateFilter("color", v)}>
                 <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Color" />
+                  <SelectValue placeholder={t("products.color")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Colors</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allColors")}</SelectItem>
                   {allColors.map((color) => (
                     <SelectItem key={color} value={color}>
                       {color}
@@ -259,24 +246,20 @@ export default function ProductsPage() {
                 onValueChange={(v) => updateFilter("status", v as ProductStatus | "")}
               >
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Availability" />
+                  <SelectValue placeholder={t("products.availability")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Status</SelectItem>
-                  <SelectItem value="AVAILABLE">Available</SelectItem>
-                  <SelectItem value="RENTED">Rented</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allStatus")}</SelectItem>
+                  <SelectItem value="AVAILABLE">{t("products.status.available")}</SelectItem>
+                  <SelectItem value="RENTED">{t("products.status.rented")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                onClick={clearFilters}
-                className="text-muted-foreground"
-              >
+              <Button variant="ghost" onClick={clearFilters} className="text-muted-foreground">
                 <X className="w-4 h-4 mr-1" />
-                Clear
+                {t("products.clear")}
               </Button>
             )}
           </div>
@@ -291,10 +274,10 @@ export default function ProductsPage() {
                 onValueChange={(v) => updateFilter("category", v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Category" />
+                  <SelectValue placeholder={t("products.category")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Categories</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allCategories")}</SelectItem>
                   {(categories as any[]).map((cat) => (
                     <SelectItem key={cat.id} value={cat.slug}>
                       {cat.name}
@@ -303,15 +286,12 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={getSelectValue(filters.size)}
-                onValueChange={(v) => updateFilter("size", v)}
-              >
+              <Select value={getSelectValue(filters.size)} onValueChange={(v) => updateFilter("size", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Size" />
+                  <SelectValue placeholder={t("products.size")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Sizes</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allSizes")}</SelectItem>
                   {allSizes.map((size) => (
                     <SelectItem key={size} value={size}>
                       {size}
@@ -320,15 +300,12 @@ export default function ProductsPage() {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={getSelectValue(filters.color)}
-                onValueChange={(v) => updateFilter("color", v)}
-              >
+              <Select value={getSelectValue(filters.color)} onValueChange={(v) => updateFilter("color", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Color" />
+                  <SelectValue placeholder={t("products.color")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Colors</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allColors")}</SelectItem>
                   {allColors.map((color) => (
                     <SelectItem key={color} value={color}>
                       {color}
@@ -342,12 +319,12 @@ export default function ProductsPage() {
                 onValueChange={(v) => updateFilter("status", v as ProductStatus | "")}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Availability" />
+                  <SelectValue placeholder={t("products.availability")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={ALL_VALUE}>All Status</SelectItem>
-                  <SelectItem value="AVAILABLE">Available</SelectItem>
-                  <SelectItem value="RENTED">Rented</SelectItem>
+                  <SelectItem value={ALL_VALUE}>{t("products.allStatus")}</SelectItem>
+                  <SelectItem value="AVAILABLE">{t("products.status.available")}</SelectItem>
+                  <SelectItem value="RENTED">{t("products.status.rented")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -369,9 +346,9 @@ export default function ProductsPage() {
           </div>
         ) : (
           <div className="text-center py-20">
-            <p className="text-lg text-muted-foreground mb-4">No products found</p>
+            <p className="text-lg text-muted-foreground mb-4">{t("products.noProducts")}</p>
             <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
+              {t("products.clearFilters")}
             </Button>
           </div>
         )}
