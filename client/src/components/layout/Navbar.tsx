@@ -21,15 +21,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
+import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { count } = useCart();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const setLang = (lng: "en" | "vi" | "ja") => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem("lang", lng);
   };
 
   return (
@@ -49,50 +59,58 @@ export function Navbar() {
               to="/products"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Collection
+              {t("navbar.collection")}
             </Link>
+
             <Link
               to="/products?category=dresses"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Dresses
+              {t("navbar.dresses")}
             </Link>
+
             <Link
               to="/products?category=tops"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Tops
+              {t("navbar.tops")}
             </Link>
+
             <Link
               to="/products?category=pants"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Pants
+              {t("navbar.pants")}
             </Link>
+
             <Link
               to="/products?category=outerwear"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
-              Outerwear
+              {t("navbar.outerwear")}
             </Link>
+
             <Link
               to="/try-on-suggest"
               className="flex items-center gap-1.5 text-sm font-medium text-gold hover:text-gold/80 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
-              AI Try-On
+              {t("navbar.aiTryOn")}
             </Link>
-          </div>  
+          </div>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center gap-4">
-            {/* ✅ Cart button replaces Search */}
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Language selector */}
+            <LanguageSwitcher />
+
+            {/* Cart button */}
             <Button
               variant="ghost"
               size="icon"
               className="relative"
               onClick={() => navigate("/cart")}
-              aria-label="Cart"
+              aria-label={t("navbar.cart")}
             >
               <ShoppingBag className="w-5 h-5" />
               {count > 0 && (
@@ -109,7 +127,7 @@ export function Navbar() {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="relative">
+                  <Button variant="ghost" size="icon" className="relative" aria-label="User">
                     {user?.avatar ? (
                       <img
                         src={user.avatar}
@@ -135,7 +153,7 @@ export function Navbar() {
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer">
                           <LayoutDashboard className="w-4 h-4 mr-2" />
-                          Admin Dashboard
+                          {t("navbar.adminDashboard")}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -145,14 +163,14 @@ export function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
                       <ShoppingBag className="w-4 h-4 mr-2" />
-                      My Rentals
+                      {t("navbar.myRentals")}
                     </Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard/profile" className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" />
-                      Settings
+                      {t("navbar.settings")}
                     </Link>
                   </DropdownMenuItem>
 
@@ -163,17 +181,17 @@ export function Navbar() {
                     className="cursor-pointer text-destructive"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
+                    {t("navbar.signOut")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" asChild>
-                  <Link to="/login">Sign In</Link>
+                  <Link to="/login">{t("navbar.signIn")}</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/register">Join Now</Link>
+                  <Link to="/register">{t("navbar.joinNow")}</Link>
                 </Button>
               </div>
             )}
@@ -185,6 +203,7 @@ export function Navbar() {
             size="icon"
             className="lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={t("navbar.menu")}
           >
             {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
@@ -194,12 +213,30 @@ export function Navbar() {
         {isOpen && (
           <div className="lg:hidden border-t border-border py-4 animate-slide-down">
             <div className="flex flex-col gap-4">
+              {/* Language selector in mobile */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("language.label")}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setLang("en")}>
+                    EN
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setLang("vi")}>
+                    VI
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setLang("ja")}>
+                    JA
+                  </Button>
+                </div>
+              </div>
+
               <Link
                 to="/products"
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Collection
+                {t("navbar.collection")}
               </Link>
 
               <Link
@@ -207,7 +244,23 @@ export function Navbar() {
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Dresses
+                {t("navbar.dresses")}
+              </Link>
+
+              <Link
+                to="/products?category=tops"
+                className="text-sm font-medium py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                {t("navbar.tops")}
+              </Link>
+
+              <Link
+                to="/products?category=pants"
+                className="text-sm font-medium py-2"
+                onClick={() => setIsOpen(false)}
+              >
+                {t("navbar.pants")}
               </Link>
 
               <Link
@@ -215,7 +268,7 @@ export function Navbar() {
                 className="text-sm font-medium py-2"
                 onClick={() => setIsOpen(false)}
               >
-                Outerwear
+                {t("navbar.outerwear")}
               </Link>
 
               <Link
@@ -224,10 +277,10 @@ export function Navbar() {
                 onClick={() => setIsOpen(false)}
               >
                 <Sparkles className="w-4 h-4" />
-                AI Try-On
+                {t("navbar.aiTryOn")}
               </Link>
 
-              {/* ✅ Cart in mobile menu */}
+              {/* Cart in mobile menu */}
               <button
                 className="text-left text-sm font-medium py-2"
                 onClick={() => {
@@ -235,7 +288,7 @@ export function Navbar() {
                   setIsOpen(false);
                 }}
               >
-                Cart {count > 0 ? `(${count})` : ""}
+                {t("navbar.cart")} {count > 0 ? `(${count})` : ""}
               </button>
 
               <div className="pt-4 border-t border-border">
@@ -246,7 +299,7 @@ export function Navbar() {
                       className="block text-sm font-medium py-2"
                       onClick={() => setIsOpen(false)}
                     >
-                      My Rentals
+                      {t("navbar.myRentals")}
                     </Link>
 
                     {user?.role === "ADMIN" && (
@@ -255,7 +308,7 @@ export function Navbar() {
                         className="block text-sm font-medium py-2"
                         onClick={() => setIsOpen(false)}
                       >
-                        Admin Dashboard
+                        {t("navbar.adminDashboard")}
                       </Link>
                     )}
 
@@ -266,19 +319,19 @@ export function Navbar() {
                       }}
                       className="text-sm font-medium py-2 text-destructive"
                     >
-                      Sign Out
+                      {t("navbar.signOut")}
                     </button>
                   </>
                 ) : (
                   <div className="flex flex-col gap-2">
                     <Button asChild className="w-full">
                       <Link to="/login" onClick={() => setIsOpen(false)}>
-                        Sign In
+                        {t("navbar.signIn")}
                       </Link>
                     </Button>
                     <Button variant="outline" asChild className="w-full">
                       <Link to="/register" onClick={() => setIsOpen(false)}>
-                        Join Now
+                        {t("navbar.joinNow")}
                       </Link>
                     </Button>
                   </div>

@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { User as UserIcon } from "lucide-react";
-
-import { authApi } from "@/lib/api"; // ✅ Cách 1: dùng authApi
+import { authApi } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export default function Profile() {
+  const { t } = useTranslation(); // ✅ giống MyRentals: không truyền namespace
   const { user, updateUser } = useAuth();
   const { toast } = useToast();
 
@@ -29,28 +30,23 @@ export default function Profile() {
     if (!user) return;
 
     setIsLoading(true);
-
     try {
-      // ✅ call API thật: PUT /auth/profile
       const res = await authApi.updateProfile({ name, phone });
-
-      // backend có thể trả { data: user } hoặc trả user thẳng
       const updatedUser = (res as any)?.data ?? res;
 
-      // ✅ update auth context để UI refresh
       updateUser({
         name: updatedUser?.name ?? name,
         phone: updatedUser?.phone ?? phone,
       });
 
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
+        title: t("common.profile2.toast.success.title"),
+        description: t("common.profile2.toast.success.desc"),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error?.message || "Failed to update profile",
+        title: t("common.profile2.toast.error.title"),
+        description: error?.message || t("common.profile2.toast.error.desc"),
         variant: "destructive",
       });
     } finally {
@@ -60,7 +56,9 @@ export default function Profile() {
 
   return (
     <div className="space-y-6">
-      <h2 className="font-display text-xl font-medium">Profile</h2>
+      <h2 className="font-display text-xl font-medium">
+        {t("common.profile2.title")}
+      </h2>
 
       <Card>
         <CardHeader>
@@ -69,16 +67,17 @@ export default function Profile() {
               {user?.avatar ? (
                 <img
                   src={user.avatar}
-                  alt={user.name}
+                  alt={user.name || "avatar"}
                   className="w-full h-full rounded-full object-cover"
                 />
               ) : (
                 <UserIcon className="w-8 h-8 text-muted-foreground" />
               )}
             </div>
+
             <div>
-              <CardTitle>{user?.name}</CardTitle>
-              <CardDescription>{user?.email}</CardDescription>
+              <CardTitle>{user?.name || t("common.dash")}</CardTitle>
+              <CardDescription>{user?.email || t("common.dash")}</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -87,17 +86,18 @@ export default function Profile() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="name">{t("common.profile2.form.fullName")}</Label>
                 <Input
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoComplete="name"
+                  placeholder={t("common.profile2.form.fullNamePlaceholder")}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("common.profile2.form.email")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -108,20 +108,22 @@ export default function Profile() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">{t("common.profile2.form.phone")}</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. 0901 234 567"
+                  placeholder={t("common.profile2.form.phonePlaceholder")}
                   autoComplete="tel"
                 />
               </div>
             </div>
 
             <Button type="submit" disabled={isLoading || !user}>
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading
+                ? t("common.profile2.button.saving")
+                : t("common.profile2.button.save")}
             </Button>
           </form>
         </CardContent>

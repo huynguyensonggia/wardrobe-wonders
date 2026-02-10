@@ -33,10 +33,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useTranslation } from "react-i18next";
+
 type Mode = "create" | "edit";
 
 export default function AdminCategories() {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -52,8 +55,11 @@ export default function AdminCategories() {
   const [vtonCategory, setVtonCategory] = useState<VtonCategory | "">("");
 
   const title = useMemo(
-    () => (mode === "create" ? "Create category" : "Update category"),
-    [mode]
+    () =>
+      mode === "create"
+        ? t("adminCategories.dialog.createTitle")
+        : t("adminCategories.dialog.updateTitle"),
+    [mode, t]
   );
 
   const resetForm = () => {
@@ -72,8 +78,8 @@ export default function AdminCategories() {
       setCategories(list || []);
     } catch (e: any) {
       toast({
-        title: "Load categories failed",
-        description: e?.message || "Error",
+        title: t("adminCategories.toasts.loadFailed.title"),
+        description: e?.message || t("common.error"),
       });
     } finally {
       setLoading(false);
@@ -107,17 +113,17 @@ export default function AdminCategories() {
     try {
       if (!name.trim()) {
         toast({
-          title: "Missing name",
-          description: "Please input category name.",
+          title: t("adminCategories.validation.missingName.title"),
+          description: t("adminCategories.validation.missingName.desc"),
         });
         return;
       }
 
-      // Backend của bạn: slug là REQUIRED trong DTO => nên validate ở FE
+      // Backend: slug REQUIRED
       if (!slug.trim()) {
         toast({
-          title: "Missing slug",
-          description: "Slug is required (CreateCategoryDto.slug).",
+          title: t("adminCategories.validation.missingSlug.title"),
+          description: t("adminCategories.validation.missingSlug.desc"),
         });
         return;
       }
@@ -131,14 +137,23 @@ export default function AdminCategories() {
 
       if (mode === "create") {
         await categoriesApi.create(payload);
-        toast({ title: "Success", description: "Category created" });
+        toast({
+          title: t("common.success"),
+          description: t("adminCategories.toasts.created.desc"),
+        });
       } else {
         if (!editing?.id) {
-          toast({ title: "Update failed", description: "Missing category id" });
+          toast({
+            title: t("adminCategories.toasts.updateFailedMissingId.title"),
+            description: t("adminCategories.toasts.updateFailedMissingId.desc"),
+          });
           return;
         }
         await categoriesApi.update(String(editing.id), payload);
-        toast({ title: "Success", description: "Category updated" });
+        toast({
+          title: t("common.success"),
+          description: t("adminCategories.toasts.updated.desc"),
+        });
       }
 
       setOpen(false);
@@ -146,8 +161,11 @@ export default function AdminCategories() {
       await fetchCategories();
     } catch (e: any) {
       toast({
-        title: mode === "create" ? "Create failed" : "Update failed",
-        description: e?.message || "Error",
+        title:
+          mode === "create"
+            ? t("adminCategories.toasts.createFailed.title")
+            : t("adminCategories.toasts.updateFailed.title"),
+        description: e?.message || t("common.error"),
       });
     }
   };
@@ -155,10 +173,16 @@ export default function AdminCategories() {
   const handleDelete = async (id: string) => {
     try {
       await categoriesApi.delete(id);
-      toast({ title: "Deleted", description: "Category removed" });
+      toast({
+        title: t("adminCategories.toasts.deleted.title"),
+        description: t("adminCategories.toasts.deleted.desc"),
+      });
       await fetchCategories();
     } catch (e: any) {
-      toast({ title: "Delete failed", description: e?.message || "Error" });
+      toast({
+        title: t("adminCategories.toasts.deleteFailed.title"),
+        description: e?.message || t("common.error"),
+      });
     }
   };
 
@@ -167,10 +191,16 @@ export default function AdminCategories() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-2xl font-semibold">Categories</h2>
-          <p className="text-muted-foreground">Manage categories</p>
+          <h2 className="font-display text-2xl font-semibold">
+            {t("adminCategories.header.title")}
+          </h2>
+          <p className="text-muted-foreground">
+            {t("adminCategories.header.subtitle")}
+          </p>
         </div>
-        <Button onClick={openCreate}>Create category</Button>
+        <Button onClick={openCreate}>
+          {t("adminCategories.buttons.create")}
+        </Button>
       </div>
 
       {/* Dialog */}
@@ -182,32 +212,32 @@ export default function AdminCategories() {
 
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label>Name</Label>
+              <Label>{t("adminCategories.form.name")}</Label>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
 
             {/* slug required in BE */}
             <div className="grid gap-2">
-              <Label>Slug</Label>
+              <Label>{t("adminCategories.form.slug")}</Label>
               <Input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                placeholder="e.g. dresses"
+                placeholder={t("adminCategories.form.slugPlaceholder")}
               />
               <p className="text-xs text-muted-foreground">
-                DTO backend đang require slug, nên không được để trống.
+                {t("adminCategories.form.slugHint")}
               </p>
             </div>
 
             {/* VTON CATEGORY */}
             <div className="grid gap-2">
-              <Label>VTON Category (AI Try-On)</Label>
+              <Label>{t("adminCategories.form.vtonLabel")}</Label>
               <Select
                 value={vtonCategory || ""}
                 onValueChange={(v) => setVtonCategory(v as VtonCategory)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select VTON category" />
+                  <SelectValue placeholder={t("adminCategories.form.vtonPlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {VTON_CATEGORY_OPTIONS.map((o) => (
@@ -217,22 +247,25 @@ export default function AdminCategories() {
                   ))}
                 </SelectContent>
               </Select>
+
               <p className="text-xs text-muted-foreground">
-                Dùng để AI biết vùng cơ thể cần mask khi Try-On.
+                {t("adminCategories.form.vtonHint")}
               </p>
             </div>
 
             <div className="grid gap-2">
-              <Label>Description (optional)</Label>
+              <Label>{t("adminCategories.form.descriptionOptional")}</Label>
               <Input
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Short description..."
+                placeholder={t("adminCategories.form.descriptionPlaceholder")}
               />
             </div>
 
             <Button onClick={handleSubmit}>
-              {mode === "create" ? "Submit" : "Update"}
+              {mode === "create"
+                ? t("adminCategories.buttons.submit")
+                : t("adminCategories.buttons.update")}
             </Button>
           </div>
         </DialogContent>
@@ -240,7 +273,9 @@ export default function AdminCategories() {
 
       {/* List */}
       {loading ? (
-        <div className="text-sm text-muted-foreground">Loading categories...</div>
+        <div className="text-sm text-muted-foreground">
+          {t("adminCategories.loading")}
+        </div>
       ) : categories.length > 0 ? (
         <div className="grid gap-3">
           {categories.map((c) => (
@@ -260,7 +295,7 @@ export default function AdminCategories() {
 
                 {(c as any).vtonCategory ? (
                   <div className="text-xs text-muted-foreground mt-1">
-                    VTON: {(c as any).vtonCategory}
+                    {t("adminCategories.list.vton")}: {(c as any).vtonCategory}
                   </div>
                 ) : null}
 
@@ -277,7 +312,7 @@ export default function AdminCategories() {
                   variant="secondary"
                   className="h-8 w-8"
                   onClick={() => openEdit(c)}
-                  title="Edit"
+                  title={t("common.edit")}
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
@@ -288,7 +323,7 @@ export default function AdminCategories() {
                       size="icon"
                       variant="destructive"
                       className="h-8 w-8"
-                      title="Delete"
+                      title={t("common.delete")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -296,16 +331,21 @@ export default function AdminCategories() {
 
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete category?</AlertDialogTitle>
+                      <AlertDialogTitle>
+                        {t("adminCategories.deleteDialog.title")}
+                      </AlertDialogTitle>
                       <AlertDialogDescription>
-                        Hành động này không thể hoàn tác. Nếu category đang được
-                        dùng bởi products, backend có thể sẽ chặn xoá.
+                        {t("adminCategories.deleteDialog.desc")}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(String(c.id))}>
-                        Delete
+                      <AlertDialogCancel>
+                        {t("common.cancel")}
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(String(c.id))}
+                      >
+                        {t("common.delete")}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
@@ -315,7 +355,9 @@ export default function AdminCategories() {
           ))}
         </div>
       ) : (
-        <div className="text-sm text-muted-foreground">No categories yet.</div>
+        <div className="text-sm text-muted-foreground">
+          {t("adminCategories.empty")}
+        </div>
       )}
     </div>
   );

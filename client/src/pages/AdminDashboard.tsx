@@ -14,13 +14,7 @@ import { cn } from "@/lib/utils";
 // ✅ NEW: Overview thật
 import AdminOverview from "@/pages/admin/AdminOverview";
 
-const sidebarLinks = [
-  { to: "/admin", icon: LayoutDashboard, label: "Overview", exact: true },
-  { to: "/admin/users", icon: Users, label: "Users" },
-  { to: "/admin/products", icon: Package, label: "Products" },
-  { to: "/admin/categories", icon: FolderOpen, label: "Categories" },
-  { to: "/admin/rentals", icon: ShoppingBag, label: "Rentals" },
-];
+import { useTranslation } from "react-i18next";
 
 // ✅ normalize role để không bị lệch "ADMIN" vs "admin"
 function isAdminRole(role?: string) {
@@ -28,8 +22,18 @@ function isAdminRole(role?: string) {
 }
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
+
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+
+  const sidebarLinks = [
+    { to: "/admin", icon: LayoutDashboard, label: t("admin.sidebar.overview"), exact: true },
+    { to: "/admin/users", icon: Users, label: t("admin.sidebar.users") },
+    { to: "/admin/products", icon: Package, label: t("admin.sidebar.products") },
+    { to: "/admin/categories", icon: FolderOpen, label: t("admin.sidebar.categories") },
+    { to: "/admin/rentals", icon: ShoppingBag, label: t("admin.sidebar.rentals") },
+  ];
 
   if (isLoading) {
     return (
@@ -50,17 +54,24 @@ export default function AdminDashboard() {
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-4 mb-8">
-          <Link to="/" className="text-muted-foreground hover:text-foreground">
+          <Link
+            to="/"
+            className="text-muted-foreground hover:text-foreground"
+            aria-label={t("admin.backHome")}
+          >
             <ArrowLeft className="w-5 h-5" />
           </Link>
+
           <div>
-            <h1 className="font-display text-3xl font-semibold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage your rental platform</p>
+            <h1 className="font-display text-3xl font-semibold">
+              {t("admin.title")}
+            </h1>
+            <p className="text-muted-foreground">{t("admin.subtitle")}</p>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-[250px_1fr] gap-8">
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label={t("admin.sidebar.aria")}>
             {sidebarLinks.map((link) => {
               const isActive = link.exact
                 ? location.pathname === link.to

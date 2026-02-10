@@ -1,32 +1,36 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function RegisterPage() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { t } = useTranslation();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const { register } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!agreeTerms) {
       toast({
-        title: 'Terms Required',
-        description: 'Please agree to the terms and conditions.',
-        variant: 'destructive',
+        title: t("auth.register.toast.termsRequired.title"),
+        description: t("auth.register.toast.termsRequired.desc"),
+        variant: "destructive",
       });
       return;
     }
@@ -36,15 +40,18 @@ export default function RegisterPage() {
     try {
       await register(email, password, name);
       toast({
-        title: 'Welcome to Élégance!',
-        description: 'Your account has been created successfully.',
+        title: t("auth.register.toast.success.title"),
+        description: t("auth.register.toast.success.desc"),
       });
-      navigate('/');
+      navigate("/");
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create account',
-        variant: 'destructive',
+        title: t("auth.register.toast.error.title"),
+        description:
+          error instanceof Error
+            ? error.message
+            : t("auth.register.toast.error.desc"),
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -56,28 +63,28 @@ export default function RegisterPage() {
       {/* Left Side - Form */}
       <div className="flex-1 flex flex-col justify-center px-8 lg:px-16 xl:px-24">
         <div className="w-full max-w-md mx-auto">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to home
+            {t("auth.register.backHome")}
           </Link>
 
           <h1 className="font-display text-3xl md:text-4xl font-semibold mb-2">
-            Join Élégance
+            {t("auth.register.title")}
           </h1>
           <p className="text-muted-foreground mb-8">
-            Create an account to start renting designer fashion.
+            {t("auth.register.subtitle")}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t("auth.register.fullName.label")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your name"
+                placeholder={t("auth.register.fullName.placeholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -85,11 +92,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("auth.register.email.label")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("auth.register.email.placeholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -97,27 +104,39 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.register.password.label")}</Label>
+
               <div className="relative">
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  type={showPassword ? "text" : "password"}
+                  placeholder={t("auth.register.password.placeholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label={
+                    showPassword
+                      ? t("auth.register.password.hide")
+                      : t("auth.register.password.show")
+                  }
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
+
               <p className="text-xs text-muted-foreground">
-                Must be at least 6 characters
+                {t("auth.register.password.hint")}
               </p>
             </div>
 
@@ -127,23 +146,39 @@ export default function RegisterPage() {
                 checked={agreeTerms}
                 onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
               />
-              <Label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
-                I agree to the{' '}
-                <a href="#" className="text-accent hover:underline">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-accent hover:underline">Privacy Policy</a>
+
+              <Label
+                htmlFor="terms"
+                className="text-sm text-muted-foreground leading-relaxed"
+              >
+                {t("auth.register.terms.prefix")}{" "}
+                <a href="#" className="text-accent hover:underline">
+                  {t("auth.register.terms.tos")}
+                </a>{" "}
+                {t("auth.register.terms.and")}{" "}
+                <a href="#" className="text-accent hover:underline">
+                  {t("auth.register.terms.privacy")}
+                </a>
               </Label>
             </div>
 
-            <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create Account'}
+            <Button
+              type="submit"
+              variant="hero"
+              size="lg"
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading
+                ? t("auth.register.button.loading")
+                : t("auth.register.button.submit")}
             </Button>
           </form>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t("auth.register.haveAccount")}{" "}
             <Link to="/login" className="text-accent hover:underline font-medium">
-              Sign in
+              {t("auth.register.signIn")}
             </Link>
           </p>
         </div>
@@ -154,9 +189,11 @@ export default function RegisterPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-12">
           <blockquote className="font-display text-2xl italic text-foreground/80">
-            "Style is a way to say who you are without having to speak."
+            {t("auth.register.quote.text")}
           </blockquote>
-          <p className="mt-4 text-sm text-muted-foreground">— Rachel Zoe</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {t("auth.register.quote.author")}
+          </p>
         </div>
       </div>
     </div>

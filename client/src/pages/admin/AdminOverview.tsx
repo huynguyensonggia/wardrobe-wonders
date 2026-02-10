@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
 import { adminApi } from "@/lib/api";
 import type { AdminStats } from "@/types/admin-stats";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 import {
   ResponsiveContainer,
@@ -19,6 +22,8 @@ function money(n: number) {
 }
 
 export default function AdminOverview() {
+  const { t } = useTranslation();
+
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -32,7 +37,7 @@ export default function AdminOverview() {
       const res = await adminApi.getStats();
       setStats(res);
     } catch (e: any) {
-      setErr(e?.message ?? "Failed to load stats");
+      setErr(e?.message ?? t("adminOverview.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -40,19 +45,20 @@ export default function AdminOverview() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cards = useMemo(() => {
     if (!stats) return [];
     return [
-      { label: "Total Products", value: stats.totalProducts },
-      { label: "Active Rentals", value: stats.activeRentals },
-      { label: "Revenue", value: money(stats.revenue) },
-      { label: "Total Users", value: stats.totalUsers },
+      { label: t("adminOverview.cards.totalProducts"), value: stats.totalProducts },
+      { label: t("adminOverview.cards.activeRentals"), value: stats.activeRentals },
+      { label: t("adminOverview.cards.revenue"), value: money(stats.revenue) },
+      { label: t("adminOverview.cards.totalUsers"), value: stats.totalUsers },
     ];
-  }, [stats]);
+  }, [stats, t]);
 
-  if (loading) return <p className="text-muted-foreground">Loading dashboard...</p>;
+  if (loading) return <p className="text-muted-foreground">{t("adminOverview.loading")}</p>;
   if (err) return <p className="text-red-500">{err}</p>;
   if (!stats) return null;
 
@@ -64,16 +70,13 @@ export default function AdminOverview() {
       {/* Header actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Overview</h2>
-          <p className="text-sm text-muted-foreground">Live data from server</p>
+          <h2 className="text-xl font-semibold">{t("adminOverview.title")}</h2>
+          <p className="text-sm text-muted-foreground">{t("adminOverview.subtitle")}</p>
         </div>
 
-        <button
-          onClick={load}
-          className="px-3 py-2 rounded-md border text-sm hover:bg-secondary"
-        >
-          Refresh
-        </button>
+        <Button variant="outline" onClick={load}>
+          {t("common.refresh")}
+        </Button>
       </div>
 
       {/* Cards */}
@@ -83,7 +86,7 @@ export default function AdminOverview() {
             <CardContent className="p-6">
               <p className="text-sm text-muted-foreground">{c.label}</p>
               <p className="text-3xl font-display font-semibold mt-1">{c.value}</p>
-              <p className="text-xs text-accent mt-1">Live</p>
+              <p className="text-xs text-accent mt-1">{t("adminOverview.live")}</p>
             </CardContent>
           </Card>
         ))}
@@ -95,13 +98,15 @@ export default function AdminOverview() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="font-medium">Weekly Rentals</p>
-              <p className="text-xs text-muted-foreground">Last 7 days</p>
+              <p className="font-medium">{t("adminOverview.charts.weeklyRentals.title")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("adminOverview.charts.weeklyRentals.subtitle")}
+              </p>
             </div>
 
             {weekly.length === 0 ? (
               <div className="h-[260px] flex items-center justify-center text-sm text-muted-foreground">
-                No rentals in last 7 days.
+                {t("adminOverview.charts.weeklyRentals.empty")}
               </div>
             ) : (
               <div className="h-[260px]">
@@ -122,13 +127,15 @@ export default function AdminOverview() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="font-medium">Monthly Revenue</p>
-              <p className="text-xs text-muted-foreground">Last 6 months</p>
+              <p className="font-medium">{t("adminOverview.charts.monthlyRevenue.title")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("adminOverview.charts.monthlyRevenue.subtitle")}
+              </p>
             </div>
 
             {monthly.length === 0 ? (
               <div className="h-[260px] flex items-center justify-center text-sm text-muted-foreground">
-                No revenue data yet.
+                {t("adminOverview.charts.monthlyRevenue.empty")}
               </div>
             ) : (
               <div className="h-[260px]">

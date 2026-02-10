@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { adminUsersApi } from "@/lib/api";
 import type { User } from "@/types";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 type EditForm = {
   name?: string;
@@ -10,6 +11,8 @@ type EditForm = {
 };
 
 export default function AdminUsersPage() {
+  const { t } = useTranslation();
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -24,7 +27,7 @@ export default function AdminUsersPage() {
       const data = await adminUsersApi.getAll();
       setUsers(data);
     } catch (e: any) {
-      setErr(e?.message ?? "Failed to load users");
+      setErr(e?.message ?? t("adminUsers.errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -32,9 +35,10 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ nếu BE có trả user.rentals thì sort cho đẹp (optional)
+  // ✅ sort by id for nicer display (optional)
   const sortedUsers = useMemo(() => {
     return [...users].sort((a: any, b: any) => Number(a.id) - Number(b.id));
   }, [users]);
@@ -55,7 +59,7 @@ export default function AdminUsersPage() {
 
   const save = async (id: number) => {
     try {
-      // ✅ chỉ gửi field BE cho phép
+      // ✅ only send fields BE allows
       const payload: any = {
         name: form.name,
         phone: form.phone,
@@ -69,40 +73,41 @@ export default function AdminUsersPage() {
       await load();
       cancelEdit();
     } catch (e: any) {
-      alert(e?.message ?? "Update failed");
+      alert(e?.message ?? t("adminUsers.errors.updateFailed"));
     }
   };
 
   const remove = async (u: User) => {
     const idNum = Number((u as any).id);
 
-    // ✅ chặn FE nếu có rentals
+    // ✅ FE guard if user has rentals
     const rentalsCount = Array.isArray((u as any).rentals) ? (u as any).rentals.length : 0;
     if (rentalsCount > 0) {
-      alert("User has rentals → cannot delete.");
+      alert(t("adminUsers.errors.cannotDeleteHasRentals"));
       return;
     }
 
-    if (!confirm(`Delete user #${idNum}?`)) return;
+    if (!confirm(t("adminUsers.confirm.deleteUser", { id: idNum }))) return;
 
     try {
       await adminUsersApi.delete(idNum);
       await load();
     } catch (e: any) {
-      alert(e?.message ?? "Delete failed");
+      alert(e?.message ?? t("adminUsers.errors.deleteFailed"));
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Admin Users</h1>
+        <h1 className="text-2xl font-semibold">{t("adminUsers.title")}</h1>
+
         <Button variant="outline" onClick={load}>
-          Refresh
+          {t("adminUsers.buttons.refresh")}
         </Button>
       </div>
 
-      {loading && <p className="text-muted-foreground">Loading...</p>}
+      {loading && <p className="text-muted-foreground">{t("common.loading")}</p>}
       {err && <p className="text-red-500">{err}</p>}
 
       {!loading && !err && (
@@ -110,12 +115,12 @@ export default function AdminUsersPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="text-left">
-                <th className="p-3">ID</th>
-                <th className="p-3">Name</th>
-                <th className="p-3">Email</th>
-                <th className="p-3">Phone</th>
-                <th className="p-3">Rentals</th>
-                <th className="p-3 w-[260px]">Actions</th>
+                <th className="p-3">{t("adminUsers.table.id")}</th>
+                <th className="p-3">{t("adminUsers.table.name")}</th>
+                <th className="p-3">{t("adminUsers.table.email")}</th>
+                <th className="p-3">{t("adminUsers.table.phone")}</th>
+                <th className="p-3">{t("adminUsers.table.rentals")}</th>
+                <th className="p-3 w-[260px]">{t("adminUsers.table.actions")}</th>
               </tr>
             </thead>
 
@@ -137,13 +142,14 @@ export default function AdminUsersPage() {
                           className="w-full border rounded px-2 py-1"
                           value={form.name ?? ""}
                           onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                          placeholder={t("adminUsers.placeholders.name")}
                         />
                       ) : (
                         u.name
                       )}
                     </td>
 
-                    {/* ✅ Email: chỉ hiển thị */}
+                    {/* ✅ Email: display only */}
                     <td className="p-3">{u.email}</td>
 
                     <td className="p-3">
@@ -152,9 +158,10 @@ export default function AdminUsersPage() {
                           className="w-full border rounded px-2 py-1"
                           value={form.phone ?? ""}
                           onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                          placeholder={t("adminUsers.placeholders.phone")}
                         />
                       ) : (
-                        u.phone ?? "-"
+                        u.phone ?? t("common.na")
                       )}
                     </td>
 
@@ -165,22 +172,24 @@ export default function AdminUsersPage() {
                         <>
                           <div className="flex gap-2">
                             <Button size="sm" onClick={() => save(idNum)}>
-                              Save
+                              {t("common.save")}
                             </Button>
                             <Button size="sm" variant="outline" onClick={cancelEdit}>
-                              Cancel
+                              {t("common.cancel")}
                             </Button>
                           </div>
 
                           <div className="mt-2">
                             <input
                               className="w-full border rounded px-2 py-1"
-                              placeholder="New password (optional)"
+                              placeholder={t("adminUsers.placeholders.newPasswordOptional")}
                               value={form.password ?? ""}
-                              onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                              onChange={(e) =>
+                                setForm((p) => ({ ...p, password: e.target.value }))
+                              }
                             />
                             <p className="text-xs text-muted-foreground mt-1">
-                              Leave empty to keep current password.
+                              {t("adminUsers.hints.keepPasswordIfEmpty")}
                             </p>
                           </div>
                         </>
@@ -188,7 +197,7 @@ export default function AdminUsersPage() {
                         <>
                           <div className="flex gap-2">
                             <Button size="sm" variant="outline" onClick={() => startEdit(u)}>
-                              Edit
+                              {t("common.edit")}
                             </Button>
 
                             <Button
@@ -196,15 +205,19 @@ export default function AdminUsersPage() {
                               variant="destructive"
                               disabled={cannotDelete}
                               onClick={() => remove(u)}
-                              title={cannotDelete ? "User has rentals → cannot delete" : "Delete user"}
+                              title={
+                                cannotDelete
+                                  ? t("adminUsers.tooltips.cannotDeleteHasRentals")
+                                  : t("adminUsers.tooltips.deleteUser")
+                              }
                             >
-                              Delete
+                              {t("common.delete")}
                             </Button>
                           </div>
 
                           {cannotDelete && (
                             <p className="text-xs text-muted-foreground mt-1">
-                              Has rentals → cannot delete
+                              {t("adminUsers.hints.cannotDeleteHasRentals")}
                             </p>
                           )}
                         </>
@@ -217,7 +230,7 @@ export default function AdminUsersPage() {
               {sortedUsers.length === 0 && (
                 <tr>
                   <td className="p-6 text-center text-muted-foreground" colSpan={6}>
-                    No users found.
+                    {t("adminUsers.empty")}
                   </td>
                 </tr>
               )}

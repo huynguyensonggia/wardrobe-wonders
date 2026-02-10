@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import type { Rental } from "@/types";
 import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
 
+import { useTranslation } from "react-i18next";
+
 function statusBadgeVariant(
   status: RentalStatus
 ): "default" | "secondary" | "destructive" | "outline" {
@@ -27,25 +29,31 @@ function statusBadgeVariant(
   }
 }
 
-// ✅ Admin actions only (no extra)
-const ADMIN_ACTIONS: Record<
+// ✅ Admin actions only (no extra) — needs t()
+function getAdminActions(t: (k: string) => string): Record<
   RentalStatus,
   { label: string; to: RentalStatus; variant?: "default" | "outline" | "destructive" }[]
-> = {
-  [RentalStatus.PENDING]: [
-    { label: "Start shipping", to: RentalStatus.SHIPPING, variant: "default" },
-    { label: "Reject", to: RentalStatus.REJECTED, variant: "destructive" },
-  ],
-  [RentalStatus.SHIPPING]: [
-    { label: "Customer received", to: RentalStatus.ACTIVE, variant: "default" }, // ✅ ACTIVE deducts stock
-  ],
-  [RentalStatus.ACTIVE]: [{ label: "Complete", to: RentalStatus.COMPLETED, variant: "default" }],
-  [RentalStatus.COMPLETED]: [],
-  [RentalStatus.REJECTED]: [],
-  [RentalStatus.CANCELLED]: [],
-};
+> {
+  return {
+    [RentalStatus.PENDING]: [
+      { label: t("adminRentals.actions.startShipping"), to: RentalStatus.SHIPPING, variant: "default" },
+      { label: t("adminRentals.actions.reject"), to: RentalStatus.REJECTED, variant: "destructive" },
+    ],
+    [RentalStatus.SHIPPING]: [
+      { label: t("adminRentals.actions.customerReceived"), to: RentalStatus.ACTIVE, variant: "default" }, // ✅ ACTIVE deducts stock
+    ],
+    [RentalStatus.ACTIVE]: [
+      { label: t("adminRentals.actions.complete"), to: RentalStatus.COMPLETED, variant: "default" },
+    ],
+    [RentalStatus.COMPLETED]: [],
+    [RentalStatus.REJECTED]: [],
+    [RentalStatus.CANCELLED]: [],
+  };
+}
 
 export default function AdminRentals() {
+  const { t } = useTranslation();
+
   const qc = useQueryClient();
 
   const [page, setPage] = useState(1);
@@ -80,7 +88,6 @@ export default function AdminRentals() {
       rentalsApi.updateStatus(id, status),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
-      // keep selected, data will refresh from query
     },
   });
 
@@ -129,7 +136,7 @@ export default function AdminRentals() {
       await updateStatusMutation.mutateAsync({ id: rentalId, status });
       setSelected((prev) => (prev ? { ...prev, status } : prev));
     } catch (e: any) {
-      alert(e?.message || "Update status failed");
+      alert(e?.message || t("adminRentals.errors.updateStatusFailed"));
     }
   };
 
@@ -160,14 +167,16 @@ export default function AdminRentals() {
 
       setEditingShip(false);
     } catch (e: any) {
-      alert(e?.message || "Update shipping failed");
+      alert(e?.message || t("adminRentals.errors.updateShippingFailed"));
     }
   };
+
+  const ADMIN_ACTIONS = useMemo(() => getAdminActions(t), [t]);
 
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-10">
-        <div className="text-muted-foreground">Loading rentals...</div>
+        <div className="text-muted-foreground">{t("adminRentals.loading")}</div>
       </div>
     );
   }
@@ -175,8 +184,12 @@ export default function AdminRentals() {
   if (isError) {
     return (
       <div className="container mx-auto px-4 py-10">
-        <div className="text-destructive font-medium mb-2">Failed to load rentals</div>
-        <div className="text-muted-foreground text-sm">{(error as Error)?.message}</div>
+        <div className="text-destructive font-medium mb-2">
+          {t("adminRentals.errors.loadFailedTitle")}
+        </div>
+        <div className="text-muted-foreground text-sm">
+          {(error as Error)?.message}
+        </div>
       </div>
     );
   }
@@ -187,9 +200,9 @@ export default function AdminRentals() {
       <div className="lg:col-span-2 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-medium">Rentals</h1>
+            <h1 className="text-xl font-medium">{t("adminRentals.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Total: <span className="font-medium">{total}</span>
+              {t("adminRentals.total")}: <span className="font-medium">{total}</span>
             </p>
           </div>
 
@@ -199,24 +212,26 @@ export default function AdminRentals() {
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
             >
-              Prev
+              {t("pagination.prev")}
             </Button>
+
             <div className="text-sm text-muted-foreground">
-              Page <span className="font-medium">{page}</span> / {totalPages}
+              {t("pagination.page")} <span className="font-medium">{page}</span> / {totalPages}
             </div>
+
             <Button
               variant="outline"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             >
-              Next
+              {t("pagination.next")}
             </Button>
           </div>
         </div>
 
         {rentals.length === 0 ? (
           <div className="border rounded-lg p-6 text-center text-muted-foreground">
-            No rentals yet.
+            {t("adminRentals.empty")}
           </div>
         ) : (
           <div className="space-y-3">
@@ -233,17 +248,18 @@ export default function AdminRentals() {
                     <div className="font-medium">
                       #{r.id} {r.rentalCode ? `• ${r.rentalCode}` : ""}
                     </div>
+
                     <div className="text-sm text-muted-foreground">
-                      {r.startDate} → {r.endDate} • {r.totalDays} days
+                      {r.startDate} → {r.endDate} • {r.totalDays} {t("adminRentals.days")}
                     </div>
 
                     <div className="text-sm text-muted-foreground mt-1">
-                      User:{" "}
+                      {t("adminRentals.user")}:{" "}
                       <span className="font-medium">
                         {(r.user as any)?.email ||
                           (r.user as any)?.fullName ||
                           (r.user as any)?.name ||
-                          `User#${(r.user as any)?.id ?? "?"}`}
+                          `${t("adminRentals.userFallback")}#${(r.user as any)?.id ?? "?"}`}
                       </span>
                     </div>
                   </div>
@@ -252,11 +268,15 @@ export default function AdminRentals() {
                     <Badge variant={statusBadgeVariant(r.status)}>
                       {formatRentalStatus(r.status)}
                     </Badge>
+
                     <div className="text-sm mt-2">
-                      <span className="text-muted-foreground">Total: </span>
+                      <span className="text-muted-foreground">{t("adminRentals.totalLabel")}: </span>
                       <span className="font-medium">${r.totalPrice}</span>
                     </div>
-                    <div className="text-xs text-muted-foreground">Deposit: ${r.totalDeposit}</div>
+
+                    <div className="text-xs text-muted-foreground">
+                      {t("adminRentals.deposit")}: ${r.totalDeposit}
+                    </div>
                   </div>
                 </div>
               </button>
@@ -267,31 +287,33 @@ export default function AdminRentals() {
 
       {/* RIGHT: Detail */}
       <div className="border rounded-lg p-5 h-fit space-y-4">
-        <h2 className="text-lg font-medium">Rental Detail</h2>
+        <h2 className="text-lg font-medium">{t("adminRentals.detailTitle")}</h2>
 
         {!selected ? (
-          <div className="text-sm text-muted-foreground">Select a rental to view details.</div>
+          <div className="text-sm text-muted-foreground">
+            {t("adminRentals.selectHint")}
+          </div>
         ) : (
           <>
             <div className="space-y-1">
-              <div className="text-sm text-muted-foreground">Rental</div>
+              <div className="text-sm text-muted-foreground">{t("adminRentals.detail.rental")}</div>
               <div className="font-medium">
                 #{selected.id} {selected.rentalCode ? `• ${selected.rentalCode}` : ""}
               </div>
               <div className="text-sm text-muted-foreground">
-                {selected.startDate} → {selected.endDate} • {selected.totalDays} days
+                {selected.startDate} → {selected.endDate} • {selected.totalDays} {t("adminRentals.days")}
               </div>
               <div className="text-sm">
-                <span className="text-muted-foreground">Total: </span>
+                <span className="text-muted-foreground">{t("adminRentals.totalLabel")}: </span>
                 <span className="font-medium">${selected.totalPrice}</span>
-                <span className="text-muted-foreground"> • Deposit: </span>
+                <span className="text-muted-foreground"> • {t("adminRentals.deposit")}: </span>
                 <span className="font-medium">${selected.totalDeposit}</span>
               </div>
             </div>
 
             {/* ✅ STATUS */}
             <div className="border-t pt-4 space-y-2">
-              <div className="text-sm text-muted-foreground">Status</div>
+              <div className="text-sm text-muted-foreground">{t("adminRentals.detail.status")}</div>
 
               <div className="flex items-center justify-between gap-3">
                 <Badge variant={statusBadgeVariant(selected.status)}>
@@ -312,20 +334,24 @@ export default function AdminRentals() {
                   ))}
 
                   {(ADMIN_ACTIONS[selected.status] ?? []).length === 0 && (
-                    <span className="text-xs text-muted-foreground">No actions</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("adminRentals.noActions")}
+                    </span>
                   )}
                 </div>
               </div>
 
               {updateStatusMutation.isPending && (
-                <div className="text-xs text-muted-foreground">Updating status...</div>
+                <div className="text-xs text-muted-foreground">
+                  {t("adminRentals.updatingStatus")}
+                </div>
               )}
             </div>
 
             {/* ✅ SHIPPING */}
             <div className="border-t pt-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Shipping</div>
+                <div className="text-sm text-muted-foreground">{t("adminRentals.detail.shipping")}</div>
 
                 {!editingShip ? (
                   <Button
@@ -333,9 +359,13 @@ export default function AdminRentals() {
                     variant="outline"
                     disabled={!canEditShipping}
                     onClick={() => setEditingShip(true)}
-                    title={!canEditShipping ? "Editable only in PENDING/SHIPPING" : "Edit shipping"}
+                    title={
+                      !canEditShipping
+                        ? t("adminRentals.shipping.editableOnlyPendingShipping")
+                        : t("adminRentals.shipping.edit")
+                    }
                   >
-                    Edit
+                    {t("common.edit")}
                   </Button>
                 ) : (
                   <div className="flex gap-2">
@@ -351,14 +381,14 @@ export default function AdminRentals() {
                         setEditingShip(false);
                       }}
                     >
-                      Cancel
+                      {t("common.cancel")}
                     </Button>
                     <Button
                       size="sm"
                       disabled={updateShippingMutation.isPending}
                       onClick={handleSaveShipping}
                     >
-                      Save
+                      {t("common.save")}
                     </Button>
                   </div>
                 )}
@@ -367,66 +397,68 @@ export default function AdminRentals() {
               {!editingShip ? (
                 <>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Name: </span>
-                    <span className="font-medium">{selected.shipFullName || "-"}</span>
+                    <span className="text-muted-foreground">{t("adminRentals.shipping.name")}: </span>
+                    <span className="font-medium">{selected.shipFullName || t("common.dash")}</span>
                   </div>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Phone: </span>
-                    <span className="font-medium">{selected.shipPhone || "-"}</span>
+                    <span className="text-muted-foreground">{t("adminRentals.shipping.phone")}: </span>
+                    <span className="font-medium">{selected.shipPhone || t("common.dash")}</span>
                   </div>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Address: </span>
-                    <span className="font-medium">{selected.shipAddress || "-"}</span>
+                    <span className="text-muted-foreground">{t("adminRentals.shipping.address")}: </span>
+                    <span className="font-medium">{selected.shipAddress || t("common.dash")}</span>
                   </div>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Note: </span>
-                    <span className="font-medium">{selected.shipNote || "-"}</span>
+                    <span className="text-muted-foreground">{t("adminRentals.shipping.note")}: </span>
+                    <span className="font-medium">{selected.shipNote || t("common.dash")}</span>
                   </div>
                 </>
               ) : (
                 <div className="space-y-2">
                   <div className="grid gap-1">
-                    <div className="text-xs text-muted-foreground">Name</div>
+                    <div className="text-xs text-muted-foreground">{t("adminRentals.shipping.name")}</div>
                     <input
                       className="w-full border rounded-md px-3 py-2 text-sm"
                       value={shipFullName}
                       onChange={(e) => setShipFullName(e.target.value)}
-                      placeholder="Full name"
+                      placeholder={t("adminRentals.placeholders.fullName")}
                     />
                   </div>
 
                   <div className="grid gap-1">
-                    <div className="text-xs text-muted-foreground">Phone</div>
+                    <div className="text-xs text-muted-foreground">{t("adminRentals.shipping.phone")}</div>
                     <input
                       className="w-full border rounded-md px-3 py-2 text-sm"
                       value={shipPhone}
                       onChange={(e) => setShipPhone(e.target.value)}
-                      placeholder="Phone"
+                      placeholder={t("adminRentals.placeholders.phone")}
                     />
                   </div>
 
                   <div className="grid gap-1">
-                    <div className="text-xs text-muted-foreground">Address</div>
+                    <div className="text-xs text-muted-foreground">{t("adminRentals.shipping.address")}</div>
                     <input
                       className="w-full border rounded-md px-3 py-2 text-sm"
                       value={shipAddress}
                       onChange={(e) => setShipAddress(e.target.value)}
-                      placeholder="Address"
+                      placeholder={t("adminRentals.placeholders.address")}
                     />
                   </div>
 
                   <div className="grid gap-1">
-                    <div className="text-xs text-muted-foreground">Note</div>
+                    <div className="text-xs text-muted-foreground">{t("adminRentals.shipping.note")}</div>
                     <input
                       className="w-full border rounded-md px-3 py-2 text-sm"
                       value={shipNote}
                       onChange={(e) => setShipNote(e.target.value)}
-                      placeholder="Note (optional)"
+                      placeholder={t("adminRentals.placeholders.noteOptional")}
                     />
                   </div>
 
                   {updateShippingMutation.isPending && (
-                    <div className="text-xs text-muted-foreground">Saving shipping...</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t("adminRentals.savingShipping")}
+                    </div>
                   )}
                 </div>
               )}
@@ -434,42 +466,44 @@ export default function AdminRentals() {
 
             {/* ✅ ITEMS */}
             <div className="border-t pt-4 space-y-2">
-              <div className="text-sm text-muted-foreground">Items</div>
+              <div className="text-sm text-muted-foreground">{t("adminRentals.detail.items")}</div>
 
               {selected.items?.length ? (
                 <div className="space-y-2">
                   {selected.items.map((it) => (
                     <div key={String(it.id)} className="border rounded-md p-3">
                       <div className="font-medium">
-                        {(it as any).product?.name || `Product#${(it as any).product?.id ?? "?"}`}
+                        {(it as any).product?.name ||
+                          `${t("adminRentals.productFallback")}#${(it as any).product?.id ?? "?"}`}
                       </div>
 
                       <div className="text-sm text-muted-foreground">
-                        Size:{" "}
+                        {t("adminRentals.item.size")}:{" "}
                         <span className="font-medium">
-                          {(it as any).variant?.size ?? `#${(it as any).variantId ?? "-"}`}
+                          {(it as any).variant?.size ?? `#${(it as any).variantId ?? t("common.dash")}`}
                         </span>
                       </div>
 
                       <div className="text-sm text-muted-foreground">
-                        ${it.rentPricePerDay}/day • {it.days} days • Qty {it.quantity}
+                        ${it.rentPricePerDay}/{t("adminRentals.perDay")} • {it.days} {t("adminRentals.days")} •{" "}
+                        {t("adminRentals.item.qty")} {it.quantity}
                       </div>
 
                       <div className="text-sm">
-                        <span className="text-muted-foreground">Subtotal: </span>
+                        <span className="text-muted-foreground">{t("adminRentals.item.subtotal")}: </span>
                         <span className="font-medium">${it.subtotal}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-sm text-muted-foreground">No items.</div>
+                <div className="text-sm text-muted-foreground">{t("adminRentals.noItems")}</div>
               )}
             </div>
 
             {selected.note ? (
               <div className="border-t pt-4 space-y-2">
-                <div className="text-sm text-muted-foreground">Note</div>
+                <div className="text-sm text-muted-foreground">{t("adminRentals.detail.note")}</div>
                 <div className="text-sm">{selected.note}</div>
               </div>
             ) : null}
