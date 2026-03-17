@@ -11,9 +11,12 @@ export const databaseConfig: DataSourceOptions = {
   database: process.env.DB_NAME || 'wardrobe-wonders',
   synchronize: false,
   logging: process.env.APP_DEBUG == 'true',
-  entities: ['src/modules/**/*.entity.ts'],
-  migrations: ['database/migrations/**/*.ts'],
+  entities: ['dist/src/modules/**/*.entity.js'],
+  migrations: ['dist/database/migrations/**/*.js'],
   subscribers: [],
+  ssl: {
+    rejectUnauthorized: false,
+  },
 };
 
 export const typeOrmNestConfig = {
