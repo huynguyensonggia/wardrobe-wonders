@@ -22,6 +22,7 @@ async function bootstrap() {
     origin: [
       "http://localhost:8080",
       "http://192.168.1.212:8080",
+      "https://wardrobe-wonders.pages.dev",
     ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
@@ -35,7 +36,7 @@ async function bootstrap() {
   console.log(`Server is running on: http://0.0.0.0:${port}`);
   console.log(`API base: http://localhost:${port}/api`);
   console.log(
-    "Admin endpoints example: http://localhost:${port}/api/admin/products",
+    `Admin endpoints example: http://localhost:${port}/api/admin/products`,
   );
 }
 
