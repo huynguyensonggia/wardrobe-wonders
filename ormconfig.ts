@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import path from 'path';
+import * as path from 'path';
 
 const isProd = process.env.NODE_ENV === 'production';
 
