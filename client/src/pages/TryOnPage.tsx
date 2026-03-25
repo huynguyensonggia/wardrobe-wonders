@@ -17,6 +17,31 @@ import {
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
+// Fix EXIF orientation: vẽ lại ảnh lên canvas theo đúng hướng
+async function fixOrientation(file: File): Promise<{ dataUrl: string; blob: Blob }> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+        canvas.toBlob(
+          (blob) => resolve({ dataUrl, blob: blob! }),
+          "image/jpeg",
+          0.92
+        );
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 type MixVton = "upper-body" | "lower-body" | "dresses";
 
 type ProductLite = {
@@ -193,7 +218,7 @@ export default function TryOnPage() {
   };
 
   const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -207,13 +232,15 @@ export default function TryOnPage() {
       }
 
       setError(null);
-      setUserFile(file);
       clearOutputs();
       setBaseResultImage(null);
 
-      const reader = new FileReader();
-      reader.onload = (event) => setUserImage(event.target?.result as string);
-      reader.readAsDataURL(file);
+      // Fix EXIF orientation trước khi hiển thị và upload
+      const { dataUrl, blob } = await fixOrientation(file);
+      const fixedFile = new File([blob], file.name, { type: "image/jpeg" });
+
+      setUserFile(fixedFile);
+      setUserImage(dataUrl);
     },
     [t]
   );
@@ -418,7 +445,7 @@ export default function TryOnPage() {
                     <img
                       src={previewUrl}
                       alt={previewLabel}
-                      className={cn("w-full h-full bg-secondary", "object-cover object-bottom")}
+                      className={cn("w-full h-full bg-secondary", "object-cover object-bottom [image-orientation:from-image]")}
                     />
 
                     <div className="absolute top-3 left-3 rounded-md bg-background/80 backdrop-blur px-3 py-2">
