@@ -22,6 +22,9 @@ import { RentalStatus } from "./enums/rental-status.enum";
 
 import { User } from "../users/entities/user.entity";
 import { Product } from "../products/entities/product.entity";
+import { Payment } from "../payments/entities/payment.entity";
+import { PaymentMethod } from "../payments/enums/payment-method.enum";
+import { PaymentStatus } from "../payments/enums/payment-status.enum";
 
 function daysBetweenInclusive(start: Date, end: Date) {
   const s = new Date(start);
@@ -58,6 +61,9 @@ export class RentalsService {
 
     @InjectRepository(ProductVariant)
     private readonly variantsRepo: Repository<ProductVariant>,
+
+    @InjectRepository(Payment)
+    private readonly paymentsRepo: Repository<Payment>,
   ) { }
 
   // =========================
@@ -191,6 +197,39 @@ export class RentalsService {
     );
 
     await this.rentalItemsRepo.save(itemEntities);
+
+    // =========================
+    // TẠO PAYMENT RECORD (tiền cọc + tiền thuê, phương thức CASH mặc định)
+    // =========================
+    const method = dto.paymentMethod ?? PaymentMethod.CASH;
+
+    // Payment 1: tiền thuê
+    if (totalPrice > 0) {
+      await this.paymentsRepo.save(
+        this.paymentsRepo.create({
+          rental: savedRental,
+          user,
+          amount: totalPrice,
+          method,
+          status: PaymentStatus.PENDING,
+          transactionCode: `RENT-${savedRental.id}-${Date.now()}`,
+        } as DeepPartial<Payment>),
+      );
+    }
+
+    // Payment 2: tiền cọc (nếu có)
+    if (totalDeposit > 0) {
+      await this.paymentsRepo.save(
+        this.paymentsRepo.create({
+          rental: savedRental,
+          user,
+          amount: totalDeposit,
+          method,
+          status: PaymentStatus.PENDING,
+          transactionCode: `DEP-${savedRental.id}-${Date.now()}`,
+        } as DeepPartial<Payment>),
+      );
+    }
 
     return this.rentalsRepo.findOne({
       where: { id: savedRental.id },

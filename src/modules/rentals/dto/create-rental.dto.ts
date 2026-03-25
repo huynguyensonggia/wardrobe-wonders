@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsDateString,
+  IsEnum,
   IsInt,
   IsOptional,
   IsPositive,
@@ -9,6 +10,7 @@ import {
   ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { PaymentMethod } from "../../payments/enums/payment-method.enum";
 
 class CreateRentalItemDto {
   @Type(() => Number)
@@ -69,4 +71,11 @@ export class CreateRentalDto {
   @IsString()
   @MaxLength(500)
   shipNote?: string;
+
+  // =========================
+  // PAYMENT METHOD
+  // =========================
+  @IsOptional()
+  @IsEnum(PaymentMethod)
+  paymentMethod?: PaymentMethod;
 }

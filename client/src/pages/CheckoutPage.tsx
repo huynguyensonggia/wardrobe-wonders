@@ -18,12 +18,13 @@ import { useTranslation } from "react-i18next";
 // ================= TYPES =================
 type CheckoutItem = {
   productId: number;
-  variantId: number; // ✅ required
+  variantId: number;
   size?: string;
 
   name: string;
   imageUrl?: string;
   rentPricePerDay: number;
+  deposit: number;
   startDate: string;
   endDate: string;
   days: number;
@@ -36,18 +37,21 @@ type CheckoutState =
       source: "rentNow";
       product: {
         productId: number;
-        variantId: number; // ✅
+        variantId: number;
         size?: string;
 
         name: string;
         imageUrl?: string;
         rentPricePerDay: number;
+        deposit: number;
         startDate: string;
         endDate: string;
         days: number;
         quantity?: number;
       };
     };
+
+type PaymentMethod = "CASH" | "COD" | "BANK_TRANSFER";
 
 function normalizePhone(s: string) {
   return String(s || "")
@@ -77,6 +81,7 @@ export default function CheckoutPage() {
           name: p.name,
           imageUrl: p.imageUrl,
           rentPricePerDay: p.rentPricePerDay,
+          deposit: p.deposit ?? 0,
           startDate: p.startDate,
           endDate: p.endDate,
           days: p.days,
@@ -93,6 +98,7 @@ export default function CheckoutPage() {
       name: it.name,
       imageUrl: it.imageUrl,
       rentPricePerDay: it.rentPricePerDay,
+      deposit: (it as any).deposit ?? 0,
       startDate: it.startDate,
       endDate: it.endDate,
       days: it.days,
@@ -140,6 +146,13 @@ export default function CheckoutPage() {
     );
   }, [checkoutItems]);
 
+  const totalDeposit = useMemo(() => {
+    return checkoutItems.reduce(
+      (sum, it) => sum + it.quantity * (it.deposit ?? 0),
+      0
+    );
+  }, [checkoutItems]);
+
   // ================= SHIPPING FORM =================
   const [shipFullName, setShipFullName] = useState("");
   const [shipPhone, setShipPhone] = useState("");
@@ -165,6 +178,7 @@ export default function CheckoutPage() {
   }, [street, ward, district, t]);
 
   const [submitting, setSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
 
   const canSubmit =
     shipFullName.trim().length > 0 &&
@@ -204,7 +218,8 @@ export default function CheckoutPage() {
           shipPhone: phone,
           shipAddress: address,
           shipNote: note || undefined,
-        } as any);
+          paymentMethod,
+        });
       }
 
       if (state.source === "cart") clear();
@@ -287,9 +302,23 @@ export default function CheckoutPage() {
         })}
 
         <div className="border-t pt-4 flex items-center justify-between">
-          <div className="text-sm">
-            {t("checkout.summary.total")}:{" "}
-            <span className="font-medium">${total}</span>
+          <div className="text-sm space-y-1">
+            <div>
+              {t("checkout.summary.total")}:{" "}
+              <span className="font-medium">${total}</span>
+            </div>
+            {totalDeposit > 0 && (
+              <div className="text-muted-foreground">
+                {t("checkout.summary.deposit")}:{" "}
+                <span className="font-medium text-foreground">${totalDeposit}</span>
+              </div>
+            )}
+            {totalDeposit > 0 && (
+              <div className="font-medium">
+                {t("checkout.summary.grandTotal")}:{" "}
+                <span className="text-primary">${total + totalDeposit}</span>
+              </div>
+            )}
           </div>
 
           {state.source === "cart" && (
@@ -379,6 +408,39 @@ export default function CheckoutPage() {
             placeholder={t("checkout.shipping.notePlaceholder")}
           />
         </div>
+
+        {/* PAYMENT METHOD */}
+        <div className="grid gap-2">
+          <Label>{t("checkout.payment.method")}</Label>
+          <div className="flex flex-col gap-2">
+            {(["CASH", "COD", "BANK_TRANSFER"] as PaymentMethod[]).map((m) => (
+              <label key={m} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={m}
+                  checked={paymentMethod === m}
+                  onChange={() => setPaymentMethod(m)}
+                  className="accent-primary"
+                />
+                <span className="text-sm">{t(`checkout.payment.methods.${m}`)}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* DEPOSIT INFO */}
+        {totalDeposit > 0 && (
+          <div className="rounded-md bg-muted px-4 py-3 text-sm space-y-1">
+            <div className="font-medium">{t("checkout.payment.depositNote")}</div>
+            <div className="text-muted-foreground">
+              {t("checkout.payment.depositAmount")}: <span className="font-medium text-foreground">${totalDeposit}</span>
+            </div>
+            <div className="text-muted-foreground text-xs">
+              {t("checkout.payment.depositHint")}
+            </div>
+          </div>
+        )}
 
         <Button
           className="w-full"

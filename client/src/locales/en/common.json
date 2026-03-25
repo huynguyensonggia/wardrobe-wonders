@@ -378,7 +378,9 @@
             "qty": "Qty",
             "line": "Line",
             "groupTotal": "Group total",
-            "total": "Total",
+            "total": "Rental total",
+            "deposit": "Deposit (refundable)",
+            "grandTotal": "Total due today",
             "backToCart": "Back to cart"
         },
         "shipping": {
@@ -402,6 +404,17 @@
         },
         "order": {
             "note": "Created from checkout"
+        },
+        "payment": {
+            "method": "Payment Method",
+            "methods": {
+                "CASH": "Cash on delivery (pay when received)",
+                "COD": "COD (Cash on Delivery)",
+                "BANK_TRANSFER": "Bank transfer"
+            },
+            "depositNote": "Deposit required",
+            "depositAmount": "Deposit amount",
+            "depositHint": "Deposit will be refunded after you return the items in good condition."
         },
         "button": {
             "creating": "Creating...",

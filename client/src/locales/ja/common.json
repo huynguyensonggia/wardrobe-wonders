@@ -379,7 +379,9 @@
             "qty": "数量",
             "line": "小計",
             "groupTotal": "グループ合計",
-            "total": "合計",
+            "total": "レンタル料金",
+            "deposit": "デポジット（返金可）",
+            "grandTotal": "本日支払い合計",
             "backToCart": "カートに戻る"
         },
         "shipping": {
@@ -403,6 +405,17 @@
         },
         "order": {
             "note": "チェックアウトから作成"
+        },
+        "payment": {
+            "method": "お支払い方法",
+            "methods": {
+                "CASH": "代金引換（受け取り時に現金払い）",
+                "COD": "COD（代金引換）",
+                "BANK_TRANSFER": "銀行振込"
+            },
+            "depositNote": "デポジットが必要です",
+            "depositAmount": "デポジット金額",
+            "depositHint": "商品を良好な状態で返却後、デポジットは返金されます。"
         },
         "button": {
             "creating": "作成中...",

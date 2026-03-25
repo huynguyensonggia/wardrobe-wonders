@@ -378,7 +378,9 @@
             "qty": "SL",
             "line": "Dòng",
             "groupTotal": "Tổng nhóm",
-            "total": "Tổng",
+            "total": "Tiền thuê",
+            "deposit": "Tiền cọc (hoàn lại)",
+            "grandTotal": "Tổng thanh toán hôm nay",
             "backToCart": "Quay lại giỏ hàng"
         },
         "shipping": {
@@ -402,6 +404,17 @@
         },
         "order": {
             "note": "Tạo từ checkout"
+        },
+        "payment": {
+            "method": "Phương thức thanh toán",
+            "methods": {
+                "CASH": "Tiền mặt khi nhận hàng",
+                "COD": "COD (Thanh toán khi nhận)",
+                "BANK_TRANSFER": "Chuyển khoản ngân hàng"
+            },
+            "depositNote": "Yêu cầu đặt cọc",
+            "depositAmount": "Số tiền cọc",
+            "depositHint": "Tiền cọc sẽ được hoàn lại sau khi bạn trả đồ trong tình trạng tốt."
         },
         "button": {
             "creating": "Đang tạo...",

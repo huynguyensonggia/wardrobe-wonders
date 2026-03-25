@@ -182,13 +182,14 @@ export const rentalsApi = {
   create: (data: {
     startDate: string;
     endDate: string;
-    items: { productId: number; variantId: number; quantity: number }[]; // ✅ FIX: thêm ;
+    items: { productId: number; variantId: number; quantity: number }[];
     note?: string;
 
     shipFullName: string;
     shipPhone: string;
     shipAddress: string;
     shipNote?: string;
+    paymentMethod?: "CASH" | "COD" | "BANK_TRANSFER";
   }) =>
     fetchApi<ApiResponse<Rental>>("/rentals", {
       method: "POST",

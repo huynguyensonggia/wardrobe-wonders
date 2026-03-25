@@ -19,11 +19,22 @@ async function bootstrap() {
 
   // CORS cho frontend React/Vite
   app.enableCors({
-    origin: [
-      "http://localhost:8080",
-      "http://192.168.1.212:8080",
-      "https://wardrobe-wonders.pages.dev",
-    ],
+    origin: (origin, callback) => {
+      const allowed = [
+        "http://localhost:8080",
+        "http://localhost:5173",
+        "http://192.168.1.212:8080",
+        "https://wardrobe-wonders.pages.dev",
+        process.env.CORS_ORIGIN,
+      ].filter(Boolean);
+
+      // Cho phép requests không có origin (mobile apps, Postman, server-to-server)
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS blocked: ${origin}`));
+      }
+    },
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
