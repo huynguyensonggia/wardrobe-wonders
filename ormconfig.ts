@@ -3,6 +3,11 @@ import * as path from 'path';
 
 const isProd = process.env.NODE_ENV === 'production';
 
+console.log('[ormconfig] NODE_ENV =', process.env.NODE_ENV);
+console.log('[ormconfig] DB_HOST =', process.env.DB_HOST);
+console.log('[ormconfig] DB_PORT =', process.env.DB_PORT);
+console.log('[ormconfig] DB_NAME =', process.env.DB_NAME);
+
 export const databaseConfig: DataSourceOptions = {
   type: 'mysql',
   host: process.env.DB_HOST || 'localhost',
