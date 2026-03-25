@@ -82,10 +82,8 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
     images: p.imageUrl ? [primaryImage] : [],
     sizes,
     colors,
-
-    // ✅ rất quan trọng cho Admin Update
     variants,
-
+    occasion: String((p as any).occasion ?? ""),
     pricePerDay: Number(p.rentPricePerDay ?? 0),
     deposit: Number(p.deposit ?? 0),
     quantity,

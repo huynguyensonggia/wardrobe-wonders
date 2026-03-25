@@ -32,7 +32,7 @@ export class ProductService {
     private readonly categoryRepo: Repository<Category>,
   ) {}
 
-  async findAll(query?: { categoryId?: number; status?: ProductStatus }) {
+  async findAll(query?: { categoryId?: number; status?: ProductStatus; occasion?: string }) {
     const qb = this.productRepo
       .createQueryBuilder("p")
       .leftJoinAndSelect("p.category", "c")
@@ -41,6 +41,15 @@ export class ProductService {
 
     if (query?.categoryId) qb.andWhere("c.id = :categoryId", { categoryId: query.categoryId });
     if (query?.status) qb.andWhere("p.status = :status", { status: query.status });
+    if (query?.occasion) {
+      // Hỗ trợ nhiều occasion cách nhau bởi dấu phẩy: party,wedding
+      const occasions = query.occasion.split(",").map((o) => o.trim()).filter(Boolean);
+      if (occasions.length === 1) {
+        qb.andWhere("p.occasion = :occasion", { occasion: occasions[0] });
+      } else if (occasions.length > 1) {
+        qb.andWhere("p.occasion IN (:...occasions)", { occasions });
+      }
+    }
 
     return qb.getMany();
   }

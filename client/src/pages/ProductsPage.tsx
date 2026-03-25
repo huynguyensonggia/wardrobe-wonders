@@ -99,11 +99,12 @@ export default function ProductsPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["products", filters.category, categoryId, filters.status],
+    queryKey: ["products", filters.category, categoryId, filters.status, filters.occasion],
     queryFn: () =>
       productsApi.getAll({
         categoryId,
         status: (filters.status as ProductStatus) || undefined,
+        occasion: filters.occasion || undefined,
       } as any),
     staleTime: 60_000,
     enabled: filters.category ? categoryId !== undefined : true,
@@ -117,13 +118,6 @@ export default function ProductsPage() {
       if (filters.search) {
         const name = String(product?.name ?? "").toLowerCase();
         if (!name.includes(filters.search.toLowerCase())) return false;
-      }
-
-      // Filter occasion (có thể là nhiều giá trị cách nhau bởi dấu phẩy)
-      if (filters.occasion) {
-        const occasions = filters.occasion.split(",").map((o) => o.trim());
-        const productOccasion = String(product?.occasion ?? "").toLowerCase();
-        if (!occasions.includes(productOccasion)) return false;
       }
 
       if (filters.size) {

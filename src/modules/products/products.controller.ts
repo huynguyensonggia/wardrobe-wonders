@@ -12,10 +12,12 @@ export class ProductController {
   getAll(
     @Query("categoryId") categoryId?: string,
     @Query("status") status?: ProductStatus,
+    @Query("occasion") occasion?: string,
   ) {
     return this.service.findAll({
       categoryId: categoryId ? Number(categoryId) : undefined,
       status: status || undefined,
+      occasion: occasion || undefined,
     });
   }
 
