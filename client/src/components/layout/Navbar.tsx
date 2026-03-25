@@ -30,31 +30,36 @@ import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 const NAV_COLLECTIONS = [
   {
     key: "event",
-    slug: "su-kien",
+    // Sự kiện = tiệc + cưới
     items: [
-      { key: "dresses", slug: "dresses" },
-      { key: "tops", slug: "tops" },
-      { key: "pants", slug: "pants" },
-      { key: "outerwear", slug: "outerwear" },
+      { key: "dresses", occasion: "party", categorySlug: "dresses" },
+      { key: "dresses", occasion: "wedding", categorySlug: "dresses" },
+      { key: "tops", occasion: "party", categorySlug: "tops" },
+      { key: "tops", occasion: "wedding", categorySlug: "tops" },
+      { key: "pants", occasion: "party", categorySlug: "pants" },
+      { key: "outerwear", occasion: "party", categorySlug: "outerwear" },
     ],
+    // Link tổng: filter occasion=party,wedding
+    occasions: ["party", "wedding"],
   },
   {
     key: "trend",
-    slug: "xu-huong",
+    // Xu hướng = thường ngày
     items: [
-      { key: "dresses", slug: "dresses" },
-      { key: "tops", slug: "tops" },
-      { key: "pants", slug: "pants" },
-      { key: "outerwear", slug: "outerwear" },
+      { key: "dresses", occasion: "casual", categorySlug: "dresses" },
+      { key: "tops", occasion: "casual", categorySlug: "tops" },
+      { key: "pants", occasion: "casual", categorySlug: "pants" },
+      { key: "outerwear", occasion: "casual", categorySlug: "outerwear" },
     ],
+    occasions: ["casual"],
   },
   {
     key: "traditional",
-    slug: "truyen-thong",
     items: [
-      { key: "aoDaiCaoCap", slug: "ao-dai-cao-cap" },
-      { key: "aoDai", slug: "ao-dai" },
+      { key: "aoDaiCaoCap", occasion: null, categorySlug: "ao-dai-cao-cap" },
+      { key: "aoDai", occasion: null, categorySlug: "ao-dai" },
     ],
+    occasions: [],
   },
 ];
 
@@ -104,19 +109,34 @@ export function Navbar() {
                   <ChevronDown className="w-3.5 h-3.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                  {/* Link tổng cho collection */}
                   <DropdownMenuItem asChild>
-                    <Link to={`/products?collection=${col.slug}`}>
+                    <Link to={
+                      col.occasions.length > 0
+                        ? `/products?occasion=${col.occasions[0]}`
+                        : `/products`
+                    }>
                       {t("navbar.collection")} ({t(`navbar.${col.key}`)})
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {col.items.map((item) => (
-                    <DropdownMenuItem key={item.key} asChild>
-                      <Link to={`/products?collection=${col.slug}&category=${item.slug}`}>
-                        {t(`navbar.${item.key}`)}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
+                  {/* Với event/trend: hiện theo category + occasion */}
+                  {col.key !== "traditional"
+                    ? Array.from(new Set(col.items.map((i) => i.categorySlug))).map((slug) => (
+                        <DropdownMenuItem key={slug} asChild>
+                          <Link to={`/products?category=${slug}&occasion=${col.occasions.join(",")}`}>
+                            {t(`navbar.${col.items.find((i) => i.categorySlug === slug)?.key ?? slug}`)}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))
+                    : col.items.map((item) => (
+                        <DropdownMenuItem key={item.categorySlug} asChild>
+                          <Link to={`/products?category=${item.categorySlug}`}>
+                            {t(`navbar.${item.key}`)}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))
+                  }
                 </DropdownMenuContent>
               </DropdownMenu>
             ))}
@@ -274,23 +294,35 @@ export function Navbar() {
               {NAV_COLLECTIONS.map((col) => (
                 <div key={col.key} className="space-y-1">
                   <Link
-                    to={`/products?collection=${col.slug}`}
+                    to={col.occasions.length > 0 ? `/products?occasion=${col.occasions[0]}` : `/products`}
                     className="text-sm font-medium py-2 block"
                     onClick={() => setIsOpen(false)}
                   >
                     {t(`navbar.${col.key}`)}
                   </Link>
                   <div className="pl-4 space-y-1 border-l border-border">
-                    {col.items.map((item) => (
-                      <Link
-                        key={item.key}
-                        to={`/products?collection=${col.slug}&category=${item.slug}`}
-                        className="text-sm text-muted-foreground py-1.5 block"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        {t(`navbar.${item.key}`)}
-                      </Link>
-                    ))}
+                    {col.key !== "traditional"
+                      ? Array.from(new Set(col.items.map((i) => i.categorySlug))).map((slug) => (
+                          <Link
+                            key={slug}
+                            to={`/products?category=${slug}&occasion=${col.occasions.join(",")}`}
+                            className="text-sm text-muted-foreground py-1.5 block"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t(`navbar.${col.items.find((i) => i.categorySlug === slug)?.key ?? slug}`)}
+                          </Link>
+                        ))
+                      : col.items.map((item) => (
+                          <Link
+                            key={item.categorySlug}
+                            to={`/products?category=${item.categorySlug}`}
+                            className="text-sm text-muted-foreground py-1.5 block"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t(`navbar.${item.key}`)}
+                          </Link>
+                        ))
+                    }
                   </div>
                 </div>
               ))}

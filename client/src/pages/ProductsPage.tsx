@@ -28,7 +28,8 @@ export default function ProductsPage() {
   // ✅ State filters (khởi tạo từ URL)
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
-    category: searchParams.get("category") || "", // slug
+    category: searchParams.get("category") || "",
+    occasion: searchParams.get("occasion") || "",
     size: searchParams.get("size") || "",
     color: searchParams.get("color") || "",
     status:
@@ -41,6 +42,7 @@ export default function ProductsPage() {
     setFilters({
       search: searchParams.get("search") || "",
       category: searchParams.get("category") || "",
+      occasion: searchParams.get("occasion") || "",
       size: searchParams.get("size") || "",
       color: searchParams.get("color") || "",
       status:
@@ -65,6 +67,7 @@ export default function ProductsPage() {
     setFilters({
       search: "",
       category: "",
+      occasion: "",
       size: "",
       color: "",
       status: "" as ProductStatus | "",
@@ -116,6 +119,13 @@ export default function ProductsPage() {
         if (!name.includes(filters.search.toLowerCase())) return false;
       }
 
+      // Filter occasion (có thể là nhiều giá trị cách nhau bởi dấu phẩy)
+      if (filters.occasion) {
+        const occasions = filters.occasion.split(",").map((o) => o.trim());
+        const productOccasion = String(product?.occasion ?? "").toLowerCase();
+        if (!occasions.includes(productOccasion)) return false;
+      }
+
       if (filters.size) {
         const sizes: string[] = product?.sizes ?? [];
         if (!sizes.includes(filters.size)) return false;
@@ -130,7 +140,7 @@ export default function ProductsPage() {
 
       return true;
     });
-  }, [productsFromApi, filters.search, filters.size, filters.color, filters.status]);
+  }, [productsFromApi, filters.search, filters.size, filters.color, filters.status, filters.occasion]);
 
   // derive sizes/colors
   const allSizes = useMemo(() => {
