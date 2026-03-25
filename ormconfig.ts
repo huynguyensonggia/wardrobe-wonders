@@ -2,7 +2,14 @@ import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as path from 'path';
 
+// Render inject env vars trực tiếp, không cần file .env
+// dotenv/config sẽ tự bỏ qua nếu không tìm thấy file .env
+
 const isProd = process.env.NODE_ENV === 'production';
+
+// Debug: log để kiểm tra env vars có được đọc không
+console.log('[ormconfig] DB_HOST:', process.env.DB_HOST);
+console.log('[ormconfig] NODE_ENV:', process.env.NODE_ENV);
 
 export const databaseConfig: DataSourceOptions = {
   type: 'mysql',
