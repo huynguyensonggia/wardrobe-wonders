@@ -9,7 +9,6 @@ import {
   Index,
 } from "typeorm";
 import { Product } from "@/modules/products/entities/product.entity";
-import { ProductSize } from "@/modules/products/enums/product-size.enum";
 
 @Entity({ name: "product_variants" })
 @Index(["productId", "size"], { unique: true })
@@ -27,10 +26,10 @@ export class ProductVariant {
 
   @Column({
     name: "size",
-    type: "enum",
-    enum: ProductSize,
+    type: "varchar",
+    length: 20,
   })
-  size: ProductSize;
+  size: string;
 
   @Column({ name: "stock", type: "int", default: 0 })
   stock: number;

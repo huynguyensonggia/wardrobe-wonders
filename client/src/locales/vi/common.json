@@ -850,7 +850,8 @@
         "depositFormat": "{{deposit}}đ tiền cọc",
         "status": {
             "currentlyRented": "Đang được thuê",
-            "unavailable": "Không khả dụng"
+            "unavailable": "Không khả dụng",
+            "soldOut": "Hết hàng"
         },
         "fallback": {
             "product": "Sản phẩm",

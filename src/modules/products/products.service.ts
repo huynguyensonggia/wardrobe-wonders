@@ -105,11 +105,7 @@ export class ProductService {
     const seen = new Set<string>();
     for (const v of variants) {
       if (!v?.size) throw new BadRequestException("variant.size is required");
-      if (!Object.values(ProductSize).includes(v.size)) {
-        throw new BadRequestException(
-          `variant.size invalid: "${v.size}". Allowed: ${Object.values(ProductSize).join(", ")}`,
-        );
-      }
+
       const stock = Number(v.stock);
       if (!Number.isFinite(stock) || stock < 0) {
         throw new BadRequestException("variant.stock must be a number >= 0");
@@ -189,7 +185,8 @@ export class ProductService {
 
   // ================= UPDATE =================
   async update(id: number, dto: UpdateProductDto, file?: Express.Multer.File) {
-    const product = await this.findOne(id);
+    try {
+      const product = await this.findOne(id);
 
     if (dto.categoryId !== undefined) {
       const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });

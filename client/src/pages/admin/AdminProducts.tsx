@@ -521,25 +521,16 @@ export default function AdminProducts() {
                       key={v.id}
                       className="grid grid-cols-[140px_1fr_40px] gap-2 items-center"
                     >
-                      <Select
+                      <Input
                         value={v.size}
-                        onValueChange={(val) =>
+                        onChange={(e) =>
                           setVariants((prev) =>
-                            prev.map((x) => (x.id === v.id ? { ...x, size: val as any } : x))
+                            prev.map((x) => (x.id === v.id ? { ...x, size: e.target.value as any } : x))
                           )
                         }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("adminProducts.form.size")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {SIZES.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              {s}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        placeholder={t("adminProducts.form.size")}
+                        className="uppercase"
+                      />
 
                       <Input
                         value={v.stock}

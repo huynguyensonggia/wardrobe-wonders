@@ -49,6 +49,9 @@ export function ProductCard({ product }: ProductCardProps) {
     ? variants
     : (product as any)?.sizes?.map((s: string) => ({ size: s, stock: 1 })) ?? [];
 
+  // Sold out khi tất cả variants đều hết hàng
+  const isSoldOut = sizes.length > 0 && sizes.every((v: any) => (v?.stock ?? 1) <= 0);
+
   return (
     <Link to={`/products/${product.id}`} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-secondary mb-4">
@@ -58,10 +61,12 @@ export function ProductCard({ product }: ProductCardProps) {
           className="w-full h-full object-cover image-zoom"
         />
 
-        {!isAvailable && (
+        {(!isAvailable || isSoldOut) && (
           <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
             <Badge variant="secondary" className="text-sm">
-              {isRented
+              {isSoldOut
+                ? t("productCard.status.soldOut")
+                : isRented
                 ? t("productCard.status.currentlyRented")
                 : t("productCard.status.unavailable")}
             </Badge>

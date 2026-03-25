@@ -851,7 +851,8 @@
         "depositFormat": "¥{{deposit}} デポジット",
         "status": {
             "currentlyRented": "レンタル中",
-            "unavailable": "利用できません"
+            "unavailable": "利用できません",
+            "soldOut": "売り切れ"
         },
         "fallback": {
             "product": "商品",

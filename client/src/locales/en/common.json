@@ -832,7 +832,8 @@
         "depositFormat": "${{deposit}} deposit",
         "status": {
             "currentlyRented": "Currently Rented",
-            "unavailable": "Unavailable"
+            "unavailable": "Unavailable",
+            "soldOut": "Sold Out"
         },
         "fallback": {
             "product": "Product",
