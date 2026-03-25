@@ -413,7 +413,7 @@ export default function CheckoutPage() {
         <div className="grid gap-2">
           <Label>{t("checkout.payment.method")}</Label>
           <div className="flex flex-col gap-2">
-            {(["CASH", "COD", "BANK_TRANSFER"] as PaymentMethod[]).map((m) => (
+            {(["CASH", "BANK_TRANSFER"] as PaymentMethod[]).map((m) => (
               <label key={m} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
