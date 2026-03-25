@@ -38,10 +38,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
   // Format giá theo ngôn ngữ
   const formatPrice = (amount: number) => {
-    if (lang === "vi") return `${amount.toLocaleString("vi-VN")}đ`;
-    if (lang === "ja") return `¥${amount.toLocaleString("ja-JP")}`;
-    return `$${amount}`;
-  };
+      return amount.toLocaleString("vi-VN") + "đ";
+    };
 
   // Lấy tất cả sizes từ variants
   const variants: any[] = (product as any)?.variants ?? [];

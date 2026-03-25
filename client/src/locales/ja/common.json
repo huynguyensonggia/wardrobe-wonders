@@ -846,9 +846,9 @@
         "featured": "おすすめ",
         "perDay": "/日",
         "deposit": "デポジット",
-        "currency": "JPY",
-        "priceFormat": "¥{{price}}/日",
-        "depositFormat": "¥{{deposit}} デポジット",
+        "currency": "VND",
+        "priceFormat": "{{price}}₫/日",
+        "depositFormat": "{{deposit}}₫ デポジット",
         "status": {
             "currentlyRented": "レンタル中",
             "unavailable": "利用できません",

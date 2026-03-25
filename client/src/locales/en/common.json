@@ -827,9 +827,9 @@
         "featured": "Featured",
         "perDay": "/day",
         "deposit": "deposit",
-        "currency": "USD",
-        "priceFormat": "${{price}}/day",
-        "depositFormat": "${{deposit}} deposit",
+        "currency": "VND",
+        "priceFormat": "{{price}}đ/day",
+        "depositFormat": "{{deposit}}đ deposit",
         "status": {
             "currentlyRented": "Currently Rented",
             "unavailable": "Unavailable",
