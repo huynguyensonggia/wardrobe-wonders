@@ -15,7 +15,7 @@ export const databaseConfig: DataSourceOptions = {
   username: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'wardrobe-wonders',
-  synchronize: isProd ? true : false,
+  synchronize: isProd ? false : false,
   logging: process.env.APP_DEBUG === 'true',
   ssl: isProd && process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   entities: isProd
