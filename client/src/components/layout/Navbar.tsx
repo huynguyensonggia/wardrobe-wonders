@@ -12,6 +12,7 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  ChevronDown,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -24,6 +25,38 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+
+// Cấu trúc danh mục
+const NAV_COLLECTIONS = [
+  {
+    key: "event",
+    slug: "su-kien",
+    items: [
+      { key: "dresses", slug: "dresses" },
+      { key: "tops", slug: "tops" },
+      { key: "pants", slug: "pants" },
+      { key: "outerwear", slug: "outerwear" },
+    ],
+  },
+  {
+    key: "trend",
+    slug: "xu-huong",
+    items: [
+      { key: "dresses", slug: "dresses" },
+      { key: "tops", slug: "tops" },
+      { key: "pants", slug: "pants" },
+      { key: "outerwear", slug: "outerwear" },
+    ],
+  },
+  {
+    key: "traditional",
+    slug: "truyen-thong",
+    items: [
+      { key: "aoDaiCaoCap", slug: "ao-dai-cao-cap" },
+      { key: "aoDai", slug: "ao-dai" },
+    ],
+  },
+];
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +87,8 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6">
+            {/* Bộ sưu tập - link thẳng */}
             <Link
               to="/products"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -62,33 +96,30 @@ export function Navbar() {
               {t("navbar.collection")}
             </Link>
 
-            <Link
-              to="/products?category=dresses"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("navbar.dresses")}
-            </Link>
-
-            <Link
-              to="/products?category=tops"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("navbar.tops")}
-            </Link>
-
-            <Link
-              to="/products?category=pants"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("navbar.pants")}
-            </Link>
-
-            <Link
-              to="/products?category=outerwear"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("navbar.outerwear")}
-            </Link>
+            {/* 3 dropdown danh mục */}
+            {NAV_COLLECTIONS.map((col) => (
+              <DropdownMenu key={col.key}>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors outline-none">
+                  {t(`navbar.${col.key}`)}
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem asChild>
+                    <Link to={`/products?collection=${col.slug}`}>
+                      {t("navbar.collection")} ({t(`navbar.${col.key}`)})
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {col.items.map((item) => (
+                    <DropdownMenuItem key={item.key} asChild>
+                      <Link to={`/products?collection=${col.slug}&category=${item.slug}`}>
+                        {t(`navbar.${item.key}`)}
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
 
             <Link
               to="/try-on-suggest"
@@ -239,37 +270,30 @@ export function Navbar() {
                 {t("navbar.collection")}
               </Link>
 
-              <Link
-                to="/products?category=dresses"
-                className="text-sm font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("navbar.dresses")}
-              </Link>
-
-              <Link
-                to="/products?category=tops"
-                className="text-sm font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("navbar.tops")}
-              </Link>
-
-              <Link
-                to="/products?category=pants"
-                className="text-sm font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("navbar.pants")}
-              </Link>
-
-              <Link
-                to="/products?category=outerwear"
-                className="text-sm font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                {t("navbar.outerwear")}
-              </Link>
+              {/* Mobile: 3 danh mục có sub-items */}
+              {NAV_COLLECTIONS.map((col) => (
+                <div key={col.key} className="space-y-1">
+                  <Link
+                    to={`/products?collection=${col.slug}`}
+                    className="text-sm font-medium py-2 block"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {t(`navbar.${col.key}`)}
+                  </Link>
+                  <div className="pl-4 space-y-1 border-l border-border">
+                    {col.items.map((item) => (
+                      <Link
+                        key={item.key}
+                        to={`/products?collection=${col.slug}&category=${item.slug}`}
+                        className="text-sm text-muted-foreground py-1.5 block"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {t(`navbar.${item.key}`)}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
 
               <Link
                 to="/try-on-suggest"

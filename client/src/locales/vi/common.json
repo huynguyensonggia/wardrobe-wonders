@@ -28,10 +28,15 @@
     },
     "navbar": {
         "collection": "Bộ sưu tập",
+        "event": "Sự kiện",
+        "trend": "Xu hướng",
+        "traditional": "Truyền thống",
         "dresses": "Váy/Đầm",
         "tops": "Áo",
         "pants": "Quần",
         "outerwear": "Áo khoác",
+        "aoDaiCaoCap": "Áo dài cao cấp",
+        "aoDai": "Áo dài",
         "aiTryOn": "AI Thử đồ",
         "cart": "Giỏ hàng",
         "myRentals": "Đơn thuê của tôi",
@@ -840,6 +845,9 @@
         "featured": "Nổi bật",
         "perDay": "/ngày",
         "deposit": "tiền cọc",
+        "currency": "VND",
+        "priceFormat": "{{price}}đ/ngày",
+        "depositFormat": "{{deposit}}đ tiền cọc",
         "status": {
             "currentlyRented": "Đang được thuê",
             "unavailable": "Không khả dụng"

@@ -28,10 +28,15 @@
     },
     "navbar": {
         "collection": "コレクション",
+        "event": "イベント",
+        "trend": "トレンド",
+        "traditional": "トラディショナル",
         "dresses": "ドレス",
         "tops": "トップス",
         "pants": "パンツ",
         "outerwear": "アウター",
+        "aoDaiCaoCap": "プレミアムアオザイ",
+        "aoDai": "アオザイ",
         "aiTryOn": "AI試着",
         "cart": "カート",
         "myRentals": "レンタル履歴",
@@ -841,6 +846,9 @@
         "featured": "おすすめ",
         "perDay": "/日",
         "deposit": "デポジット",
+        "currency": "JPY",
+        "priceFormat": "¥{{price}}/日",
+        "depositFormat": "¥{{deposit}} デポジット",
         "status": {
             "currentlyRented": "レンタル中",
             "unavailable": "利用できません"

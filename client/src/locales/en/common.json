@@ -28,10 +28,15 @@
     },
     "navbar": {
         "collection": "Collection",
+        "event": "Events",
+        "trend": "Trends",
+        "traditional": "Traditional",
         "dresses": "Dresses",
         "tops": "Tops",
         "pants": "Pants",
         "outerwear": "Outerwear",
+        "aoDaiCaoCap": "Premium Ao Dai",
+        "aoDai": "Ao Dai",
         "aiTryOn": "AI Try-On",
         "cart": "Cart",
         "myRentals": "My Rentals",
@@ -822,6 +827,9 @@
         "featured": "Featured",
         "perDay": "/day",
         "deposit": "deposit",
+        "currency": "USD",
+        "priceFormat": "${{price}}/day",
+        "depositFormat": "${{deposit}} deposit",
         "status": {
             "currentlyRented": "Currently Rented",
             "unavailable": "Unavailable"
