@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
@@ -88,6 +88,7 @@ export default function TryOnPage() {
   // mix state
   const [mixProductId, setMixProductId] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [elapsed, setElapsed] = useState(0); // seconds
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -232,6 +233,9 @@ export default function TryOnPage() {
 
     setIsProcessing(true);
     setError(null);
+    setElapsed(0);
+
+    const timer = setInterval(() => setElapsed((s) => s + 1), 1000);
 
     try {
       const productIdToUse = isFirstRun ? selectedProduct : mixProductId;
@@ -250,6 +254,7 @@ export default function TryOnPage() {
     } catch (err: any) {
       setError(err?.message || t("tryOn.errors.generateFailed"));
     } finally {
+      clearInterval(timer);
       setIsProcessing(false);
     }
   };
@@ -393,13 +398,20 @@ export default function TryOnPage() {
               {/* Preview */}
               <div className="relative aspect-[3/4] rounded-lg bg-secondary overflow-hidden">
                 {isProcessing ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
                     <div className="relative">
                       <div className="w-16 h-16 border-4 border-accent/30 border-t-accent rounded-full animate-spin" />
                       <Sparkles className="w-6 h-6 text-accent absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                     </div>
                     <p className="mt-4 font-medium">{t("tryOn.processing.title")}</p>
-                    <p className="text-sm text-muted-foreground">{t("tryOn.processing.subtitle")}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {elapsed < 10
+                        ? t("tryOn.processing.wakeUp")
+                        : t("tryOn.processing.hint")}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-2 tabular-nums">
+                      {elapsed}s
+                    </p>
                   </div>
                 ) : previewUrl ? (
                   <>

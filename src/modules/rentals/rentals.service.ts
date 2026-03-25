@@ -446,6 +446,39 @@ export class RentalsService {
   }
 
   // =========================
+  // ADMIN: REFUND DEPOSIT
+  // Đánh dấu payment tiền cọc là REFUNDED
+  // =========================
+  async refundDeposit(id: number) {
+    const rental = await this.rentalsRepo.findOne({
+      where: { id },
+      relations: ["payments"],
+    });
+    if (!rental) throw new NotFoundException("Rental not found");
+
+    if (rental.status !== RentalStatus.COMPLETED) {
+      throw new BadRequestException("Can only refund deposit for COMPLETED rentals");
+    }
+
+    // Tìm payment tiền cọc (transactionCode bắt đầu bằng DEP-)
+    const depositPayments = rental.payments.filter(
+      (p) => p.transactionCode?.startsWith("DEP-") && p.status !== PaymentStatus.REFUNDED,
+    );
+
+    if (!depositPayments.length) {
+      throw new BadRequestException("No deposit payment found or already refunded");
+    }
+
+    for (const p of depositPayments) {
+      p.status = PaymentStatus.REFUNDED;
+      p.paidAt = new Date();
+      await this.paymentsRepo.save(p);
+    }
+
+    return { refunded: true, count: depositPayments.length };
+  }
+
+  // =========================
   // USER: CANCEL
   // (không hoàn kho ở đây vì user chỉ cancel khi pending)
   // =========================
@@ -462,6 +495,46 @@ export class RentalsService {
     }
 
     rental.status = RentalStatus.CANCELLED;
+    return this.rentalsRepo.save(rental);
+  }
+
+  // =========================
+  // USER: EXTEND
+  // Chỉ cho phép gia hạn khi ACTIVE
+  // =========================
+  async extendMine(userId: number, id: number, newEndDate: string) {
+    const rental = await this.rentalsRepo.findOne({
+      where: { id, user: { id: userId } as any },
+      relations: ["items", "items.product"],
+    });
+    if (!rental) throw new NotFoundException("Rental not found");
+
+    if (rental.status !== RentalStatus.ACTIVE) {
+      throw new BadRequestException("Can only extend ACTIVE rentals");
+    }
+
+    const end = new Date(newEndDate);
+    if (isNaN(end.getTime())) throw new BadRequestException("Invalid endDate");
+
+    const currentEnd = new Date(rental.endDate);
+    if (end <= currentEnd) {
+      throw new BadRequestException("New end date must be after current end date");
+    }
+
+    const extraDays = daysBetweenInclusive(
+      new Date(currentEnd.getTime() + 86400000), // ngày tiếp theo sau endDate cũ
+      end,
+    );
+
+    // Tính thêm tiền thuê cho số ngày gia hạn
+    const extraPrice = rental.items.reduce((sum, it) => {
+      return sum + (it.rentPricePerDay ?? 0) * it.quantity * extraDays;
+    }, 0);
+
+    rental.endDate = end;
+    rental.totalDays = daysBetweenInclusive(new Date(rental.startDate), end);
+    rental.totalPrice = rental.totalPrice + extraPrice;
+
     return this.rentalsRepo.save(rental);
   }
 }

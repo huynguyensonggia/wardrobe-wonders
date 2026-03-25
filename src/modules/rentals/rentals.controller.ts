@@ -11,6 +11,7 @@ import {
 
 import { RentalsService } from "./rentals.service";
 import { CreateRentalDto } from "./dto/create-rental.dto";
+import { ExtendRentalDto } from "./dto/extend-rental.dto";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("rentals") // => /api/rentals
@@ -41,5 +42,11 @@ export class RentalsController {
   cancel(@Req() req: any, @Param("id") id: string) {
     const userId = req.user.id;
     return this.rentalsService.cancelMine(userId, Number(id));
+  }
+
+  @Post(":id/extend")
+  extend(@Req() req: any, @Param("id") id: string, @Body() dto: ExtendRentalDto) {
+    const userId = req.user.id;
+    return this.rentalsService.extendMine(userId, Number(id), dto.endDate);
   }
 }

@@ -51,6 +51,17 @@ function getAdminActions(t: (k: string) => string): Record<
   };
 }
 
+async function handleRefundDeposit(rentalId: string, t: (k: string) => string) {
+  try {
+    await rentalsApi.refundDeposit(rentalId);
+    alert(t("rentals.refundDeposit.success"));
+    return true;
+  } catch (e: any) {
+    alert(e?.message || t("rentals.refundDeposit.error"));
+    return false;
+  }
+}
+
 export default function AdminRentals() {
   const { t } = useTranslation();
 
@@ -338,6 +349,21 @@ export default function AdminRentals() {
                       {t("adminRentals.noActions")}
                     </span>
                   )}
+
+                  {/* Nút hoàn cọc khi COMPLETED và có deposit */}
+                  {selected.status === RentalStatus.COMPLETED &&
+                    Number(selected.totalDeposit) > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={async () => {
+                          const ok = await handleRefundDeposit(String(selected.id), t);
+                          if (ok) await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
+                        }}
+                      >
+                        {t("adminRentals.actions.refundDeposit")} (${selected.totalDeposit})
+                      </Button>
+                    )}
                 </div>
               </div>
 

@@ -234,6 +234,11 @@ export const rentalsApi = {
       method: "PATCH",
       body: JSON.stringify(data),
     }),
+
+  refundDeposit: (id: string) =>
+    fetchApi<{ refunded: boolean; count: number }>(`/admin/rentals/${id}/refund-deposit`, {
+      method: "PATCH",
+    }),
 };
 
 export const adminApi = {

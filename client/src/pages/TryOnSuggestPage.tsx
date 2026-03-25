@@ -160,6 +160,9 @@ export default function TryOnSuggestPage() {
           <p className="text-muted-foreground max-w-lg mx-auto">
             {t("tryOnSuggest.header.subtitle")}
           </p>
+          <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+            {t("tryOnSuggest.header.note")}
+          </p>
         </div>
 
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-8">

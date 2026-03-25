@@ -1,18 +1,17 @@
 // CartContext.tsx
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState, useEffect } from "react";
 
 export type CartItem = {
   productId: number;
-  variantId: number;        // ✅ NEW
-  size?: string;            // (optional) để show UI
-
+  variantId: number;
+  size?: string;
   name: string;
   imageUrl?: string;
   rentPricePerDay: number;
+  deposit: number;
   quantity: number;
-
-  startDate: string; // yyyy-MM-dd
-  endDate: string;   // yyyy-MM-dd
+  startDate: string;
+  endDate: string;
   days: number;
 };
 
@@ -43,8 +42,24 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+const CART_KEY = "ww_cart";
+
+function loadCart(): CartItem[] {
+  try {
+    const raw = localStorage.getItem(CART_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(loadCart);
+
+  // Sync to localStorage on every change
+  useEffect(() => {
+    localStorage.setItem(CART_KEY, JSON.stringify(items));
+  }, [items]);
 
   const count = useMemo(
     () => items.reduce((s, i) => s + i.quantity, 0),

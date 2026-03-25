@@ -200,7 +200,9 @@
         },
         "processing": {
             "title": "Generating try-on...",
-            "subtitle": "This may take a few seconds"
+            "subtitle": "This may take a few seconds",
+            "hint": "AI is processing (~20–60s). Please wait...",
+            "wakeUp": "Waking up AI server, first request may take 1–2 minutes..."
         },
         "actions": {
             "save": "Save"
@@ -480,6 +482,18 @@
             "extend": "Extend Rental",
             "cancel": "Cancel"
         },
+        "extend": {
+            "title": "Extend Rental",
+            "newEndDate": "New end date",
+            "confirm": "Confirm",
+            "cancel": "Cancel",
+            "success": "Rental extended successfully!",
+            "error": "Failed to extend rental"
+        },
+        "refundDeposit": {
+            "success": "Deposit refunded successfully!",
+            "error": "Failed to refund deposit"
+        },
         "history": {
             "title": "Rental History",
             "emptyTitle": "No rental history",
@@ -519,7 +533,8 @@
             "startShipping": "Start shipping",
             "reject": "Reject",
             "customerReceived": "Customer received",
-            "complete": "Complete"
+            "complete": "Complete",
+            "refundDeposit": "Refund Deposit"
         },
         "detail": {
             "rental": "Rental",
@@ -835,7 +850,8 @@
     "tryOnSuggest": {
         "header": {
             "title": "Virtual Try-On (Suggest)",
-            "subtitle": "Upload your photo and we suggest the best product for you."
+            "subtitle": "Upload your photo and we suggest the best product for you.",
+            "note": "This feature suggests matching products based on category. For AI try-on, use the AI Try-On page."
         },
         "upload": {
             "aria": "Upload your photo",
@@ -856,7 +872,7 @@
             "empty": "No preview"
         },
         "buttons": {
-            "generate": "Generate Try-On",
+            "generate": "Find Matching Products",
             "rentThisPiece": "Rent This Piece"
         },
         "errors": {

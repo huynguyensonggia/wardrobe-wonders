@@ -44,4 +44,9 @@ export class AdminRentalsController {
   remove(@Param("id") id: string): Promise<{ deleted: boolean }> {
     return this.rentalsService.remove(Number(id));
   }
+
+  @Patch(":id/refund-deposit")
+  refundDeposit(@Param("id") id: string) {
+    return this.rentalsService.refundDeposit(Number(id));
+  }
 }

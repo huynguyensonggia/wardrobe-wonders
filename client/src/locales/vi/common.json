@@ -200,7 +200,9 @@
         },
         "processing": {
             "title": "Đang tạo kết quả...",
-            "subtitle": "Có thể mất vài giây"
+            "subtitle": "Có thể mất vài giây",
+            "hint": "AI đang xử lý (~20–60 giây). Vui lòng chờ...",
+            "wakeUp": "Đang khởi động AI server, lần đầu có thể mất 1–2 phút..."
         },
         "actions": {
             "save": "Lưu"
@@ -480,6 +482,18 @@
             "extend": "Gia hạn",
             "cancel": "Hủy"
         },
+        "extend": {
+            "title": "Gia hạn đơn thuê",
+            "newEndDate": "Ngày kết thúc mới",
+            "confirm": "Xác nhận",
+            "cancel": "Hủy",
+            "success": "Gia hạn thành công!",
+            "error": "Gia hạn thất bại"
+        },
+        "refundDeposit": {
+            "success": "Hoàn cọc thành công!",
+            "error": "Hoàn cọc thất bại"
+        },
         "history": {
             "title": "Lịch sử thuê",
             "emptyTitle": "Chưa có lịch sử thuê",
@@ -519,7 +533,8 @@
             "startShipping": "Bắt đầu giao",
             "reject": "Từ chối",
             "customerReceived": "Khách đã nhận",
-            "complete": "Hoàn tất"
+            "complete": "Hoàn tất",
+            "refundDeposit": "Hoàn cọc"
         },
         "detail": {
             "rental": "Đơn thuê",
@@ -853,7 +868,8 @@
     "tryOnSuggest": {
         "header": {
             "title": "Thử đồ ảo (Gợi ý)",
-            "subtitle": "Tải ảnh của bạn lên và hệ thống sẽ gợi ý sản phẩm phù hợp."
+            "subtitle": "Tải ảnh của bạn lên và hệ thống sẽ gợi ý sản phẩm phù hợp.",
+            "note": "Tính năng này gợi ý sản phẩm theo danh mục. Để thử đồ AI thật sự, dùng trang AI Thử đồ."
         },
         "upload": {
             "aria": "Tải ảnh của bạn lên",
@@ -874,7 +890,7 @@
             "empty": "Chưa có xem trước"
         },
         "buttons": {
-            "generate": "Tạo Try-On",
+            "generate": "Gợi ý sản phẩm phù hợp",
             "rentThisPiece": "Thuê sản phẩm này"
         },
         "errors": {

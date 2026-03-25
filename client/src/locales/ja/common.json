@@ -200,7 +200,9 @@
         },
         "processing": {
             "title": "試着結果を生成中...",
-            "subtitle": "数秒かかる場合があります"
+            "subtitle": "数秒かかる場合があります",
+            "hint": "AIが処理中です（約20〜60秒）。しばらくお待ちください...",
+            "wakeUp": "AIサーバーを起動中です。初回リクエストは1〜2分かかる場合があります..."
         },
         "actions": {
             "save": "保存"
@@ -481,6 +483,18 @@
             "extend": "延長",
             "cancel": "キャンセル"
         },
+        "extend": {
+            "title": "レンタルを延長",
+            "newEndDate": "新しい終了日",
+            "confirm": "確認",
+            "cancel": "キャンセル",
+            "success": "延長しました！",
+            "error": "延長に失敗しました"
+        },
+        "refundDeposit": {
+            "success": "デポジットを返金しました！",
+            "error": "返金に失敗しました"
+        },
         "history": {
             "title": "レンタル履歴",
             "emptyTitle": "レンタル履歴がありません",
@@ -520,7 +534,8 @@
             "startShipping": "発送開始",
             "reject": "却下",
             "customerReceived": "受け取り完了",
-            "complete": "完了"
+            "complete": "完了",
+            "refundDeposit": "デポジット返金"
         },
         "detail": {
             "rental": "レンタル",
@@ -854,7 +869,8 @@
     "tryOnSuggest": {
         "header": {
             "title": "バーチャル試着（おすすめ）",
-            "subtitle": "写真をアップロードすると、最適な商品をおすすめします。"
+            "subtitle": "写真をアップロードすると、最適な商品をおすすめします。",
+            "note": "この機能はカテゴリに基づいて商品を提案します。AI試着はAI試着ページをご利用ください。"
         },
         "upload": {
             "aria": "写真をアップロード",
@@ -875,7 +891,7 @@
             "empty": "プレビューなし"
         },
         "buttons": {
-            "generate": "試着を生成",
+            "generate": "おすすめ商品を探す",
             "rentThisPiece": "この商品をレンタル"
         },
         "errors": {

@@ -8,7 +8,6 @@ import { rentalsApi } from "@/lib/api";
 
 import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
 import { useTranslation } from "react-i18next";
-
 type RentalItem = {
   id: number;
   quantity: number;
@@ -55,6 +54,10 @@ export default function MyRentals() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Extend dialog state
+  const [extendRentalId, setExtendRentalId] = useState<string | null>(null);
+  const [extendDate, setExtendDate] = useState("");
+
   async function load() {
     setLoading(true);
     setError(null);
@@ -80,6 +83,19 @@ export default function MyRentals() {
       await load();
     } catch (e: any) {
       alert(e?.message || t("common.errors.cancelFailed"));
+    }
+  }
+
+  async function onExtend() {
+    if (!extendRentalId || !extendDate) return;
+    try {
+      await rentalsApi.extend(extendRentalId, extendDate);
+      setExtendRentalId(null);
+      setExtendDate("");
+      await load();
+      alert(t("rentals.extend.success"));
+    } catch (e: any) {
+      alert(e?.message || t("rentals.extend.error"));
     }
   }
 
@@ -143,6 +159,35 @@ export default function MyRentals() {
           {t("rentals.current.activeCount", { count: activeCount })}
         </Badge>
       </div>
+
+      {/* Extend Dialog */}
+      {extendRentalId && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background rounded-lg p-6 w-full max-w-sm space-y-4 shadow-xl">
+            <h3 className="font-medium text-lg">{t("rentals.extend.title")}</h3>
+            <div className="grid gap-2">
+              <label className="text-sm text-muted-foreground">
+                {t("rentals.extend.newEndDate")}
+              </label>
+              <input
+                type="date"
+                className="border rounded-md px-3 py-2 text-sm"
+                value={extendDate}
+                min={new Date().toISOString().slice(0, 10)}
+                onChange={(e) => setExtendDate(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => { setExtendRentalId(null); setExtendDate(""); }}>
+                {t("rentals.extend.cancel")}
+              </Button>
+              <Button disabled={!extendDate} onClick={onExtend}>
+                {t("rentals.extend.confirm")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         {currentRentals.map((r) => {
@@ -235,7 +280,15 @@ export default function MyRentals() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" disabled>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={normalizeStatus(r.status) !== RentalStatus.ACTIVE}
+                      onClick={() => {
+                        setExtendRentalId(rentalId);
+                        setExtendDate(String(r.endDate).slice(0, 10));
+                      }}
+                    >
                       {t("rentals.actions.extend")}
                     </Button>
 
