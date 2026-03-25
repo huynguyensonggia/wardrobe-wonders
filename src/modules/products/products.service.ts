@@ -185,8 +185,7 @@ export class ProductService {
 
   // ================= UPDATE =================
   async update(id: number, dto: UpdateProductDto, file?: Express.Multer.File) {
-    try {
-      const product = await this.findOne(id);
+    const product = await this.findOne(id);
 
     if (dto.categoryId !== undefined) {
       const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
