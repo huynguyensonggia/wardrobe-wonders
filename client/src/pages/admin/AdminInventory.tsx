@@ -40,6 +40,96 @@ const MANUAL_STATUSES: ConditionStatus[] = [
 
 const MANUALLY_EDITABLE: ConditionStatus[] = ["available", "returned", "washing", "repairing"];
 
+// Component nút điền tình trạng %
+function ConditionNoteButton({ item, onSave }: { item: InventoryItem; onSave: (note: string) => void }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+
+  // Parse % từ conditionNote hiện tại nếu có (VD: "90% - Tốt")
+  const parsePct = (note?: string) => {
+    if (!note) return 100;
+    const m = note.match(/^(\d+)%/);
+    return m ? Number(m[1]) : 100;
+  };
+
+  const getLabel = (p: number) =>
+    p >= 90 ? t("adminInventory.condition.good")
+    : p >= 70 ? t("adminInventory.condition.normal")
+    : p >= 50 ? t("adminInventory.condition.old")
+    : t("adminInventory.condition.damaged");
+
+  const [pct, setPct] = useState(() => parsePct(item.conditionNote));
+  const [note, setNote] = useState(() => {
+    const p = parsePct(item.conditionNote);
+    return `${p}% - ${getLabel(p)}`;
+  });
+
+  const handleOpen = () => {
+    const p = parsePct(item.conditionNote);
+    setPct(p);
+    setNote(item.conditionNote || `${p}% - ${getLabel(p)}`);
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={handleOpen}
+        className="text-xs px-2 py-1.5 border rounded-md hover:bg-secondary transition"
+        title="Cập nhật tình trạng"
+      >
+        📝
+      </button>
+      {open && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setOpen(false)}>
+          <div className="bg-background rounded-lg p-5 w-full max-w-xs space-y-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-medium">{t("adminInventory.conditionModal.title")}: <span className="font-mono">{item.barcode}</span></h3>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>{t("adminInventory.conditionModal.condition")}</span>
+                <span className="font-medium">{pct}% — {getLabel(pct)}</span>
+              </div>
+              <input
+                type="range" min={0} max={100} step={5}
+                value={pct}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  setPct(v);
+                  setNote(`${v}% - ${getLabel(v)}`);
+                }}
+                className="w-full accent-primary"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{t("adminInventory.conditionModal.damaged")}</span>
+                <span>{t("adminInventory.conditionModal.good")}</span>
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">{t("adminInventory.conditionModal.extraNote")}</label>
+              <input
+                className="w-full border rounded-md px-3 py-2 text-sm"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder={t("adminInventory.conditionModal.placeholder")}
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setOpen(false)} className="text-sm px-3 py-1.5 border rounded-md">{t("common.cancel")}</button>
+              <button
+                onClick={() => { onSave(note); setOpen(false); }}
+                className="text-sm px-3 py-1.5 bg-primary text-primary-foreground rounded-md"
+              >
+                {t("common.save")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export default function AdminInventory() {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -74,8 +164,11 @@ export default function AdminInventory() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: ConditionStatus }) =>
-      fetchApi(`/admin/inventory/${id}/status`, { method: "PATCH", body: JSON.stringify({ status }) }),
+    mutationFn: ({ id, status, note }: { id: number; status: ConditionStatus; note?: string }) =>
+      fetchApi(`/admin/inventory/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status, note }),
+      }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-inventory"] }),
   });
 
@@ -237,28 +330,39 @@ export default function AdminInventory() {
                 </div>
               </div>
 
-              <select
-                className={`text-xs border rounded-md px-2 py-1.5 bg-background transition ${
-                  !MANUALLY_EDITABLE.includes(item.conditionStatus)
-                    ? "opacity-40 cursor-not-allowed"
-                    : ""
-                }`}
-                value={item.conditionStatus}
-                disabled={
-                  !MANUALLY_EDITABLE.includes(item.conditionStatus) ||
-                  item.conditionStatus === "retired" ||
-                  updateMutation.isPending
-                }
-                onChange={(e) => updateMutation.mutate({ id: item.id, status: e.target.value as ConditionStatus })}
-              >
-                {/* Nếu item đang ở trạng thái không editable, hiện trạng thái đó như readonly */}
-                {!MANUALLY_EDITABLE.includes(item.conditionStatus) && (
-                  <option value={item.conditionStatus}>{t(`adminInventory.status.${item.conditionStatus}`)}</option>
+              <div className="flex items-center gap-2 shrink-0">
+                <select
+                  className={`text-xs border rounded-md px-2 py-1.5 bg-background transition ${
+                    !MANUALLY_EDITABLE.includes(item.conditionStatus)
+                      ? "opacity-40 cursor-not-allowed"
+                      : ""
+                  }`}
+                  value={item.conditionStatus}
+                  disabled={
+                    !MANUALLY_EDITABLE.includes(item.conditionStatus) ||
+                    item.conditionStatus === "retired" ||
+                    updateMutation.isPending
+                  }
+                  onChange={(e) => updateMutation.mutate({ id: item.id, status: e.target.value as ConditionStatus })}
+                >
+                  {/* Nếu item đang ở trạng thái không editable, hiện trạng thái đó như readonly */}
+                  {!MANUALLY_EDITABLE.includes(item.conditionStatus) && (
+                    <option value={item.conditionStatus}>{t(`adminInventory.status.${item.conditionStatus}`)}</option>
+                  )}
+                  {MANUAL_STATUSES.map((s) => (
+                    <option key={s} value={s}>{t(`adminInventory.status.${s}`)}</option>
+                  ))}
+                </select>
+
+                {MANUALLY_EDITABLE.includes(item.conditionStatus) && item.conditionStatus !== "retired" && (
+                  <ConditionNoteButton
+                    item={item}
+                    onSave={(note) =>
+                      updateMutation.mutate({ id: item.id, status: item.conditionStatus, note })
+                    }
+                  />
                 )}
-                {MANUAL_STATUSES.map((s) => (
-                  <option key={s} value={s}>{t(`adminInventory.status.${s}`)}</option>
-                ))}
-              </select>
+              </div>
             </div>
           ))}
         </div>

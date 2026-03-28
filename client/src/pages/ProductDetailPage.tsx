@@ -454,14 +454,17 @@ export default function ProductDetailPage() {
                       disabled={disabled}
                       title={title}
                       className={cn(
-                        "w-12 h-12 rounded-md border text-sm font-medium transition-all",
+                        "px-3 h-10 rounded-md border text-sm font-medium transition-all",
                         disabled && "opacity-40 cursor-not-allowed",
                         selectedSize === size
                           ? "border-primary bg-primary text-primary-foreground"
                           : "border-border hover:border-accent"
                       )}
                     >
-                      {size}
+                      <div>{size}</div>
+                      <div className="text-xs font-normal opacity-70">
+                        {disabled ? "Hết" : `${stock} còn`}
+                      </div>
                     </button>
                   );
                 })}

@@ -105,7 +105,7 @@
             "outOfStock": "Out of stock",
             "stock": "Stock: {{stock}}"
         },
-        "selectedVariant": "Selected variant: #{{id}} • Stock: {{stock}}",
+        "selectedVariant": "• Stock: {{stock}}",
         "features": {
             "freeShipping": "Free shipping over 400.000đ",
             "damageProtection": "Damage protection included"
@@ -808,6 +808,20 @@
         "more": "more",
         "retirementWarning": "{{count}} items should be considered for retirement (≥40 rentals)",
         "rentedCount": "Rented {{count}}/{{max}} times",
+        "condition": {
+            "good": "Good",
+            "normal": "Normal",
+            "old": "Worn",
+            "damaged": "Damaged"
+        },
+        "conditionModal": {
+            "title": "Condition",
+            "condition": "Condition",
+            "good": "Good",
+            "damaged": "Damaged",
+            "extraNote": "Additional note",
+            "placeholder": "E.g: 90% - Like new, slight fading"
+        },
         "status": {
             "available": "Available",
             "shipping": "Shipping",

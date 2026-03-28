@@ -180,7 +180,13 @@ export class ProductService {
       for (let i = 1; i <= stock; i++) {
         const barcode = `WW-${saved.id}-${sv.size}-${String(i).padStart(3, "0")}`;
         try {
-          await this.inventoryService.create({ variantId: sv.id, barcode, maxRentals: 50, conditionNote });
+          await this.inventoryService.create({
+            variantId: sv.id,
+            barcode,
+            maxRentals: 50,
+            conditionNote,
+            skipStockUpdate: true, // stock đã set đúng khi tạo variant
+          });
         } catch { /* barcode trùng → bỏ qua */ }
       }
     }

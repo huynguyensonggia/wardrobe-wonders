@@ -211,13 +211,6 @@ export function Navbar() {
                   )}
 
                   <DropdownMenuItem asChild>
-                    <Link to="/dashboard" className="cursor-pointer">
-                      <ShoppingBag className="w-4 h-4 mr-2" />
-                      {t("navbar.myRentals")}
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
                     <Link to="/dashboard/profile" className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" />
                       {t("navbar.settings")}

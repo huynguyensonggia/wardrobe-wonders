@@ -105,7 +105,7 @@
             "outOfStock": "在庫切れ",
             "stock": "在庫: {{stock}}"
         },
-        "selectedVariant": "選択したバリアント: #{{id}} • 在庫: {{stock}}",
+        "selectedVariant": "• 在庫: {{stock}}",
         "features": {
             "freeShipping": "400.000đ以上で送料無料",
             "damageProtection": "破損補償込み"
@@ -809,6 +809,20 @@
         "more": "他",
         "retirementWarning": "{{count}}点のアイテムが廃棄を検討すべきです（≥40回レンタル）",
         "rentedCount": "レンタル {{count}}/{{max}} 回",
+        "condition": {
+            "good": "良好",
+            "normal": "普通",
+            "old": "古い",
+            "damaged": "破損"
+        },
+        "conditionModal": {
+            "title": "状態",
+            "condition": "状態",
+            "good": "良好",
+            "damaged": "破損",
+            "extraNote": "追加メモ",
+            "placeholder": "例: 90% - ほぼ新品、わずかに色あせ"
+        },
         "status": {
             "available": "利用可能",
             "shipping": "配送中",

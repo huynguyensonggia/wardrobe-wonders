@@ -37,12 +37,27 @@ export class InventoryService {
     maxRentals?: number;
     conditionNote?: string;
     acquiredDate?: string;
+    skipStockUpdate?: boolean; // dùng khi tạo từ product (stock đã set đúng)
   }) {
     const variant = await this.variantRepo.findOne({ where: { id: dto.variantId } });
     if (!variant) throw new NotFoundException("Variant not found");
 
     const existing = await this.repo.findOne({ where: { barcode: dto.barcode } });
     if (existing) throw new BadRequestException(`Barcode "${dto.barcode}" already exists`);
+
+    if (dto.skipStockUpdate) {
+      // Tạo item mà không cộng stock (stock đã được set đúng khi tạo variant)
+      const item = this.repo.create({
+        variantId: dto.variantId,
+        variant,
+        barcode: dto.barcode,
+        maxRentals: dto.maxRentals ?? 50,
+        conditionNote: dto.conditionNote,
+        acquiredDate: dto.acquiredDate ? new Date(dto.acquiredDate) : undefined,
+        conditionStatus: ConditionStatus.AVAILABLE,
+      });
+      return this.repo.save(item);
+    }
 
     return this.dataSource.transaction(async (manager) => {
       const variantRepo = manager.getRepository(ProductVariant);
@@ -86,8 +101,14 @@ export class InventoryService {
         throw new BadRequestException("Không thể thay đổi trạng thái món đã loại bỏ");
       }
 
-      // Không cho đổi nếu giống nhau
-      if (prev === status) return item;
+      // Không cho đổi nếu giống nhau - nhưng vẫn cho update note
+      if (prev === status) {
+        if (note !== undefined) {
+          item.conditionNote = note;
+          return itemRepo.save(item);
+        }
+        return item;
+      }
 
       const variant = await variantRepo.findOne({
         where: { id: item.variantId },
@@ -189,6 +210,17 @@ export class InventoryService {
       relations: ["variant", "variant.product"],
       order: { conditionStatus: "ASC", id: "ASC" },
     });
+  }
+
+  async findByProduct(productId: number) {
+    return this.repo
+      .createQueryBuilder("i")
+      .leftJoinAndSelect("i.variant", "v")
+      .leftJoinAndSelect("v.product", "p")
+      .where("v.product_id = :productId", { productId })
+      .orderBy("v.size", "ASC")
+      .addOrderBy("i.id", "ASC")
+      .getMany();
   }
 
   // ========================

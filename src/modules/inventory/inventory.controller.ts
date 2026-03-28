@@ -77,6 +77,12 @@ export class InventoryController {
     return this.service.findByVariant(Number(variantId));
   }
 
+  // GET /admin/inventory/product/:productId - lấy tất cả inventory của 1 product
+  @Get("product/:productId")
+  findByProduct(@Param("productId") productId: string) {
+    return this.service.findByProduct(Number(productId));
+  }
+
   // POST /admin/inventory
   @Post()
   create(@Body() dto: CreateInventoryItemDto) {

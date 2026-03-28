@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { productsApi, categoriesApi } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { productsApi, categoriesApi, fetchApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -117,6 +118,17 @@ export default function AdminProducts() {
   /* ===== PRODUCTS LIST ===== */
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [detailProductId, setDetailProductId] = useState<string | null>(null);
+
+  // Load inventory items của sản phẩm đang xem detail
+  const { data: inventoryItems = [], isLoading: loadingInventory } = useQuery<any[]>({
+    queryKey: ["inventory-by-product", detailProductId],
+    queryFn: () => fetchApi(`/admin/inventory/product/${detailProductId}`),
+    enabled: !!detailProductId,
+    staleTime: 30_000,
+  });
+
+  const detailProduct = products.find((p) => String(p.id) === detailProductId);
 
   const fetchProducts = async () => {
     setLoadingProducts(true);
@@ -521,7 +533,7 @@ export default function AdminProducts() {
                   {variants.map((v) => (
                     <div
                       key={v.id}
-                      className="grid grid-cols-[120px_80px_1fr_36px] gap-2 items-center"
+                      className="grid grid-cols-[120px_80px_36px] gap-2 items-center"
                     >
                       <Input
                         value={v.size}
@@ -543,16 +555,6 @@ export default function AdminProducts() {
                         }
                         inputMode="numeric"
                         placeholder={t("adminProducts.form.stock")}
-                      />
-
-                      <Input
-                        value={v.conditionNote}
-                        onChange={(e) =>
-                          setVariants((prev) =>
-                            prev.map((x) => (x.id === v.id ? { ...x, conditionNote: e.target.value } : x))
-                          )
-                        }
-                        placeholder="Ghi chú tình trạng (tuỳ chọn)"
                       />
 
                       <Button
@@ -595,6 +597,15 @@ export default function AdminProducts() {
               style={{ animationDelay: `${i * 0.05}s` }}
             >
               <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-8 w-8"
+                  onClick={() => setDetailProductId(String(product.id) === detailProductId ? null : String(product.id))}
+                  title="Xem kho"
+                >
+                  <span className="text-xs">📦</span>
+                </Button>
                 <Button
                   size="icon"
                   variant="secondary"
@@ -640,6 +651,58 @@ export default function AdminProducts() {
         </div>
       ) : (
         <div className="text-sm text-muted-foreground">{t("adminProducts.empty")}</div>
+      )}
+
+      {/* ===== INVENTORY DETAIL PANEL ===== */}
+      {detailProductId && detailProduct && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setDetailProductId(null)}>
+          <div className="bg-background rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b">
+              <div>
+                <h3 className="font-medium text-lg">📦 Kho vận: {(detailProduct as any).name}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{inventoryItems.length} món đồ trong kho</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setDetailProductId(null)}>✕</Button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {loadingInventory ? (
+                <div className="text-sm text-muted-foreground">Đang tải...</div>
+              ) : inventoryItems.length === 0 ? (
+                <div className="text-sm text-muted-foreground">Chưa có món đồ nào trong kho.</div>
+              ) : (
+                Array.from(new Set(inventoryItems.map((i: any) => i.variant?.size))).map((size) => {
+                  const sizeItems = inventoryItems.filter((i: any) => i.variant?.size === size);
+                  return (
+                    <div key={size} className="border rounded-md p-3 space-y-2">
+                      <div className="text-sm font-medium">Size {size} — {sizeItems.length} món</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {sizeItems.map((item: any) => (
+                          <div key={item.id} className="flex items-center justify-between bg-muted/40 rounded px-3 py-2 text-xs">
+                            <div>
+                              <span className="font-mono font-medium">{item.barcode}</span>
+                              {item.conditionNote && <span className="text-muted-foreground ml-2">• {item.conditionNote}</span>}
+                            </div>
+                            <span className={`px-2 py-0.5 rounded-full font-medium ${
+                              item.conditionStatus === "available" ? "bg-green-100 text-green-800" :
+                              item.conditionStatus === "washing" ? "bg-cyan-100 text-cyan-800" :
+                              item.conditionStatus === "repairing" ? "bg-red-100 text-red-800" :
+                              item.conditionStatus === "retired" ? "bg-gray-100 text-gray-500" :
+                              item.conditionStatus === "rented" ? "bg-yellow-100 text-yellow-800" :
+                              "bg-indigo-100 text-indigo-800"
+                            }`}>
+                              {item.conditionStatus}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

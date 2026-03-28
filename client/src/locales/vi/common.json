@@ -105,7 +105,7 @@
             "outOfStock": "Hết hàng",
             "stock": "Tồn kho: {{stock}}"
         },
-        "selectedVariant": "Biến thể đã chọn: #{{id}} • Tồn: {{stock}}",
+        "selectedVariant": "• Tồn: {{stock}}",
         "features": {
             "freeShipping": "Miễn phí ship cho đơn từ 400.000đ",
             "damageProtection": "Bao gồm bảo vệ hư hỏng"
@@ -808,6 +808,20 @@
         "more": "khác",
         "retirementWarning": "{{count}} món đồ nên xem xét thanh lý (≥40 lần thuê)",
         "rentedCount": "Đã thuê {{count}}/{{max}} lần",
+        "condition": {
+            "good": "Tốt",
+            "normal": "Bình thường",
+            "old": "Cũ",
+            "damaged": "Hỏng nhiều"
+        },
+        "conditionModal": {
+            "title": "Tình trạng",
+            "condition": "Tình trạng",
+            "good": "Tốt",
+            "damaged": "Hỏng",
+            "extraNote": "Ghi chú thêm",
+            "placeholder": "VD: 90% - Còn mới, nhẹ phai màu"
+        },
         "status": {
             "available": "Sẵn sàng",
             "shipping": "Đang giao",

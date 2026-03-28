@@ -6,8 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { CartProvider } from "@/contexts/CartContext";
-import { FloatingZaloButton } from "@/components/FloatingZaloButton";
-import { FloatingFacebookButton } from "@/components/FloatingFacebookButton";
+import { FloatingSupportButton } from "@/components/FloatingSupportButton";
 
 // Pages
 import HomePage from "@/pages/HomePage";
@@ -81,8 +80,7 @@ const App = () => (
 
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <FloatingZaloButton />
-            < FloatingFacebookButton />
+            <FloatingSupportButton />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>
