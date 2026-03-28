@@ -16,11 +16,13 @@ import { ProductStatus } from "./enums/product-status.enum";
 import { ProductOccasion } from "./enums/product-occasion.enum";
 import { ProductSize } from "./enums/product-size.enum";
 import { CloudinaryService } from "../../common/cloudinary/cloudinary.service";
+import { InventoryService } from "../inventory/inventory.service";
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly cloudinaryService: CloudinaryService,
+    private readonly inventoryService: InventoryService,
 
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
@@ -168,7 +170,20 @@ export class ProductService {
         isActive: true,
       }),
     );
-    await this.variantRepo.save(variants);
+    const savedVariants = await this.variantRepo.save(variants);
+
+    // Tự động tạo inventory items cho từng variant theo stock
+    for (const sv of savedVariants) {
+      const variantDto = (dto as any).variants.find((v: any) => v.size === sv.size);
+      const stock = Number(variantDto?.stock ?? 0);
+      const conditionNote = variantDto?.conditionNote ?? undefined;
+      for (let i = 1; i <= stock; i++) {
+        const barcode = `WW-${saved.id}-${sv.size}-${String(i).padStart(3, "0")}`;
+        try {
+          await this.inventoryService.create({ variantId: sv.id, barcode, maxRentals: 50, conditionNote });
+        } catch { /* barcode trùng → bỏ qua */ }
+      }
+    }
 
     // image
     try {

@@ -34,6 +34,9 @@ export class ProductVariant {
   @Column({ name: "stock", type: "int", default: 0 })
   stock: number;
 
+  @Column({ name: "buffer_days", type: "int", default: 1 })
+  bufferDays: number;
+
   @Column({ name: "is_active", type: "tinyint", width: 1, default: 1 })
   isActive: boolean;
 

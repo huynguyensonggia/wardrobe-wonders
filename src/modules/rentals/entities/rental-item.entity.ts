@@ -9,6 +9,7 @@ import {
 import { Rental } from "./rental.entity";
 import { Product } from "../../products/entities/product.entity";
 import { ProductVariant } from "@/modules/products/entities/product-variant.entity";
+import { InventoryItem } from "../../inventory/entities/inventory-item.entity";
 
 @Entity("rental_items")
 @Index(["rental", "variantId"], { unique: true }) // tránh trùng same variant trong 1 rental
@@ -38,6 +39,14 @@ export class RentalItem {
   // ===== SNAPSHOT =====
   @Column({ name: "rent_price_per_day", type: "int" })
   rentPricePerDay: number;
+
+  // Track món đồ vật lý cụ thể (optional)
+  @Column({ name: "inventory_item_id", type: "int", nullable: true })
+  inventoryItemId?: number;
+
+  @ManyToOne(() => InventoryItem, { nullable: true, onDelete: "SET NULL" })
+  @JoinColumn({ name: "inventory_item_id" })
+  inventoryItem?: InventoryItem;
 
   @Column({ type: "int", default: 1 })
   quantity: number;

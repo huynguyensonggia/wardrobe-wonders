@@ -52,6 +52,10 @@ type CheckoutState =
     };
 
 type PaymentMethod = "CASH" | "COD" | "BANK_TRANSFER";
+type PickupType = "delivery" | "store";
+
+// Địa chỉ store
+const STORE_ADDRESS = "14 Doãn Uẩn, Quận Ngũ Hành Sơn, Đà Nẵng";
 
 function normalizePhone(s: string) {
   return String(s || "")
@@ -179,13 +183,17 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
+  const [pickupType, setPickupType] = useState<PickupType>("delivery");
 
+  // Khi nhận tại store, không cần validate địa chỉ
   const canSubmit =
     shipFullName.trim().length > 0 &&
     normalizePhone(shipPhone).length > 0 &&
-    street.trim().length > 0 &&
-    Boolean(district) &&
-    Boolean(ward);
+    (pickupType === "store" || (
+      street.trim().length > 0 &&
+      Boolean(district) &&
+      Boolean(ward)
+    ));
 
   // ================= CONFIRM =================
   const handleConfirm = async () => {
@@ -197,12 +205,18 @@ export default function CheckoutPage() {
 
       if (!fullName) return alert(t("checkout.alert.fullName"));
       if (!phone) return alert(t("checkout.alert.phone"));
-      if (!street.trim()) return alert(t("checkout.alert.street"));
-      if (!district) return alert(t("checkout.alert.district"));
-      if (!ward) return alert(t("checkout.alert.ward"));
-      if (!address) return alert(t("checkout.alert.address"));
+
+      // Chỉ validate địa chỉ khi chọn giao tận nơi
+      if (pickupType === "delivery") {
+        if (!street.trim()) return alert(t("checkout.alert.street"));
+        if (!district) return alert(t("checkout.alert.district"));
+        if (!ward) return alert(t("checkout.alert.ward"));
+        if (!address) return alert(t("checkout.alert.address"));
+      }
 
       setSubmitting(true);
+
+      const finalAddress = pickupType === "store" ? STORE_ADDRESS : address;
 
       for (const g of groups) {
         await rentalsApi.create({
@@ -216,10 +230,11 @@ export default function CheckoutPage() {
           note: t("checkout.order.note"),
           shipFullName: fullName,
           shipPhone: phone,
-          shipAddress: address,
+          shipAddress: finalAddress,
           shipNote: note || undefined,
           paymentMethod,
-        });
+          pickupType,
+        } as any);
       }
 
       if (state.source === "cart") clear();
@@ -278,13 +293,13 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="text-sm text-muted-foreground">
-                        ${it.rentPricePerDay}/{t("checkout.summary.perDay")} •{" "}
+                        {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/{t("checkout.summary.perDay")} •{" "}
                         {t("checkout.summary.days", { days: it.days })} •{" "}
                         {t("checkout.summary.qty")} {it.quantity}
                       </div>
 
                       <div className="text-sm font-medium">
-                        {t("checkout.summary.line")}: ${lineTotal}
+                        {t("checkout.summary.line")}: {lineTotal.toLocaleString("vi-VN")}đ
                       </div>
                     </div>
                   </div>
@@ -295,7 +310,7 @@ export default function CheckoutPage() {
                 <span className="text-muted-foreground">
                   {t("checkout.summary.groupTotal")}
                 </span>
-                <span className="font-medium">${groupTotal}</span>
+                <span className="font-medium">{groupTotal.toLocaleString("vi-VN")}đ</span>
               </div>
             </div>
           );
@@ -305,18 +320,18 @@ export default function CheckoutPage() {
           <div className="text-sm space-y-1">
             <div>
               {t("checkout.summary.total")}:{" "}
-              <span className="font-medium">${total}</span>
+              <span className="font-medium">{total.toLocaleString("vi-VN")}đ</span>
             </div>
             {totalDeposit > 0 && (
               <div className="text-muted-foreground">
                 {t("checkout.summary.deposit")}:{" "}
-                <span className="font-medium text-foreground">${totalDeposit}</span>
+                <span className="font-medium text-foreground">{totalDeposit.toLocaleString("vi-VN")}đ</span>
               </div>
             )}
             {totalDeposit > 0 && (
               <div className="font-medium">
                 {t("checkout.summary.grandTotal")}:{" "}
-                <span className="text-primary">${total + totalDeposit}</span>
+                <span className="text-primary">{(total + totalDeposit).toLocaleString("vi-VN")}đ</span>
               </div>
             )}
           </div>
@@ -332,6 +347,35 @@ export default function CheckoutPage() {
       {/* RIGHT: Shipping */}
       <div className="border rounded-lg p-5 space-y-4">
         <h2 className="text-xl font-medium">{t("checkout.shipping.title")}</h2>
+
+        {/* PICKUP TYPE */}
+        <div className="grid gap-2">
+          <Label>{t("checkout.pickup.label")}</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {(["delivery", "store"] as PickupType[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPickupType(p)}
+                className={`border rounded-lg p-3 text-sm text-left transition-all ${
+                  pickupType === p
+                    ? "border-primary bg-primary/5 font-medium"
+                    : "border-border hover:border-accent"
+                }`}
+              >
+                <div className="font-medium">{t(`checkout.pickup.${p}.title`)}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {t(`checkout.pickup.${p}.desc`)}
+                </div>
+              </button>
+            ))}
+          </div>
+          {pickupType === "store" && (
+            <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+              📍 {STORE_ADDRESS}
+            </div>
+          )}
+        </div>
 
         <div className="grid gap-2">
           <Label>{t("checkout.shipping.fullName")}</Label>
@@ -350,57 +394,6 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid gap-2">
-          <Label>{t("checkout.shipping.street")}</Label>
-          <Input value={street} onChange={(e) => setStreet(e.target.value)} />
-        </div>
-
-        <div className="grid gap-2">
-          <Label>{t("checkout.shipping.district")}</Label>
-          <select
-            className="h-10 rounded-md border px-3 text-sm"
-            value={district}
-            onChange={(e) => {
-              const d = e.target.value as DaNangDistrict | "";
-              setDistrict(d);
-              setWard("");
-            }}
-          >
-            <option value="">{t("checkout.shipping.districtPlaceholder")}</option>
-            {DA_NANG_DISTRICTS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid gap-2">
-          <Label>{t("checkout.shipping.ward")}</Label>
-          <select
-            className="h-10 rounded-md border px-3 text-sm"
-            value={ward}
-            onChange={(e) => setWard(e.target.value)}
-            disabled={!district}
-          >
-            <option value="">
-              {district
-                ? t("checkout.shipping.wardPlaceholder")
-                : t("checkout.shipping.wardNeedDistrict")}
-            </option>
-            {wardOptions.map((w) => (
-              <option key={w} value={w}>
-                {w}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid gap-2">
-          <Label>{t("checkout.shipping.combinedAddress")}</Label>
-          <Input value={shipAddress} readOnly />
-        </div>
-
-        <div className="grid gap-2">
           <Label>{t("checkout.shipping.note")}</Label>
           <Input
             value={shipNote}
@@ -408,6 +401,56 @@ export default function CheckoutPage() {
             placeholder={t("checkout.shipping.notePlaceholder")}
           />
         </div>
+
+        {/* Form địa chỉ - chỉ hiện khi chọn giao tận nơi */}
+        {pickupType === "delivery" && (
+          <>
+            <div className="grid gap-2">
+              <Label>{t("checkout.shipping.street")}</Label>
+              <Input value={street} onChange={(e) => setStreet(e.target.value)} />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>{t("checkout.shipping.district")}</Label>
+              <select
+                className="h-10 rounded-md border px-3 text-sm"
+                value={district}
+                onChange={(e) => {
+                  const d = e.target.value as DaNangDistrict | "";
+                  setDistrict(d);
+                  setWard("");
+                }}
+              >
+                <option value="">{t("checkout.shipping.districtPlaceholder")}</option>
+                {DA_NANG_DISTRICTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>{t("checkout.shipping.ward")}</Label>
+              <select
+                className="h-10 rounded-md border px-3 text-sm"
+                value={ward}
+                onChange={(e) => setWard(e.target.value)}
+                disabled={!district}
+              >
+                <option value="">
+                  {district ? t("checkout.shipping.wardPlaceholder") : t("checkout.shipping.wardNeedDistrict")}
+                </option>
+                {wardOptions.map((w) => (
+                  <option key={w} value={w}>{w}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>{t("checkout.shipping.combinedAddress")}</Label>
+              <Input value={shipAddress} readOnly />
+            </div>
+          </>
+        )}
 
         {/* PAYMENT METHOD */}
         <div className="grid gap-2">
@@ -434,7 +477,7 @@ export default function CheckoutPage() {
           <div className="rounded-md bg-muted px-4 py-3 text-sm space-y-1">
             <div className="font-medium">{t("checkout.payment.depositNote")}</div>
             <div className="text-muted-foreground">
-              {t("checkout.payment.depositAmount")}: <span className="font-medium text-foreground">${totalDeposit}</span>
+              {t("checkout.payment.depositAmount")}: <span className="font-medium text-foreground">{totalDeposit.toLocaleString("vi-VN")}đ</span>
             </div>
             <div className="text-muted-foreground text-xs">
               {t("checkout.payment.depositHint")}

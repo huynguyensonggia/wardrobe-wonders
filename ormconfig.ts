@@ -1,12 +1,12 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import * as path from 'path';
 
-const isProd = process.env.NODE_ENV === 'production';
+// Load .env khi chạy local (Render tự inject env vars nên không cần)
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
-console.log('[ormconfig] NODE_ENV =', process.env.NODE_ENV);
-console.log('[ormconfig] DB_HOST =', process.env.DB_HOST);
-console.log('[ormconfig] DB_PORT =', process.env.DB_PORT);
-console.log('[ormconfig] DB_NAME =', process.env.DB_NAME);
+const isProd = process.env.NODE_ENV === 'production';
 
 export const databaseConfig: DataSourceOptions = {
   type: 'mysql',

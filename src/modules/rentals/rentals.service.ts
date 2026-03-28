@@ -13,12 +13,15 @@ import {
 
 import { Rental } from "./entities/rental.entity";
 import { RentalItem } from "./entities/rental-item.entity";
+import { RentalSurcharge, SurchargeType } from "./entities/rental-surcharge.entity";
 import { ProductVariant } from "../products/entities/product-variant.entity";
 
 import { CreateRentalDto } from "./dto/create-rental.dto";
 import { UpdateRentalDto } from "./dto/update-rental.dto";
 import { UpdateShippingDto } from "./dto/update-shipping.dto";
+import { AddSurchargeDto } from "./dto/add-surcharge.dto";
 import { RentalStatus } from "./enums/rental-status.enum";
+import { InventoryService } from "../inventory/inventory.service";
 
 import { User } from "../users/entities/user.entity";
 import { Product } from "../products/entities/product.entity";
@@ -64,7 +67,49 @@ export class RentalsService {
 
     @InjectRepository(Payment)
     private readonly paymentsRepo: Repository<Payment>,
+
+    @InjectRepository(RentalSurcharge)
+    private readonly surchargesRepo: Repository<RentalSurcharge>,
+
+    private readonly inventoryService: InventoryService,
   ) { }
+
+  // =========================
+  // HELPER: Check overlap ngày thuê theo thời gian
+  // =========================
+  private async checkDateOverlap(
+    variantId: number,
+    startDate: Date,
+    endDate: Date,
+    excludeRentalId?: number,
+  ) {
+    // Lấy buffer_days của variant
+    const variant = await this.variantsRepo.findOne({ where: { id: variantId } });
+    const bufferDays = variant?.bufferDays ?? 1;
+
+    // endDate thực tế cần check = endDate + bufferDays
+    const bufferedEnd = new Date(endDate);
+    bufferedEnd.setDate(bufferedEnd.getDate() + bufferDays);
+
+    // Tìm các rental_items có cùng variantId và overlap ngày
+    // Overlap khi: item.rental.start_date <= bufferedEnd AND item.rental.end_date >= startDate
+    const qb = this.rentalItemsRepo
+      .createQueryBuilder("ri")
+      .innerJoin("ri.rental", "r")
+      .where("ri.variant_id = :variantId", { variantId })
+      .andWhere("r.status IN (:...statuses)", {
+        statuses: [RentalStatus.PENDING, RentalStatus.SHIPPING, RentalStatus.ACTIVE],
+      })
+      .andWhere("r.start_date <= :bufferedEnd", { bufferedEnd })
+      .andWhere("r.end_date >= :startDate", { startDate });
+
+    if (excludeRentalId) {
+      qb.andWhere("r.id != :excludeRentalId", { excludeRentalId });
+    }
+
+    const conflict = await qb.getOne();
+    return conflict;
+  }
 
   // =========================
   // CREATE RENTAL (USER)
@@ -122,7 +167,7 @@ export class RentalsService {
     let totalPrice = 0;
     let totalDeposit = 0;
 
-    const preparedItems = dto.items.map((it: any) => {
+    const preparedItems = await Promise.all(dto.items.map(async (it: any) => {
       const variant = variantById.get(Number(it.variantId))!;
       const product = variant.product;
 
@@ -154,14 +199,26 @@ export class RentalsService {
         );
       }
 
+      // ✅ check overlap ngày thuê
+      const conflict = await this.checkDateOverlap(variant.id, start, end);
+      if (conflict) {
+        throw new BadRequestException(
+          `Sản phẩm "${product.name}" size ${variant.size} đã được đặt trong khoảng thời gian này. Vui lòng chọn ngày khác.`,
+        );
+      }
+
       const days = totalDays;
       const subtotal = rentPricePerDay * quantity * days;
+      const depositAmt = (product as any).deposit ?? 0;
 
-      totalPrice += subtotal;
-      totalDeposit += deposit * quantity;
+      return { product, variant, rentPricePerDay, quantity, days, subtotal, deposit: depositAmt };
+    }));
 
-      return { product, variant, rentPricePerDay, quantity, days, subtotal };
-    });
+    // Tính tổng sau khi có tất cả items
+    for (const item of preparedItems) {
+      totalPrice += item.subtotal;
+      totalDeposit += item.deposit * item.quantity;
+    }
 
     const rentalData: DeepPartial<Rental> = {
       user,
@@ -172,7 +229,7 @@ export class RentalsService {
       totalDeposit,
       status: RentalStatus.PENDING,
       note: dto.note?.trim() || undefined,
-
+      pickupType: dto.pickupType ?? ("delivery" as any),
       shipFullName,
       shipPhone,
       shipAddress,
@@ -280,7 +337,10 @@ export class RentalsService {
   // Cộng lại stock khi ACTIVE -> COMPLETED / CANCELLED / REJECTED
   // =========================
   async update(id: number, dto: UpdateRentalDto) {
-    return this.dataSource.transaction(async (manager) => {
+    let nextStatus: RentalStatus | undefined;
+    let prevStatus: RentalStatus | undefined;
+
+    const result = await this.dataSource.transaction(async (manager) => {
       const rentalsRepo = manager.getRepository(Rental);
       const itemsRepo = manager.getRepository(RentalItem);
       const variantsRepo = manager.getRepository(ProductVariant);
@@ -288,8 +348,8 @@ export class RentalsService {
       const rental = await rentalsRepo.findOne({ where: { id } });
       if (!rental) throw new NotFoundException("Rental not found");
 
-      const prevStatus = rental.status;
-      const nextStatus = dto.status ?? prevStatus;
+      prevStatus = rental.status;
+      nextStatus = dto.status ?? rental.status;
 
       const d: any = dto as any;
 
@@ -386,6 +446,18 @@ export class RentalsService {
         relations: ["user", "items", "items.product", "items.variant", "payments"],
       });
     });
+
+    // Sync inventory NGOÀI transaction để tránh deadlock
+    if (nextStatus && nextStatus !== prevStatus) {
+      const allItems = await this.rentalItemsRepo.find({ where: { rental: { id } as any } });
+      await Promise.all(
+        allItems.map((ri) =>
+          this.inventoryService.syncFromRental(ri.id, ri.variantId, nextStatus!).catch(() => {})
+        )
+      );
+    }
+
+    return result;
   }
 
   // =========================
@@ -433,6 +505,56 @@ export class RentalsService {
       where: { id: saved.id },
       relations: ["user", "items", "items.product", "items.variant", "payments"],
     });
+  }
+
+  // =========================
+  // ADMIN: ADD SURCHARGE (phí phát sinh)
+  // =========================
+  async addSurcharge(rentalId: number, dto: AddSurchargeDto) {
+    const rental = await this.rentalsRepo.findOne({ where: { id: rentalId } });
+    if (!rental) throw new NotFoundException("Rental not found");
+
+    const surcharge = this.surchargesRepo.create({
+      rental,
+      type: dto.type,
+      amount: dto.amount,
+      note: dto.note,
+    });
+
+    await this.surchargesRepo.save(surcharge);
+
+    // Cộng thêm vào totalPrice
+    rental.totalPrice += dto.amount;
+    await this.rentalsRepo.save(rental);
+
+    return this.rentalsRepo.findOne({
+      where: { id: rentalId },
+      relations: ["user", "items", "items.product", "items.variant", "payments", "surcharges"],
+    });
+  }
+
+  // =========================
+  // ADMIN: SET ACTUAL RETURN DATE
+  // =========================
+  async setActualReturnDate(rentalId: number, actualReturnDate: string) {
+    const rental = await this.rentalsRepo.findOne({ where: { id: rentalId } });
+    if (!rental) throw new NotFoundException("Rental not found");
+
+    const date = new Date(actualReturnDate);
+    if (isNaN(date.getTime())) throw new BadRequestException("Invalid date");
+
+    rental.actualReturnDate = date;
+    return this.rentalsRepo.save(rental);
+  }
+
+  // =========================
+  // ADMIN: CHECK AVAILABILITY (kiểm tra ngày thuê có trống không)
+  // =========================
+  async checkAvailability(variantId: number, startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const conflict = await this.checkDateOverlap(variantId, start, end);
+    return { available: !conflict };
   }
 
   // =========================
@@ -522,11 +644,10 @@ export class RentalsService {
     }
 
     const extraDays = daysBetweenInclusive(
-      new Date(currentEnd.getTime() + 86400000), // ngày tiếp theo sau endDate cũ
+      new Date(currentEnd.getTime() + 86400000),
       end,
     );
 
-    // Tính thêm tiền thuê cho số ngày gia hạn
     const extraPrice = rental.items.reduce((sum, it) => {
       return sum + (it.rentPricePerDay ?? 0) * it.quantity * extraDays;
     }, 0);
@@ -535,6 +656,26 @@ export class RentalsService {
     rental.totalDays = daysBetweenInclusive(new Date(rental.startDate), end);
     rental.totalPrice = rental.totalPrice + extraPrice;
 
-    return this.rentalsRepo.save(rental);
+    const saved = await this.rentalsRepo.save(rental);
+
+    // Tạo payment record cho phần gia hạn
+    if (extraPrice > 0) {
+      const user = await this.usersRepo.findOne({ where: { id: userId } });
+      await this.paymentsRepo.save(
+        this.paymentsRepo.create({
+          rental: saved,
+          user: user!,
+          amount: extraPrice,
+          method: PaymentMethod.CASH,
+          status: PaymentStatus.PENDING,
+          transactionCode: `EXT-${id}-${Date.now()}`,
+        } as DeepPartial<Payment>),
+      );
+    }
+
+    return this.rentalsRepo.findOne({
+      where: { id: saved.id },
+      relations: ["items", "items.product", "items.variant", "payments"],
+    });
   }
 }

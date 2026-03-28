@@ -12,13 +12,13 @@
         "shippingReturns": "配送と返品",
         "faq": "よくある質問",
         "company": "会社情報",
-        "about": "Wardrobe Wonders について",
+        "about": "AI Closet について",
         "sustainability": "サステナビリティ",
         "careers": "採用情報",
         "contact": "お問い合わせ",
         "privacy": "プライバシーポリシー",
         "terms": "利用規約",
-        "copyright": "© {{year}} Wardrobe Wonders. All rights reserved."
+        "copyright": "© {{year}} AI Closet. All rights reserved."
     },
     "language": {
         "label": "言語",
@@ -107,7 +107,7 @@
         },
         "selectedVariant": "選択したバリアント: #{{id}} • 在庫: {{stock}}",
         "features": {
-            "freeShipping": "$100以上で送料無料",
+            "freeShipping": "400.000đ以上で送料無料",
             "damageProtection": "破損補償込み"
         },
         "alerts": {
@@ -126,7 +126,7 @@
         },
         "hero": {
             "imageAlt": "エレガントなファッション",
-            "titleLine1": "ラグジュアリーをレンタル、",
+            "titleLine1": "すぐにレンタルできる、",
             "titleHighlight": "瞬間を自分のものに",
             "subtitle": "所有せずにデザイナーファッションを楽しもう。サステナブルで手頃、そしていつもスタイリッシュ。",
             "ctaExplore": "コレクションを見る",
@@ -139,7 +139,7 @@
             },
             "delivery": {
                 "title": "送料無料",
-                "desc": "$100以上の注文で送料無料"
+                "desc": "400.000đ以上の注文で送料無料"
             },
             "insured": {
                 "title": "補償付き",
@@ -166,7 +166,7 @@
             "button": "今すぐ試す"
         },
         "testimonial": {
-            "quote": "“Wardrobe Wondersのおかげで服選びが変わりました。AI試着でレンタル前にフィット感を確認できるので、イベントごとに最高のコーデを選べます。”",
+            "quote": "“AI Closetのおかげで服選びが変わりました。AI試着でレンタル前にフィット感を確認できるので、イベントごとに最高のコーデを選べます。”",
             "name": "Sarah Mitchell",
             "title": "ファッションエディター, Vogue"
         }
@@ -257,7 +257,7 @@
     "auth": {
         "register": {
             "backHome": "ホームに戻る",
-            "title": "Wardrobe Wonders に参加",
+            "title": "AI Closet に参加",
             "subtitle": "アカウントを作成してデザイナーファッションのレンタルを始めましょう。",
             "fullName": {
                 "label": "氏名",
@@ -293,7 +293,7 @@
                     "desc": "利用規約に同意してください。"
                 },
                 "success": {
-                    "title": "Wardrobe Wonders へようこそ！",
+                    "title": "AI Closet へようこそ！",
                     "desc": "アカウントが作成されました。"
                 },
                 "error": {
@@ -329,7 +329,7 @@
             "createOne": "作成する",
             "demo": {
                 "title": "デモ認証情報",
-                "body": "User: user@demo.com / demo123\nAdmin: admin@demo.com / admin123"
+                "body": "User: user@smartdress.com / 123456\nAdmin: admin@smartdress.com / admin123"
             },
             "toast": {
                 "success": {
@@ -413,6 +413,17 @@
         "order": {
             "note": "チェックアウトから作成"
         },
+        "pickup": {
+            "label": "受け取り方法",
+            "delivery": {
+                "title": "宅配",
+                "desc": "ご指定の住所にお届けします"
+            },
+            "store": {
+                "title": "店舗受け取り",
+                "desc": "店舗に直接お越しください"
+            }
+        },
         "payment": {
             "method": "お支払い方法",
             "methods": {
@@ -449,7 +460,8 @@
             "users": "ユーザー",
             "products": "商品",
             "categories": "カテゴリー",
-            "rentals": "レンタル"
+            "rentals": "レンタル",
+            "inventory": "在庫管理"
         }
     },
     "common": {
@@ -480,10 +492,11 @@
             "emptyDesc": "完了したレンタルはレンタル履歴に保存されます。",
             "noItems": "このレンタルには商品がありません。"
         },
-        "itemLine": "数量: {{qty}} • 日数: {{days}} • /日: ${{pricePerDay}}",
+        "itemLine": "数量: {{qty}} • 日数: {{days}} • /日: {{pricePerDay}}đ",
         "subtotal": "小計",
         "total": "合計",
         "deposit": "デポジット",
+        "extended": "延長済み",
         "actions": {
             "extend": "延長",
             "cancel": "キャンセル"
@@ -540,14 +553,22 @@
             "reject": "却下",
             "customerReceived": "受け取り完了",
             "complete": "完了",
-            "refundDeposit": "デポジット返金"
+            "refundDeposit": "デポジット返金",
+            "depositRefunded": "返金済み"
         },
         "detail": {
             "rental": "レンタル",
             "status": "ステータス",
             "shipping": "配送",
             "items": "商品",
-            "note": "メモ"
+            "note": "メモ",
+            "surcharges": "追加料金",
+            "payments": "支払い内訳"
+        },
+        "payment": {
+            "rent": "レンタル料",
+            "deposit": "デポジット",
+            "extension": "延長料金"
         },
         "shipping": {
             "edit": "配送を編集",
@@ -572,7 +593,21 @@
         "error": "エラー",
         "edit": "編集",
         "delete": "削除",
-        "cancel": "キャンセル"
+        "cancel": "キャンセル",
+        "surcharge": {
+            "add": "追加料金を追加",
+            "amount": "金額",
+            "note": "メモ（任意）",
+            "success": "追加料金を追加しました",
+            "error": "追加料金の追加に失敗しました",
+            "types": {
+                "late_return": "延滞",
+                "damage": "破損",
+                "cleaning": "特別クリーニング",
+                "express_delivery": "速達配送",
+                "other": "その他"
+            }
+        }
     },
     "adminProducts": {
         "header": {
@@ -758,6 +793,42 @@
             "deleteFailed": {
                 "title": "削除に失敗しました"
             }
+        }
+    },
+    "adminInventory": {
+        "title": "在庫管理",
+        "itemCount": "点",
+        "addItem": "アイテム追加",
+        "saving": "保存中...",
+        "loading": "読み込み中...",
+        "empty": "アイテムがありません。",
+        "all": "すべて",
+        "searchBarcode": "バーコードで検索...",
+        "nearLimit": "上限近い",
+        "times": "回",
+        "more": "他",
+        "retirementWarning": "{{count}}点のアイテムが廃棄を検討すべきです（≥40回レンタル）",
+        "rentedCount": "レンタル {{count}}/{{max}} 回",
+        "status": {
+            "available": "利用可能",
+            "shipping": "配送中",
+            "rented": "レンタル中",
+            "returned": "返却済み",
+            "washing": "洗濯中",
+            "repairing": "修理中",
+            "retired": "廃棄済み"
+        },
+        "form": {
+            "title": "在庫にアイテムを追加",
+            "product": "商品",
+            "selectProduct": "商品を選択",
+            "size": "サイズ",
+            "selectSize": "サイズを選択",
+            "stock": "在庫",
+            "barcode": "バーコード",
+            "maxRentals": "最大レンタル回数",
+            "note": "状態メモ",
+            "notePlaceholder": "任意"
         }
     },
     "adminUsers": {

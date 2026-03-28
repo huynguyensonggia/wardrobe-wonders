@@ -186,7 +186,7 @@ export default function RentalHistory() {
                                   {t("rentals.itemLine", {
                                     qty: it.quantity,
                                     days: it.days,
-                                    pricePerDay: Number(it.rentPricePerDay || 0),
+                                    pricePerDay: Number(it.rentPricePerDay || 0).toLocaleString("vi-VN"),
                                   })}
                                 </div>
                               </div>
@@ -194,7 +194,7 @@ export default function RentalHistory() {
                               <div className="text-sm">
                                 {t("rentals.subtotal")}:{" "}
                                 <span className="font-medium">
-                                  ${Number(it.subtotal || 0)}
+                                  {Number(it.subtotal || 0).toLocaleString("vi-VN")}đ
                                 </span>
                               </div>
                             </div>
@@ -210,13 +210,12 @@ export default function RentalHistory() {
                   <div className="text-sm">
                     {t("rentals.total")}:{" "}
                     <span className="font-medium">
-                      ${Number(r.totalPrice || 0)}
+                      {Number(r.totalPrice || 0).toLocaleString("vi-VN")}đ
                     </span>
 
                     {"totalDeposit" in r ? (
                       <div className="text-xs text-muted-foreground">
-                        {t("rentals.deposit")}: $
-                        {Number((r as any).totalDeposit || 0)}
+                        {t("rentals.deposit")}: {Number((r as any).totalDeposit || 0).toLocaleString("vi-VN")}đ
                       </div>
                     ) : null}
                   </div>

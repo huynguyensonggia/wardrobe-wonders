@@ -7,13 +7,13 @@ import { TryonModule } from "./modules/tryon/tryon.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { UsersModule } from "./modules/users/users.module";
 import { AdminModule } from "./modules/admin/admin.module";
-import { RentalsModule } from "./modules/rentals/rentals.module"
+import { RentalsModule } from "./modules/rentals/rentals.module";
+import { InventoryModule } from "./modules/inventory/inventory.module";
 
 @Module({
   imports: [
     EnvConfig(),
     DatabaseConfig(),
-
     ProductsModule,
     CategoriesModule,
     TryonModule,
@@ -21,6 +21,7 @@ import { RentalsModule } from "./modules/rentals/rentals.module"
     UsersModule,
     AdminModule,
     RentalsModule,
+    InventoryModule,
   ],
   controllers: [],
   providers: [],

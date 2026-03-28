@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ArrowLeft,
   Users,
+  Warehouse,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ export default function AdminDashboard() {
     { to: "/admin/products", icon: Package, label: t("admin.sidebar.products") },
     { to: "/admin/categories", icon: FolderOpen, label: t("admin.sidebar.categories") },
     { to: "/admin/rentals", icon: ShoppingBag, label: t("admin.sidebar.rentals") },
+    { to: "/admin/inventory", icon: Warehouse, label: t("admin.sidebar.inventory") },
   ];
 
   if (isLoading) {

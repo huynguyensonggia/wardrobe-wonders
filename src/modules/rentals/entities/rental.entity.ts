@@ -14,7 +14,13 @@ import {
 import { User } from "../../users/entities/user.entity";
 import { RentalItem } from "./rental-item.entity";
 import { Payment } from "../../payments/entities/payment.entity";
+import { RentalSurcharge } from "./rental-surcharge.entity";
 import { RentalStatus } from "../enums/rental-status.enum";
+
+export enum PickupType {
+  DELIVERY = "delivery",
+  STORE = "store",
+}
 
 @Entity("rentals")
 export class Rental {
@@ -47,6 +53,9 @@ export class Rental {
 
   @OneToMany(() => Payment, (payment) => payment.rental, { cascade: true })
   payments: Payment[];
+
+  @OneToMany(() => RentalSurcharge, (s) => s.rental, { cascade: true })
+  surcharges: RentalSurcharge[];
 
   // ===== BUSINESS =====
   @Column({ type: "date", name: "start_date" })
@@ -85,6 +94,12 @@ export class Rental {
 
   @Column({ name: "ship_note", type: "varchar", length: 255, nullable: true })
   shipNote?: string;
+
+  @Column({ name: "pickup_type", type: "enum", enum: PickupType, default: PickupType.DELIVERY })
+  pickupType: PickupType;
+
+  @Column({ name: "actual_return_date", type: "date", nullable: true })
+  actualReturnDate?: Date;
 
   // ===== TIMESTAMPS =====
   @CreateDateColumn({ name: "created_at" })

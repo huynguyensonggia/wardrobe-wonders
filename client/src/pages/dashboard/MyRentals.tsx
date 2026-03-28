@@ -25,12 +25,15 @@ type RentalItem = {
 
 type Rental = {
   id: number | string;
+  rentalCode?: string;
   startDate: string;
   endDate: string;
   status: RentalStatus | string;
   totalPrice: number;
   totalDeposit: number;
+  totalDays: number;
   items?: RentalItem[];
+  payments?: { id: number; amount: number; transactionCode?: string; status: string }[];
 };
 
 function normalizeStatus(s: Rental["status"]): RentalStatus | string {
@@ -193,7 +196,6 @@ export default function MyRentals() {
         {currentRentals.map((r) => {
           const rentalId = String(r.id);
           const st = normalizeStatus(r.status);
-          const isCancelled = st === RentalStatus.CANCELLED;
           const items = r.items ?? [];
 
           return (
@@ -251,7 +253,7 @@ export default function MyRentals() {
                                   {t("rentals.itemLine", {
                                     qty: it.quantity,
                                     days: it.days,
-                                    pricePerDay: Number(it.rentPricePerDay || 0),
+                                    pricePerDay: Number(it.rentPricePerDay || 0).toLocaleString("vi-VN"),
                                   })}
                                 </div>
                               </div>
@@ -259,7 +261,7 @@ export default function MyRentals() {
                               <div className="text-sm">
                                 {t("rentals.subtotal")}:{" "}
                                 <span className="font-medium">
-                                  ${Number(it.subtotal || 0)}
+                                  {Number(it.subtotal || 0).toLocaleString("vi-VN")}đ
                                 </span>
                               </div>
                             </div>
@@ -271,12 +273,24 @@ export default function MyRentals() {
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <div className="text-sm">
-                    {t("rentals.total")}:{" "}
-                    <span className="font-medium">${Number(r.totalPrice || 0)}</span>
-                    <div className="text-xs text-muted-foreground">
-                      {t("rentals.deposit")}: ${Number(r.totalDeposit || 0)}
+                  <div className="text-sm space-y-0.5">
+                    <div>
+                      {t("rentals.total")}:{" "}
+                      <span className="font-medium">{Number(r.totalPrice || 0).toLocaleString("vi-VN")}đ</span>
                     </div>
+                    <div className="text-xs text-muted-foreground">
+                      {t("rentals.deposit")}: {Number(r.totalDeposit || 0).toLocaleString("vi-VN")}đ
+                    </div>
+                    {/* Hiển thị nếu có gia hạn */}
+                    {(r.payments ?? []).some((p) => p.transactionCode?.startsWith("EXT-")) && (
+                      <div className="text-xs text-blue-600">
+                        📅 {t("rentals.extended")}: {String(r.endDate).slice(0, 10)} •{" "}
+                        {(r.payments ?? [])
+                          .filter((p) => p.transactionCode?.startsWith("EXT-"))
+                          .reduce((s, p) => s + p.amount, 0)
+                          .toLocaleString("vi-VN")}đ
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2">
@@ -292,15 +306,17 @@ export default function MyRentals() {
                       {t("rentals.actions.extend")}
                     </Button>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive"
-                      disabled={isCancelled}
-                      onClick={() => onCancel(rentalId)}
-                    >
-                      {t("rentals.actions.cancel")}
-                    </Button>
+                    {/* Chỉ hiện nút Cancel khi PENDING */}
+                    {normalizeStatus(r.status) === RentalStatus.PENDING && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive"
+                        onClick={() => onCancel(rentalId)}
+                      >
+                        {t("rentals.actions.cancel")}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>

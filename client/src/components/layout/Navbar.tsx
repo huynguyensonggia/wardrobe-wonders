@@ -56,7 +56,6 @@ const NAV_COLLECTIONS = [
   {
     key: "traditional",
     items: [
-      { key: "aoDaiCaoCap", occasion: null, categorySlug: "ao-dai-cao-cap" },
       { key: "aoDai", occasion: null, categorySlug: "ao-dai" },
     ],
     occasions: [],
@@ -87,7 +86,7 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-display text-2xl lg:text-3xl font-semibold tracking-tight">
-              WARDROBE WONDERS
+              AI CLOSET
             </span>
           </Link>
 

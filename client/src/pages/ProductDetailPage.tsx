@@ -157,7 +157,7 @@ export default function ProductDetailPage() {
   }, [product, selectedSize, selectedColor]);
 
   const totalPrice = useMemo(() => {
-    const pricePerDay = Number((product as any)?.pricePerDay ?? 0);
+    const pricePerDay = Number((product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0);
     return rentalDays * pricePerDay;
   }, [product, rentalDays]);
 
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
         size: selectedVariant!.size,
         name: displayName,
         imageUrl,
-        rentPricePerDay: Number((product as any).pricePerDay ?? 0),
+        rentPricePerDay: Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0),
         startDate,
         endDate,
         days: rentalDays,
@@ -264,7 +264,7 @@ export default function ProductDetailPage() {
           size: selectedVariant!.size,
           name: displayName,
           imageUrl,
-          rentPricePerDay: Number((product as any).pricePerDay ?? 0),
+          rentPricePerDay: Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0),
           startDate,
           endDate,
           days: rentalDays,
@@ -380,10 +380,10 @@ export default function ProductDetailPage() {
 
             <div className="flex items-baseline gap-3 mb-6">
               <span className="text-2xl font-medium">
-                ${Number((product as any).pricePerDay)}{t("productDetail.perDay")}
+                {Number((product as any).pricePerDay).toLocaleString("vi-VN")}đ{t("productDetail.perDay")}
               </span>
               <span className="text-muted-foreground">
-                ${Number((product as any).deposit)} {t("productDetail.deposit")}
+                {Number((product as any).deposit).toLocaleString("vi-VN")}đ {t("productDetail.deposit")}
               </span>
             </div>
 
@@ -569,20 +569,20 @@ export default function ProductDetailPage() {
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
-                    ${Number((product as any).pricePerDay)} × {rentalDays}{" "}
+                    {Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0).toLocaleString("vi-VN")}đ × {rentalDays}{" "}
                     {t("productDetail.days")}
                   </span>
-                  <span>${totalPrice}</span>
+                  <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>{t("productDetail.refundableDeposit")}</span>
-                  <span>${Number((product as any).deposit)}</span>
+                  <span>{Number((product as any).deposit).toLocaleString("vi-VN")}đ</span>
                 </div>
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
                     <span>{t("productDetail.totalDueToday")}</span>
                     <span>
-                      ${totalPrice + Number((product as any).deposit ?? 0)}
+                      {(totalPrice + Number((product as any).deposit ?? 0)).toLocaleString("vi-VN")}đ
                     </span>
                   </div>
                 </div>

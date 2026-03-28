@@ -81,11 +81,11 @@ export default function CartPage() {
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      ${it.rentPricePerDay}/{t("cart.perDay")}
+                      {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/{t("cart.perDay")}
                     </div>
 
                     <div className="text-sm font-medium mt-1">
-                      {t("cart.lineTotal")}: ${lineTotal}
+                      {t("cart.lineTotal")}: {lineTotal.toLocaleString("vi-VN")}đ
                     </div>
                   </div>
 
@@ -151,7 +151,7 @@ export default function CartPage() {
 
         <div className="flex items-center gap-4">
           <div className="text-sm">
-            {t("cart.total")}: <span className="font-medium">${total}</span>
+            {t("cart.total")}: <span className="font-medium">{total.toLocaleString("vi-VN")}đ</span>
           </div>
           <Button onClick={handleCheckout}>{t("cart.checkout")}</Button>
         </div>

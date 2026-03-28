@@ -41,9 +41,10 @@ type ProductOccasion = "party" | "wedding" | "casual";
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 
 type VariantForm = {
-  id: string; // ✅ stable key for React list
+  id: string;
   size: (typeof SIZES)[number];
   stock: string;
+  conditionNote: string;
 };
 /* ================================= */
 
@@ -145,7 +146,7 @@ export default function AdminProducts() {
   const [color, setColor] = useState("unknown");
 
   const [variants, setVariants] = useState<VariantForm[]>([
-    { id: makeRowId(), size: "M", stock: "1" },
+    { id: makeRowId(), size: "M", stock: "1", conditionNote: "" },
   ]);
 
   const resetForm = () => {
@@ -155,7 +156,7 @@ export default function AdminProducts() {
     setRentPricePerDay("150");
     setDeposit("200");
     setColor("unknown");
-    setVariants([{ id: makeRowId(), size: "M", stock: "1" }]);
+    setVariants([{ id: makeRowId(), size: "M", stock: "1", conditionNote: "" }]);
   };
 
   const openCreate = () => {
@@ -186,13 +187,14 @@ export default function AdminProducts() {
     if (Array.isArray(vts) && vts.length) {
       setVariants(
         vts.map((v) => ({
-          id: String(v.id ?? makeRowId()), // ✅ use DB id as key
+          id: String(v.id ?? makeRowId()),
           size: (v.size ?? "M") as any,
           stock: String(v.stock ?? 0),
+          conditionNote: "",
         }))
       );
     } else {
-      setVariants([{ id: makeRowId(), size: "M", stock: "1" }]);
+      setVariants([{ id: makeRowId(), size: "M", stock: "1", conditionNote: "" }]);
     }
 
     setOpen(true);
@@ -282,7 +284,7 @@ export default function AdminProducts() {
       // IMPORTANT: multipart/form-data -> variants as JSON string
       form.append(
         "variants",
-        JSON.stringify(variants.map((v) => ({ size: v.size, stock: Number(v.stock) })))
+        JSON.stringify(variants.map((v) => ({ size: v.size, stock: Number(v.stock), conditionNote: v.conditionNote || undefined })))
       );
 
       if (mode === "create") {
@@ -502,7 +504,7 @@ export default function AdminProducts() {
                     variant="secondary"
                     size="sm"
                     onClick={() =>
-                      setVariants((prev) => [...prev, { id: makeRowId(), size: "M", stock: "0" }])
+                      setVariants((prev) => [...prev, { id: makeRowId(), size: "M", stock: "0", conditionNote: "" }])
                     }
                   >
                     {t("adminProducts.buttons.addSize")}
@@ -519,7 +521,7 @@ export default function AdminProducts() {
                   {variants.map((v) => (
                     <div
                       key={v.id}
-                      className="grid grid-cols-[140px_1fr_40px] gap-2 items-center"
+                      className="grid grid-cols-[120px_80px_1fr_36px] gap-2 items-center"
                     >
                       <Input
                         value={v.size}
@@ -541,6 +543,16 @@ export default function AdminProducts() {
                         }
                         inputMode="numeric"
                         placeholder={t("adminProducts.form.stock")}
+                      />
+
+                      <Input
+                        value={v.conditionNote}
+                        onChange={(e) =>
+                          setVariants((prev) =>
+                            prev.map((x) => (x.id === v.id ? { ...x, conditionNote: e.target.value } : x))
+                          )
+                        }
+                        placeholder="Ghi chú tình trạng (tuỳ chọn)"
                       />
 
                       <Button

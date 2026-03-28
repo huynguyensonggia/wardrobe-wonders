@@ -12,13 +12,13 @@
         "shippingReturns": "Giao hàng & Đổi trả",
         "faq": "Câu hỏi thường gặp",
         "company": "Về chúng tôi",
-        "about": "Về Wardrobe Wonders",
+        "about": "Về AI Closet",
         "sustainability": "Bền vững",
         "careers": "Tuyển dụng",
         "contact": "Liên hệ",
         "privacy": "Chính sách bảo mật",
         "terms": "Điều khoản dịch vụ",
-        "copyright": "© {{year}} Wardrobe Wonders. Bảo lưu mọi quyền."
+        "copyright": "© {{year}} AI Closet. Bảo lưu mọi quyền."
     },
     "language": {
         "label": "Ngôn ngữ",
@@ -107,7 +107,7 @@
         },
         "selectedVariant": "Biến thể đã chọn: #{{id}} • Tồn: {{stock}}",
         "features": {
-            "freeShipping": "Miễn phí ship cho đơn từ $100",
+            "freeShipping": "Miễn phí ship cho đơn từ 400.000đ",
             "damageProtection": "Bao gồm bảo vệ hư hỏng"
         },
         "alerts": {
@@ -126,7 +126,7 @@
         },
         "hero": {
             "imageAlt": "Thời trang sang trọng",
-            "titleLine1": "Thuê đồ sang trọng,",
+            "titleLine1": "Thuê đồ nhanh chóng,",
             "titleHighlight": "Tỏa sáng mọi khoảnh khắc",
             "subtitle": "Trải nghiệm thời trang hàng hiệu mà không cần sở hữu. Bền vững, hợp túi tiền và luôn hợp mốt.",
             "ctaExplore": "Khám phá bộ sưu tập",
@@ -139,7 +139,7 @@
             },
             "delivery": {
                 "title": "Giao hàng miễn phí",
-                "desc": "Miễn phí ship cho đơn hàng từ $100"
+                "desc": "Miễn phí ship cho đơn hàng từ 400.000đ"
             },
             "insured": {
                 "title": "Bảo hiểm đầy đủ",
@@ -166,7 +166,7 @@
             "button": "Thử ngay"
         },
         "testimonial": {
-            "quote": "“Wardrobe Wonders đã thay đổi cách tôi ăn mặc. Nhờ thử đồ ảo AI, tôi có thể xem đồ có hợp không trước khi thuê—nên lúc nào cũng chọn đúng outfit cho mọi sự kiện.”",
+            "quote": "“AI Closet đã thay đổi cách tôi ăn mặc. Nhờ thử đồ ảo AI, tôi có thể xem đồ có hợp không trước khi thuê—nên lúc nào cũng chọn đúng outfit cho mọi sự kiện.”",
             "name": "Sarah Mitchell",
             "title": "Biên tập thời trang, Vogue"
         }
@@ -257,7 +257,7 @@
     "auth": {
         "register": {
             "backHome": "Về trang chủ",
-            "title": "Tham gia Wardrobe Wonders",
+            "title": "Tham gia AI Closet",
             "subtitle": "Tạo tài khoản để bắt đầu thuê thời trang thiết kế.",
             "fullName": {
                 "label": "Họ và tên",
@@ -292,7 +292,7 @@
                     "desc": "Vui lòng đồng ý với điều khoản và điều kiện."
                 },
                 "success": {
-                    "title": "Chào mừng đến Wardrobe Wonders!",
+                    "title": "Chào mừng đến AI Closet!",
                     "desc": "Tạo tài khoản thành công."
                 },
                 "error": {
@@ -328,7 +328,7 @@
             "createOne": "Tạo tài khoản",
             "demo": {
                 "title": "Tài khoản demo",
-                "body": "User: user@demo.com / demo123\nAdmin: admin@demo.com / admin123"
+                "body": "User: user@smartdress.com / 123456\nAdmin: admin@smartdress.com / admin123"
             },
             "toast": {
                 "success": {
@@ -412,6 +412,17 @@
         "order": {
             "note": "Tạo từ checkout"
         },
+        "pickup": {
+            "label": "Hình thức nhận hàng",
+            "delivery": {
+                "title": "Giao tận nơi",
+                "desc": "Chúng tôi giao đến địa chỉ của bạn"
+            },
+            "store": {
+                "title": "Nhận tại cửa hàng",
+                "desc": "Đến cửa hàng để nhận trực tiếp"
+            }
+        },
         "payment": {
             "method": "Phương thức thanh toán",
             "methods": {
@@ -448,7 +459,8 @@
             "users": "Người dùng",
             "products": "Sản phẩm",
             "categories": "Danh mục",
-            "rentals": "Đơn thuê"
+            "rentals": "Đơn thuê",
+            "inventory": "Kho vận"
         }
     },
     "common": {
@@ -479,10 +491,11 @@
             "emptyDesc": "Các đơn đã hoàn tất được lưu trong Lịch sử thuê.",
             "noItems": "Đơn thuê này không có sản phẩm."
         },
-        "itemLine": "SL: {{qty}} • Số ngày: {{days}} • /ngày: ${{pricePerDay}}",
+        "itemLine": "SL: {{qty}} • Số ngày: {{days}} • /ngày: {{pricePerDay}}đ",
         "subtotal": "Tạm tính",
         "total": "Tổng",
         "deposit": "Tiền cọc",
+        "extended": "Đã gia hạn đến",
         "actions": {
             "extend": "Gia hạn",
             "cancel": "Hủy"
@@ -539,14 +552,22 @@
             "reject": "Từ chối",
             "customerReceived": "Khách đã nhận",
             "complete": "Hoàn tất",
-            "refundDeposit": "Hoàn cọc"
+            "refundDeposit": "Hoàn cọc",
+            "depositRefunded": "Đã hoàn cọc"
         },
         "detail": {
             "rental": "Đơn thuê",
             "status": "Trạng thái",
             "shipping": "Giao hàng",
             "items": "Sản phẩm",
-            "note": "Ghi chú"
+            "note": "Ghi chú",
+            "surcharges": "Phí phát sinh",
+            "payments": "Chi tiết thanh toán"
+        },
+        "payment": {
+            "rent": "Tiền thuê",
+            "deposit": "Tiền cọc",
+            "extension": "Phí gia hạn"
         },
         "shipping": {
             "edit": "Sửa giao hàng",
@@ -571,7 +592,21 @@
         "error": "Lỗi",
         "edit": "Sửa",
         "delete": "Xoá",
-        "cancel": "Huỷ"
+        "cancel": "Huỷ",
+        "surcharge": {
+            "add": "Thêm phí phát sinh",
+            "amount": "Số tiền",
+            "note": "Ghi chú (tuỳ chọn)",
+            "success": "Đã thêm phí phát sinh",
+            "error": "Thêm phí thất bại",
+            "types": {
+                "late_return": "Trả trễ",
+                "damage": "Hư hỏng",
+                "cleaning": "Vệ sinh đặc biệt",
+                "express_delivery": "Giao nhanh",
+                "other": "Khác"
+            }
+        }
     },
     "adminProducts": {
         "header": {
@@ -757,6 +792,42 @@
             "deleteFailed": {
                 "title": "Xoá thất bại"
             }
+        }
+    },
+    "adminInventory": {
+        "title": "Quản lý kho vận",
+        "itemCount": "món đồ",
+        "addItem": "Thêm món đồ",
+        "saving": "Đang lưu...",
+        "loading": "Đang tải...",
+        "empty": "Không có món đồ nào.",
+        "all": "Tất cả",
+        "searchBarcode": "Tìm theo barcode...",
+        "nearLimit": "Gần hết hạn",
+        "times": "lần",
+        "more": "khác",
+        "retirementWarning": "{{count}} món đồ nên xem xét thanh lý (≥40 lần thuê)",
+        "rentedCount": "Đã thuê {{count}}/{{max}} lần",
+        "status": {
+            "available": "Sẵn sàng",
+            "shipping": "Đang giao",
+            "rented": "Đang thuê",
+            "returned": "Đã trả",
+            "washing": "Đang giặt",
+            "repairing": "Đang sửa",
+            "retired": "Đã loại bỏ"
+        },
+        "form": {
+            "title": "Thêm món đồ vào kho",
+            "product": "Sản phẩm",
+            "selectProduct": "Chọn sản phẩm",
+            "size": "Size",
+            "selectSize": "Chọn size",
+            "stock": "tồn kho",
+            "barcode": "Barcode",
+            "maxRentals": "Số lần thuê tối đa",
+            "note": "Ghi chú tình trạng",
+            "notePlaceholder": "Tuỳ chọn"
         }
     },
     "adminUsers": {

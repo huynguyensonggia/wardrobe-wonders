@@ -12,13 +12,13 @@
         "shippingReturns": "Shipping & Returns",
         "faq": "FAQ",
         "company": "Company",
-        "about": "About Wardrobe Wonders",
+        "about": "About AI Closet",
         "sustainability": "Sustainability",
         "careers": "Careers",
         "contact": "Contact",
         "privacy": "Privacy Policy",
         "terms": "Terms of Service",
-        "copyright": "© {{year}} Wardrobe Wonders. All rights reserved."
+        "copyright": "© {{year}} AI Closet. All rights reserved."
     },
     "language": {
         "label": "Language",
@@ -107,7 +107,7 @@
         },
         "selectedVariant": "Selected variant: #{{id}} • Stock: {{stock}}",
         "features": {
-            "freeShipping": "Free shipping over $100",
+            "freeShipping": "Free shipping over 400.000đ",
             "damageProtection": "Damage protection included"
         },
         "alerts": {
@@ -126,7 +126,7 @@
         },
         "hero": {
             "imageAlt": "Elegant fashion",
-            "titleLine1": "Rent Luxury,",
+            "titleLine1": "Rent Quickly,",
             "titleHighlight": "Own the Moment",
             "subtitle": "Access designer fashion without the commitment. Sustainable, affordable, and always in style.",
             "ctaExplore": "Explore Collection",
@@ -139,7 +139,7 @@
             },
             "delivery": {
                 "title": "Free Delivery",
-                "desc": "Complimentary shipping on orders over $100"
+                "desc": "Complimentary shipping on orders over 400.000đ"
             },
             "insured": {
                 "title": "Fully Insured",
@@ -166,7 +166,7 @@
             "button": "Try It Now"
         },
         "testimonial": {
-            "quote": "“Wardrobe Wonders changed the way I dress. Thanks to AI virtual try-on, I can see how outfits fit before renting—so I always choose the right look for every event.”",
+            "quote": "“AI Closet changed the way I dress. Thanks to AI virtual try-on, I can see how outfits fit before renting—so I always choose the right look for every event.”",
             "name": "Sarah Mitchell",
             "title": "Fashion Editor, Vogue"
         }
@@ -257,7 +257,7 @@
     "auth": {
         "register": {
             "backHome": "Back to home",
-            "title": "Join Wardrobe Wonders",
+            "title": "Join AI Closet",
             "subtitle": "Create an account to start renting designer fashion.",
             "fullName": {
                 "label": "Full Name",
@@ -292,7 +292,7 @@
                     "desc": "Please agree to the terms and conditions."
                 },
                 "success": {
-                    "title": "Welcome to Wardrobe Wonders!",
+                    "title": "Welcome to AI Closet!",
                     "desc": "Your account has been created successfully."
                 },
                 "error": {
@@ -329,7 +329,7 @@
         "createOne": "Create one",
         "demo": {
             "title": "Demo Credentials",
-            "body": "User: user@demo.com / demo123\nAdmin: admin@demo.com / admin123"
+            "body": "User: user@smartdress.com / 123456\nAdmin: admin@smartdress.com / admin123"
         },
         "toast": {
             "success": {
@@ -412,6 +412,17 @@
         "order": {
             "note": "Created from checkout"
         },
+        "pickup": {
+            "label": "Pickup method",
+            "delivery": {
+                "title": "Home delivery",
+                "desc": "We deliver to your address"
+            },
+            "store": {
+                "title": "Pick up at store",
+                "desc": "Come to our store to pick up"
+            }
+        },
         "payment": {
             "method": "Payment Method",
             "methods": {
@@ -448,7 +459,8 @@
             "users": "Users",
             "products": "Products",
             "categories": "Categories",
-            "rentals": "Rentals"
+            "rentals": "Rentals",
+            "inventory": "Inventory"
         }
     },
     "common": {
@@ -479,10 +491,11 @@
             "emptyDesc": "Your completed rentals are saved in Rental History.",
             "noItems": "No items in this rental."
         },
-        "itemLine": "Qty: {{qty}} • Days: {{days}} • /day: ${{pricePerDay}}",
+        "itemLine": "Qty: {{qty}} • Days: {{days}} • /day: {{pricePerDay}}đ",
         "subtotal": "Subtotal",
         "total": "Total",
         "deposit": "Deposit",
+        "extended": "Extended to",
         "actions": {
             "extend": "Extend Rental",
             "cancel": "Cancel"
@@ -539,14 +552,22 @@
             "reject": "Reject",
             "customerReceived": "Customer received",
             "complete": "Complete",
-            "refundDeposit": "Refund Deposit"
+            "refundDeposit": "Refund Deposit",
+            "depositRefunded": "Deposit Refunded"
         },
         "detail": {
             "rental": "Rental",
             "status": "Status",
             "shipping": "Shipping",
             "items": "Items",
-            "note": "Note"
+            "note": "Note",
+            "surcharges": "Surcharges",
+            "payments": "Payment breakdown"
+        },
+        "payment": {
+            "rent": "Rental fee",
+            "deposit": "Deposit",
+            "extension": "Extension fee"
         },
         "shipping": {
             "edit": "Edit shipping",
@@ -571,7 +592,21 @@
         "error": "Error",
         "edit": "Edit",
         "delete": "Delete",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "surcharge": {
+            "add": "Add surcharge",
+            "amount": "Amount",
+            "note": "Note (optional)",
+            "success": "Surcharge added",
+            "error": "Failed to add surcharge",
+            "types": {
+                "late_return": "Late return",
+                "damage": "Damage",
+                "cleaning": "Special cleaning",
+                "express_delivery": "Express delivery",
+                "other": "Other"
+            }
+        }
     },
     "adminProducts": {
         "header": {
@@ -757,6 +792,42 @@
             "deleteFailed": {
                 "title": "Delete failed"
             }
+        }
+    },
+    "adminInventory": {
+        "title": "Inventory Management",
+        "itemCount": "items",
+        "addItem": "Add item",
+        "saving": "Saving...",
+        "loading": "Loading...",
+        "empty": "No items found.",
+        "all": "All",
+        "searchBarcode": "Search by barcode...",
+        "nearLimit": "Near limit",
+        "times": "times",
+        "more": "more",
+        "retirementWarning": "{{count}} items should be considered for retirement (≥40 rentals)",
+        "rentedCount": "Rented {{count}}/{{max}} times",
+        "status": {
+            "available": "Available",
+            "shipping": "Shipping",
+            "rented": "Rented",
+            "returned": "Returned",
+            "washing": "Washing",
+            "repairing": "Repairing",
+            "retired": "Retired"
+        },
+        "form": {
+            "title": "Add item to inventory",
+            "product": "Product",
+            "selectProduct": "Select product",
+            "size": "Size",
+            "selectSize": "Select size",
+            "stock": "stock",
+            "barcode": "Barcode",
+            "maxRentals": "Max rentals",
+            "note": "Condition note",
+            "notePlaceholder": "Optional"
         }
     },
     "adminUsers": {

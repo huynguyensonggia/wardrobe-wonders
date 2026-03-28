@@ -11,6 +11,7 @@ import {
 } from "class-validator";
 import { Type } from "class-transformer";
 import { PaymentMethod } from "../../payments/enums/payment-method.enum";
+import { PickupType } from "../entities/rental.entity";
 
 class CreateRentalItemDto {
   @Type(() => Number)
@@ -78,4 +79,8 @@ export class CreateRentalDto {
   @IsOptional()
   @IsEnum(PaymentMethod)
   paymentMethod?: PaymentMethod;
+
+  @IsOptional()
+  @IsEnum(PickupType)
+  pickupType?: PickupType;
 }

@@ -20,15 +20,18 @@ async function bootstrap() {
   // CORS cho frontend React/Vite
   app.enableCors({
     origin: (origin, callback) => {
+      // Local dev: cho phép tất cả
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+
       const allowed = [
         "http://localhost:8080",
         "http://localhost:5173",
-        "http://192.168.1.212:8080",
         "https://wardrobe-wonders.pages.dev",
         process.env.CORS_ORIGIN,
       ].filter(Boolean);
 
-      // Cho phép requests không có origin (mobile apps, Postman, server-to-server)
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
       } else {

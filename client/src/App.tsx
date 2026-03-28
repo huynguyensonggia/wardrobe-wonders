@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { CartProvider } from "@/contexts/CartContext";
+import { FloatingZaloButton } from "@/components/FloatingZaloButton";
+import { FloatingFacebookButton } from "@/components/FloatingFacebookButton";
 
 // Pages
 import HomePage from "@/pages/HomePage";
@@ -25,6 +27,7 @@ import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminCategories from "@/pages/admin/AdminCategories";
 import AdminRentals from "@/pages/admin/AdminRentals";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
+import AdminInventory from "@/pages/admin/AdminInventory";
 import CartPage from "@/pages/CartPage";
 import TryOnSuggestPage from "@/pages/TryOnSuggestPage";
 
@@ -72,11 +75,14 @@ const App = () => (
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="rentals" element={<AdminRentals />} />
                   <Route path="users" element={<AdminUsersPage />} />
+                  <Route path="inventory" element={<AdminInventory />} />
                 </Route>
               </Route>
 
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <FloatingZaloButton />
+            < FloatingFacebookButton />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>

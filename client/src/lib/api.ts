@@ -17,7 +17,7 @@ import type { RentalStatus } from "@/types/rental-status";
 const API_BASE = import.meta.env.VITE_API_BASE;
 
 // Helper function for API calls
-async function fetchApi<T>(
+export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -239,6 +239,23 @@ export const rentalsApi = {
     fetchApi<{ refunded: boolean; count: number }>(`/admin/rentals/${id}/refund-deposit`, {
       method: "PATCH",
     }),
+
+  addSurcharge: (id: string, data: { type: string; amount: number; note?: string }) =>
+    fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/surcharges`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  setActualReturn: (id: string, actualReturnDate: string) =>
+    fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/actual-return`, {
+      method: "PATCH",
+      body: JSON.stringify({ actualReturnDate }),
+    }),
+
+  checkAvailability: (variantId: number, startDate: string, endDate: string) =>
+    fetchApi<{ available: boolean }>(
+      `/admin/rentals/check-availability?variantId=${variantId}&startDate=${startDate}&endDate=${endDate}`
+    ),
 };
 
 export const adminApi = {
