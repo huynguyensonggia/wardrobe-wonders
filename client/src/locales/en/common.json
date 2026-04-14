@@ -38,6 +38,7 @@
         "aoDaiCaoCap": "Premium Ao Dai",
         "aoDai": "Ao Dai",
         "aiTryOn": "AI Try-On",
+        "styleAdvisor": "Style Advisor",
         "cart": "Cart",
         "myRentals": "My Rentals",
         "adminDashboard": "Admin Dashboard",
@@ -161,8 +162,8 @@
             "viewAllMobile": "View All Products"
         },
         "tryOnCta": {
-            "title": "Try Before You Rent",
-            "desc": "Our AI-powered virtual try-on lets you see how any piece looks on you. Upload your photo and discover your perfect fit.",
+            "title": "Let AI Style You",
+            "desc": "Just enter your height, weight, favorite colors and occasion — our AI will instantly recommend the most suitable outfits from our collection.",
             "button": "Try It Now"
         },
         "testimonial": {
@@ -172,6 +173,12 @@
         }
     },
     "tryOn": {
+        "disclaimer": {
+            "title": "📸 Before You Try On",
+            "body": "Our AI virtual try-on generates illustrative images to help you visualize the overall style of each outfit.\n\nBecause AI processes images algorithmically, results may not perfectly reflect your actual body proportions — especially for unique body types.\n\n👗 For the best fit, please refer to our size chart and measure your body (bust, waist, hips) before placing a rental order.",
+            "sizeGuideLink": "View size guide",
+            "confirm": "I understand, continue to try-on"
+        },
         "header": {
             "title": "AI Virtual Try-On",
             "subtitle": "Upload your photo and generate the final try-on in one step."

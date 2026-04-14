@@ -38,6 +38,7 @@
         "aoDaiCaoCap": "Áo dài cao cấp",
         "aoDai": "Áo dài",
         "aiTryOn": "AI Thử đồ",
+        "styleAdvisor": "Tư vấn phong cách",
         "cart": "Giỏ hàng",
         "myRentals": "Đơn thuê của tôi",
         "adminDashboard": "Bảng điều khiển Admin",
@@ -130,7 +131,7 @@
             "titleHighlight": "Tỏa sáng mọi khoảnh khắc",
             "subtitle": "Trải nghiệm thời trang hàng hiệu mà không cần sở hữu. Bền vững, hợp túi tiền và luôn hợp mốt.",
             "ctaExplore": "Khám phá bộ sưu tập",
-            "ctaTryOn": "Thử đồ AI"
+            "ctaTryOn": "Tư vấn AI"
         },
         "features": {
             "ai": {
@@ -161,8 +162,8 @@
             "viewAllMobile": "Xem tất cả sản phẩm"
         },
         "tryOnCta": {
-            "title": "Thử trước khi thuê",
-            "desc": "Tính năng thử đồ ảo bằng AI giúp bạn xem đồ lên dáng ra sao. Tải ảnh lên và tìm ngay lựa chọn phù hợp nhất.",
+            "title": "Để AI chọn đồ cho bạn",
+            "desc": "Chỉ cần nhập chiều cao, cân nặng, màu yêu thích và dịp mặc — AI sẽ gợi ý ngay những trang phục phù hợp nhất từ bộ sưu tập của chúng tôi.",
             "button": "Thử ngay"
         },
         "testimonial": {
@@ -172,6 +173,12 @@
         }
     },
     "tryOn": {
+        "disclaimer": {
+            "title": "📸 Lưu ý trước khi thử đồ ảo",
+            "body": "Tính năng thử đồ ảo bằng AI tạo ra hình ảnh mang tính minh họa để bạn hình dung phong cách tổng thể của trang phục.\n\nDo AI xử lý hình ảnh, kết quả có thể chưa phản ánh chính xác tỷ lệ cơ thể thực tế của bạn — đặc biệt với các vóc dáng đặc biệt.\n\n👗 Để chọn size phù hợp nhất, hãy tham khảo bảng size và đo số đo cơ thể (ngực, eo, hông) trước khi đặt thuê.",
+            "sizeGuideLink": "Xem bảng size",
+            "confirm": "Tôi đã hiểu, tiếp tục thử đồ"
+        },
         "header": {
             "title": "Thử đồ ảo bằng AI",
             "subtitle": "Tải ảnh của bạn lên và tạo kết quả thử đồ chỉ trong 1 bước."

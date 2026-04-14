@@ -106,7 +106,7 @@ export default function HomePage() {
               </Button>
 
               <Button variant="hero-outline" size="xl" asChild>
-                <Link to="/try-on-suggest">
+                <Link to="/style-advisor">
                   <Sparkles className="w-5 h-5 mr-2" />
                   {t("home.hero.ctaTryOn")}
                 </Link>
@@ -264,7 +264,7 @@ export default function HomePage() {
               {t("home.tryOnCta.desc")}
             </p>
             <Button variant="gold" size="xl" asChild>
-              <Link to="/try-on-suggest">
+              <Link to="/style-advisor">
                 {t("home.tryOnCta.button")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>

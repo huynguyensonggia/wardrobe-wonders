@@ -4,6 +4,15 @@ import { useQuery } from "@tanstack/react-query";
 
 import { productsApi, tryOnApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 import {
   Upload,
@@ -13,6 +22,7 @@ import {
   RefreshCw,
   Download,
   AlertCircle,
+  Ruler,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -102,6 +112,8 @@ export default function TryOnPage() {
 
   // base product (khóa, không cho chọn nữa)
   const [selectedProduct] = useState(preselectedProduct || "");
+
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
 
   const [userImage, setUserImage] = useState<string | null>(null);
   const [userFile, setUserFile] = useState<File | null>(null);
@@ -309,6 +321,46 @@ export default function TryOnPage() {
 
   return (
     <div className="min-h-screen py-8">
+      {/* Disclaimer Dialog */}
+      <AlertDialog open={!disclaimerAccepted}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg">
+              {t("tryOn.disclaimer.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-sm text-foreground/80">
+                {t("tryOn.disclaimer.body")
+                  .split("\n")
+                  .map((line, i) =>
+                    line.trim() === "" ? null : (
+                      <p key={i}>{line}</p>
+                    )
+                  )}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 text-primary underline underline-offset-2 text-sm font-medium"
+                    onClick={() => window.open("/size-chart.png", "_blank")}
+                  >
+                    <Ruler className="w-3.5 h-3.5" />
+                    {t("tryOn.disclaimer.sizeGuideLink")}
+                  </button>
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              className="w-full"
+              onClick={() => setDisclaimerAccepted(true)}
+            >
+              {t("tryOn.disclaimer.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">

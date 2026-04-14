@@ -32,9 +32,6 @@ import {
 import {
   format,
   differenceInDays,
-  addDays,
-  isAfter,
-  isBefore,
   startOfDay,
 } from "date-fns";
 
@@ -59,9 +56,15 @@ function isVariantActive(x: any): boolean {
   return true;
 }
 
+/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
+function calcRentalPrice(basePrice: number, days: number): number {
+  if (days <= 0) return 0;
+  return basePrice + (days - 1) * 10_000;
+}
+
 export default function ProductDetailPage() {
   const { t } = useTranslation();
-  const MIN_RENTAL_DAYS = 3;
+  const MIN_RENTAL_DAYS = 1;
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -142,7 +145,7 @@ export default function ProductDetailPage() {
     return (
       canRent &&
       !!selectedVariant?.id &&
-      rentalDays >= MIN_RENTAL_DAYS &&
+      rentalDays >= 1 &&
       (selectedVariant?.stock ?? 0) > 0
     );
   }, [canRent, selectedVariant?.id, selectedVariant?.stock, rentalDays]);
@@ -158,7 +161,7 @@ export default function ProductDetailPage() {
 
   const totalPrice = useMemo(() => {
     const pricePerDay = Number((product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0);
-    return rentalDays * pricePerDay;
+    return calcRentalPrice(pricePerDay, rentalDays);
   }, [product, rentalDays]);
 
   const mainImage = useMemo(() => {
@@ -170,32 +173,17 @@ export default function ProductDetailPage() {
     );
   }, [images, selectedImage, product]);
 
-  // disable days: past + enforce min days when selecting end
+  // disable days: past only
   const disabledDays = useMemo(() => {
     const today = startOfDay(new Date());
-    const from = dateRange.from ? startOfDay(dateRange.from) : undefined;
-    const minTo = from ? addDays(from, MIN_RENTAL_DAYS - 1) : undefined;
+    return (date: Date) => startOfDay(date) < today;
+  }, []);
 
-    return (date: Date) => {
-      const d = startOfDay(date);
-
-      if (d < today) return true;
-
-      if (from && !dateRange.to && minTo) {
-        return isAfter(d, from) && isBefore(d, minTo);
-      }
-
-      return false;
-    };
-  }, [dateRange.from, dateRange.to]);
-
-  // auto-suggest a valid range (from -> from+2)
+  // auto-suggest: khi chọn from mà chưa có to, set to = from (1 ngày)
   useEffect(() => {
     if (!dateRange.from) return;
     if (dateRange.to) return;
-
-    const suggestedTo = addDays(dateRange.from, MIN_RENTAL_DAYS - 1);
-    setDateRange((prev) => ({ ...prev, to: suggestedTo }));
+    setDateRange((prev) => ({ ...prev, to: prev.from }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dateRange.from]);
 
@@ -219,12 +207,6 @@ export default function ProductDetailPage() {
 
     if (!dateRange.from || !dateRange.to) {
       alert(t("productDetail.alerts.selectDates"));
-      return false;
-    }
-
-    const days = differenceInDays(dateRange.to, dateRange.from) + 1;
-    if (days < MIN_RENTAL_DAYS) {
-      alert(t("productDetail.alerts.minimumRental", { days: MIN_RENTAL_DAYS }));
       return false;
     }
 
@@ -529,12 +511,6 @@ export default function ProductDetailPage() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <div className="p-3 pb-2 text-xs text-muted-foreground">
-                    {t("productDetail.minimumRentalHint")}{" "}
-                    <span className="font-medium">
-                      {t("productDetail.minimumDays", { days: MIN_RENTAL_DAYS })}
-                    </span>
-                  </div>
                   <Calendar
                     mode="range"
                     selected={dateRange}
@@ -543,16 +519,8 @@ export default function ProductDetailPage() {
                         setDateRange({ from: undefined, to: undefined });
                         return;
                       }
-
-                      if (!range.to) {
-                        setDateRange({ from: range.from, to: undefined });
-                        return;
-                      }
-
-                      const days = differenceInDays(range.to, range.from) + 1;
-                      if (days < MIN_RENTAL_DAYS) return;
-
-                      setDateRange({ from: range.from, to: range.to });
+                      // Nếu chỉ chọn 1 ngày (from = to), cho phép
+                      setDateRange({ from: range.from, to: range.to ?? range.from });
                     }}
                     disabled={disabledDays}
                     numberOfMonths={2}
@@ -560,20 +528,18 @@ export default function ProductDetailPage() {
                 </PopoverContent>
               </Popover>
 
-              {rentalDays > 0 && rentalDays < MIN_RENTAL_DAYS && (
-                <p className="text-xs text-destructive mt-2">
-                  {t("productDetail.minimumRentalError", { days: MIN_RENTAL_DAYS })}
-                </p>
-              )}
             </div>
 
             {/* Price Summary */}
-            {rentalDays >= MIN_RENTAL_DAYS && (
+            {rentalDays >= 1 && (
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
-                    {Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0).toLocaleString("vi-VN")}đ × {rentalDays}{" "}
-                    {t("productDetail.days")}
+                    {Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0).toLocaleString("vi-VN")}đ
+                    {rentalDays > 1 && (
+                      <> + {((rentalDays - 1) * 10_000).toLocaleString("vi-VN")}đ</>
+                    )}{" "}
+                    ({rentalDays} {t("productDetail.days")})
                   </span>
                   <span>{totalPrice.toLocaleString("vi-VN")}đ</span>
                 </div>

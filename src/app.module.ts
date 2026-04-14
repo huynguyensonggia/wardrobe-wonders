@@ -9,6 +9,7 @@ import { UsersModule } from "./modules/users/users.module";
 import { AdminModule } from "./modules/admin/admin.module";
 import { RentalsModule } from "./modules/rentals/rentals.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
+import { RecommendationsModule } from "./modules/recommendations/recommendations.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { InventoryModule } from "./modules/inventory/inventory.module";
     AdminModule,
     RentalsModule,
     InventoryModule,
+    RecommendationsModule,
   ],
   controllers: [],
   providers: [],

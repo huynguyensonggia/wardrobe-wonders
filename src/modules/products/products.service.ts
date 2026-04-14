@@ -77,7 +77,13 @@ export class ProductService {
     return (occasion ?? "").toString().trim();
   }
   private toNumber(v: any) {
-    const n = Number(v);
+    if (v === null || v === undefined || v === "") return null;
+    // Xử lý format số kiểu VN: "100.000" hoặc "100,000" → 100000
+    const cleaned = String(v)
+      .trim()
+      .replace(/\./g, "")   // bỏ dấu chấm phân cách hàng nghìn kiểu VN
+      .replace(/,/g, "");   // bỏ dấu phẩy phân cách hàng nghìn kiểu EN
+    const n = Number(cleaned);
     return Number.isFinite(n) ? n : null;
   }
 
@@ -261,18 +267,60 @@ export class ProductService {
     if ((dto as any).variants !== undefined) {
       this.validateVariants((dto as any).variants);
 
-      await this.variantRepo.delete({ productId: id });
+      // Lấy variants hiện tại
+      const existingVariants = await this.variantRepo.find({ where: { productId: id } });
 
-      const variants = (dto as any).variants.map((v: any) =>
-        this.variantRepo.create({
-          productId: id,
-          product,
-          size: v.size,
-          stock: Number(v.stock),
-          isActive: true,
-        }),
-      );
-      await this.variantRepo.save(variants);
+      // Tìm variant nào đang được tham chiếu bởi rental_items → không được xóa cứng
+      const referencedIds = new Set<number>();
+      for (const v of existingVariants) {
+        const inUse = await this.variantRepo.manager
+          .getRepository("rental_items")
+          .findOne({ where: { variantId: v.id } } as any);
+        if (inUse) referencedIds.add(v.id);
+      }
+
+      // Xóa cứng các variant chưa được tham chiếu
+      const deletableIds = existingVariants
+        .filter((v) => !referencedIds.has(v.id))
+        .map((v) => v.id);
+      if (deletableIds.length > 0) {
+        await this.variantRepo.delete(deletableIds);
+      }
+
+      // Variant đang được tham chiếu → set inactive + stock = 0
+      for (const vid of referencedIds) {
+        await this.variantRepo.update(vid, { isActive: false as any, stock: 0 });
+      }
+
+      // Tạo variants mới từ dto
+      const newSizes = new Set((dto as any).variants.map((v: any) => String(v.size)));
+
+      // Nếu size mới trùng với variant đang bị referenced → reactivate thay vì tạo mới
+      for (const vid of referencedIds) {
+        const existing = existingVariants.find((v) => v.id === vid);
+        if (existing && newSizes.has(existing.size)) {
+          const dtoVariant = (dto as any).variants.find((v: any) => String(v.size) === existing.size);
+          await this.variantRepo.update(vid, {
+            isActive: true as any,
+            stock: Number(dtoVariant.stock),
+          });
+          newSizes.delete(existing.size); // đã xử lý, không tạo mới
+        }
+      }
+
+      // Tạo mới các size chưa tồn tại
+      const toCreate = (dto as any).variants
+        .filter((v: any) => newSizes.has(String(v.size)))
+        .map((v: any) =>
+          this.variantRepo.create({
+            productId: id,
+            product,
+            size: v.size,
+            stock: Number(v.stock),
+            isActive: true,
+          }),
+        );
+      if (toCreate.length > 0) await this.variantRepo.save(toCreate);
     }
 
     // image (optional)

@@ -28,7 +28,7 @@ import AdminRentals from "@/pages/admin/AdminRentals";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminInventory from "@/pages/admin/AdminInventory";
 import CartPage from "@/pages/CartPage";
-import TryOnSuggestPage from "@/pages/TryOnSuggestPage";
+import StyleAdvisorPage from "@/pages/StyleAdvisorPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -54,7 +54,7 @@ const App = () => (
                 <Route path="/products" element={<ProductsPage />} />
                 <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/try-on" element={<TryOnPage />} />
-                <Route path="/try-on-suggest" element={<TryOnSuggestPage />} />
+                <Route path="/style-advisor" element={<StyleAdvisorPage />} />
                 <Route path="/cart" element={<CartPage />} />
 
                 {/* ✅ NEW: Checkout */}

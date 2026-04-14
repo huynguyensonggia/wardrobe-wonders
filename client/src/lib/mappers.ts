@@ -82,6 +82,7 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
     images: p.imageUrl ? [primaryImage] : [],
     sizes,
     colors,
+    color: p.color ?? "unknown",
     variants,
     occasion: String((p as any).occasion ?? ""),
     pricePerDay: Number(p.rentPricePerDay ?? 0),

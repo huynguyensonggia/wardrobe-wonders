@@ -141,11 +141,11 @@ export function Navbar() {
             ))}
 
             <Link
-              to="/try-on-suggest"
+              to="/style-advisor"
               className="flex items-center gap-1.5 text-sm font-medium text-gold hover:text-gold/80 transition-colors"
             >
               <Sparkles className="w-4 h-4" />
-              {t("navbar.aiTryOn")}
+              {t("navbar.styleAdvisor")}
             </Link>
           </div>
 
@@ -320,12 +320,12 @@ export function Navbar() {
               ))}
 
               <Link
-                to="/try-on-suggest"
+                to="/style-advisor"
                 className="flex items-center gap-1.5 text-sm font-medium py-2 text-gold"
                 onClick={() => setIsOpen(false)}
               >
                 <Sparkles className="w-4 h-4" />
-                {t("navbar.aiTryOn")}
+                {t("navbar.styleAdvisor")}
               </Link>
 
               {/* Cart in mobile menu */}

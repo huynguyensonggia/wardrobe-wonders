@@ -63,6 +63,12 @@ function normalizePhone(s: string) {
     .replace(/[^\d+]/g, "");
 }
 
+/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
+function calcRentalPrice(basePrice: number, days: number): number {
+  if (days <= 0) return 0;
+  return basePrice + (days - 1) * 10_000;
+}
+
 export default function CheckoutPage() {
   const { t } = useTranslation();
 
@@ -145,7 +151,7 @@ export default function CheckoutPage() {
 
   const total = useMemo(() => {
     return checkoutItems.reduce(
-      (sum, it) => sum + it.quantity * it.rentPricePerDay * it.days,
+      (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
       0
     );
   }, [checkoutItems]);
@@ -257,7 +263,7 @@ export default function CheckoutPage() {
 
         {groups.map((g) => {
           const groupTotal = g.list.reduce(
-            (sum, it) => sum + it.quantity * it.rentPricePerDay * it.days,
+            (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
             0
           );
 
@@ -299,7 +305,7 @@ export default function CheckoutPage() {
                       </div>
 
                       <div className="text-sm font-medium">
-                        {t("checkout.summary.line")}: {lineTotal.toLocaleString("vi-VN")}đ
+                        {t("checkout.summary.line")}: {(it.quantity * calcRentalPrice(it.rentPricePerDay, it.days)).toLocaleString("vi-VN")}đ
                       </div>
                     </div>
                   </div>

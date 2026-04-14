@@ -347,3 +347,40 @@ export const tryOnApi = {
     });
   },
 };
+
+export type RecommendRequest = {
+  height: number;
+  weight: number;
+  bust?: number;
+  waist?: number;
+  hips?: number;
+  favoriteColors?: string;
+  occasion?: string;
+  style?: string;
+};
+
+export type RecommendedProduct = {
+  id: number;
+  name: string;
+  imageUrl: string | null;
+  rentPricePerDay: number;
+  deposit: number;
+  color: string;
+  occasion: string;
+  category: string;
+  sizes: string[];
+};
+
+export type RecommendResult = {
+  product: RecommendedProduct;
+  reason: string;
+};
+
+export const recommendationsApi = {
+  recommend: (dto: RecommendRequest) =>
+    fetchApi<RecommendResult[]>("/recommendations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto),
+    }),
+};

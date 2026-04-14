@@ -40,6 +40,12 @@ function daysBetweenInclusive(start: Date, end: Date) {
   return days;
 }
 
+/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
+function calcRentalPrice(basePrice: number, days: number): number {
+  if (days <= 0) return 0;
+  return basePrice + (days - 1) * 10_000;
+}
+
 function normalizePhone(input: any) {
   const s = String(input ?? "").trim();
   return s.replace(/[^\d+]/g, "");
@@ -208,7 +214,7 @@ export class RentalsService {
       }
 
       const days = totalDays;
-      const subtotal = rentPricePerDay * quantity * days;
+      const subtotal = calcRentalPrice(rentPricePerDay, days) * quantity;
       const depositAmt = (product as any).deposit ?? 0;
 
       return { product, variant, rentPricePerDay, quantity, days, subtotal, deposit: depositAmt };
@@ -649,7 +655,7 @@ export class RentalsService {
     );
 
     const extraPrice = rental.items.reduce((sum, it) => {
-      return sum + (it.rentPricePerDay ?? 0) * it.quantity * extraDays;
+      return sum + calcRentalPrice(it.rentPricePerDay ?? 0, extraDays) * it.quantity;
     }, 0);
 
     rental.endDate = end;
