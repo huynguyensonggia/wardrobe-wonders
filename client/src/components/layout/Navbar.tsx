@@ -256,6 +256,19 @@ export function Navbar() {
         {isOpen && (
           <div className="lg:hidden border-t border-border py-4 animate-slide-down">
             <div className="flex flex-col gap-4">
+
+              {/* Auth buttons - hiện trên cùng khi chưa đăng nhập */}
+              {!isAuthenticated && (
+                <div className="flex gap-2 pb-2 border-b border-border">
+                  <Button asChild className="flex-1" onClick={() => setIsOpen(false)}>
+                    <Link to="/login">{t("navbar.signIn")}</Link>
+                  </Button>
+                  <Button variant="outline" asChild className="flex-1" onClick={() => setIsOpen(false)}>
+                    <Link to="/register">{t("navbar.joinNow")}</Link>
+                  </Button>
+                </div>
+              )}
+
               {/* Language selector in mobile */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
