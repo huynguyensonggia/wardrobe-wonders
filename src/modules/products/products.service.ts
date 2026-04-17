@@ -430,7 +430,7 @@ export class ProductService {
         const saved = await this.productRepo.save(product);
 
         // create variants
-        await this.variantRepo.save(
+        const savedVariants = await this.variantRepo.save(
           variants.map((v) =>
             this.variantRepo.create({
               productId: saved.id,
@@ -441,6 +441,20 @@ export class ProductService {
             }),
           ),
         );
+
+        // Tự động tạo inventory items theo stock của từng variant
+        for (const variant of savedVariants) {
+          const stockCount = Number(variant.stock ?? 0);
+          for (let s = 0; s < stockCount; s++) {
+            const barcode = `${saved.id}-${variant.id}-${s + 1}-${Date.now()}`;
+            await this.inventoryService.create({
+              variantId: variant.id,
+              barcode,
+              maxRentals: 50,
+              skipStockUpdate: true,
+            });
+          }
+        }
 
         // image (optional)
         if (imageUrl) {

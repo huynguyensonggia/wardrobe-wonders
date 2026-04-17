@@ -23,13 +23,9 @@ export class RecommendDto {
 
   @IsOptional()
   @IsString()
-  favoriteColors?: string; // "đen, trắng, đỏ"
+  favoriteColors?: string; // "hồng, đỏ đô"
 
   @IsOptional()
   @IsString()
-  occasion?: string; // "tiệc, đi làm, casual"
-
-  @IsOptional()
-  @IsString()
-  style?: string; // "thanh lịch, năng động, cổ điển"
+  category?: string; // "Quần, Áo, Váy, Áo khoác"
 }

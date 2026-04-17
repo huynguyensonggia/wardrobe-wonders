@@ -28,6 +28,7 @@ import { Product } from "../products/entities/product.entity";
 import { Payment } from "../payments/entities/payment.entity";
 import { PaymentMethod } from "../payments/enums/payment-method.enum";
 import { PaymentStatus } from "../payments/enums/payment-status.enum";
+import { MailService } from "../mail/mail.service";
 
 function daysBetweenInclusive(start: Date, end: Date) {
   const s = new Date(start);
@@ -78,6 +79,7 @@ export class RentalsService {
     private readonly surchargesRepo: Repository<RentalSurcharge>,
 
     private readonly inventoryService: InventoryService,
+    private readonly mailService: MailService,
   ) { }
 
   // =========================
@@ -294,10 +296,36 @@ export class RentalsService {
       );
     }
 
-    return this.rentalsRepo.findOne({
+    const finalRental = await this.rentalsRepo.findOne({
       where: { id: savedRental.id },
       relations: ["items", "items.product", "items.variant", "payments", "user"],
     });
+
+    // Gửi email xác nhận đơn thuê (không block response)
+    if (finalRental && user.email) {
+      const emailItems = finalRental.items.map((it) => ({
+        name: it.product?.name ?? `Sản phẩm #${it.id}`,
+        size: it.variant?.size ?? "",
+        quantity: it.quantity,
+        subtotal: it.subtotal,
+      }));
+
+      this.mailService.sendRentalConfirmation({
+        to: user.email,
+        customerName: user.name,
+        rentalId: finalRental.id,
+        startDate: new Date(finalRental.startDate).toLocaleDateString("vi-VN"),
+        endDate: new Date(finalRental.endDate).toLocaleDateString("vi-VN"),
+        totalDays: finalRental.totalDays,
+        items: emailItems,
+        totalPrice: finalRental.totalPrice,
+        totalDeposit: finalRental.totalDeposit,
+        shipAddress: finalRental.shipAddress,
+        paymentMethod: String(dto.paymentMethod ?? "CASH"),
+      }).catch(() => {});
+    }
+
+    return finalRental;
   }
 
   // =========================

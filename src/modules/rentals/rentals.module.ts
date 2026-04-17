@@ -13,6 +13,7 @@ import { Product } from "../products/entities/product.entity";
 import { ProductVariant } from "../products/entities/product-variant.entity";
 import { Payment } from "../payments/entities/payment.entity";
 import { InventoryModule } from "../inventory/inventory.module";
+import { MailModule } from "../mail/mail.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { InventoryModule } from "../inventory/inventory.module";
       User, Product, ProductVariant, Payment,
     ]),
     InventoryModule,
+    MailModule,
   ],
   controllers: [RentalsController],
   providers: [RentalsService],

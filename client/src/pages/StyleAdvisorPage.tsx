@@ -7,9 +7,13 @@ import { Label } from "@/components/ui/label";
 import { recommendationsApi, type RecommendResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-const OCCASIONS = ["Tiệc", "Cưới", "Casual", "Đi làm"];
-const STYLES = ["Thanh lịch", "Năng động", "Cổ điển", "Hiện đại", "Ngọt ngào"];
-const COLORS = ["Đen", "Trắng", "Đỏ", "Hồng", "Xanh navy", "Be", "Vàng", "Xanh lá"];
+const CATEGORIES = [
+  { label: "👗 Váy / Đầm", value: "Dresses" },
+  { label: "👚 Áo", value: "Tops" },
+  { label: "👖 Quần", value: "Pants" },
+  { label: "🧥 Áo khoác", value: "Outerwear" },
+  { label: "🥻 Áo dài", value: "Áo dài" },
+];
 
 export default function StyleAdvisorPage() {
   const [height, setHeight] = useState("");
@@ -17,9 +21,8 @@ export default function StyleAdvisorPage() {
   const [bust, setBust] = useState("");
   const [waist, setWaist] = useState("");
   const [hips, setHips] = useState("");
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [colorInput, setColorInput] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const [results, setResults] = useState<RecommendResult[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,9 +54,8 @@ export default function StyleAdvisorPage() {
         bust: bust ? Number(bust) : undefined,
         waist: waist ? Number(waist) : undefined,
         hips: hips ? Number(hips) : undefined,
-        favoriteColors: selectedColors.join(", ") || undefined,
-        occasion: selectedOccasions.join(", ") || undefined,
-        style: selectedStyles.join(", ") || undefined,
+        favoriteColors: colorInput.trim() || undefined,
+        category: selectedCategories.join(", ") || undefined,
       });
       setResults(data);
     } catch (e: any) {
@@ -143,75 +145,48 @@ export default function StyleAdvisorPage() {
               </div>
             </div>
 
+            {/* Loại trang phục */}
+            <div>
+              <h3 className="font-medium mb-3">👗 Loại trang phục</h3>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() =>
+                      toggleItem(selectedCategories, setSelectedCategories, c.value)
+                    }
+                    className={cn(
+                      "px-3 py-1.5 rounded-full border text-sm transition-all",
+                      selectedCategories.includes(c.value)
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border hover:border-accent"
+                    )}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Có thể chọn nhiều loại. Bỏ trống để AI tự chọn.
+              </p>
+            </div>
+
             {/* Màu yêu thích */}
             <div>
               <h3 className="font-medium mb-3">🎨 Màu sắc yêu thích</h3>
-              <div className="flex flex-wrap gap-2">
-                {COLORS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => toggleItem(selectedColors, setSelectedColors, c)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-full border text-sm transition-all",
-                      selectedColors.includes(c)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-accent"
-                    )}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
+              <Input
+                type="text"
+                placeholder="VD: màu hồng, đỏ đô, xanh pastel..."
+                value={colorInput}
+                onChange={(e) => setColorInput(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Điền màu bạn thích, AI sẽ tìm sản phẩm phù hợp nhất.
+              </p>
             </div>
 
-            {/* Dịp mặc */}
-            <div>
-              <h3 className="font-medium mb-3">🎉 Dịp mặc</h3>
-              <div className="flex flex-wrap gap-2">
-                {OCCASIONS.map((o) => (
-                  <button
-                    key={o}
-                    type="button"
-                    onClick={() =>
-                      toggleItem(selectedOccasions, setSelectedOccasions, o)
-                    }
-                    className={cn(
-                      "px-3 py-1.5 rounded-full border text-sm transition-all",
-                      selectedOccasions.includes(o)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-accent"
-                    )}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Phong cách */}
-            <div>
-              <h3 className="font-medium mb-3">✨ Phong cách</h3>
-              <div className="flex flex-wrap gap-2">
-                {STYLES.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() =>
-                      toggleItem(selectedStyles, setSelectedStyles, s)
-                    }
-                    className={cn(
-                      "px-3 py-1.5 rounded-full border text-sm transition-all",
-                      selectedStyles.includes(s)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-accent"
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Dịp mặc - đã bỏ */}
 
             {error && (
               <p className="text-sm text-destructive">{error}</p>

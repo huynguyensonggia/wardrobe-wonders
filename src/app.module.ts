@@ -10,6 +10,8 @@ import { AdminModule } from "./modules/admin/admin.module";
 import { RentalsModule } from "./modules/rentals/rentals.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
 import { RecommendationsModule } from "./modules/recommendations/recommendations.module";
+import { MailModule } from "./modules/mail/mail.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { RecommendationsModule } from "./modules/recommendations/recommendations
     RentalsModule,
     InventoryModule,
     RecommendationsModule,
+    MailModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],

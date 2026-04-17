@@ -33,15 +33,6 @@ function inferSize(height: number, weight: number): string[] {
   return ["XL", "XXL"];
 }
 
-// ─── Occasion mapping ─────────────────────────────────────────────────────────
-function mapOccasion(input: string): string[] {
-  const s = input.toLowerCase();
-  const result: string[] = [];
-  if (s.includes("tiệc") || s.includes("party") || s.includes("event")) result.push("party");
-  if (s.includes("cưới") || s.includes("wedding")) result.push("wedding");
-  if (s.includes("casual") || s.includes("thường") || s.includes("ngày")) result.push("casual");
-  return result.length ? result : [];
-}
 
 @Injectable()
 export class RecommendationsService {
@@ -57,63 +48,36 @@ export class RecommendationsService {
       relations: ["category", "variants"],
     });
 
-    // 2. Rule-based filter
     const suggestedSizes = inferSize(dto.height, dto.weight);
-    const occasionFilter = dto.occasion ? mapOccasion(dto.occasion) : [];
-    const colorKeywords = dto.favoriteColors
-      ? dto.favoriteColors.toLowerCase().split(/[,،\s]+/).filter(Boolean)
+
+    // Category filter
+    const categoryKeywords = dto.category
+      ? dto.category.toLowerCase().split(/[,،]+/).map((s) => s.trim()).filter(Boolean)
       : [];
 
     let filtered = allProducts.filter((p) => {
-      // Có size phù hợp trong variants
       const hasSuitableSize =
         suggestedSizes.length === 0 ||
         p.variants?.some((v) => suggestedSizes.includes(v.size) && v.stock > 0);
 
-      // Occasion khớp (nếu có filter)
-      const occasionMatch =
-        occasionFilter.length === 0 ||
-        occasionFilter.includes(p.occasion?.toLowerCase());
+      const productCatName = (p.category?.name ?? "").toLowerCase();
+      const categoryMatch =
+        categoryKeywords.length === 0 ||
+        categoryKeywords.some((kw) => productCatName.includes(kw) || kw.includes(productCatName));
 
-      // Màu sắc khớp (nếu có filter) — so sánh loose
-      const productColor = (p.color ?? "").toLowerCase();
-      const colorMatch =
-        colorKeywords.length === 0 ||
-        colorKeywords.some((kw) => productColor.includes(kw) || kw.includes(productColor));
-
-      return hasSuitableSize && occasionMatch && colorMatch;
+      return hasSuitableSize && categoryMatch;
     });
 
-    // Nếu filter màu quá chặt (< 5 kết quả) → bỏ filter màu, giữ size + occasion
+    // Fallback: bỏ category filter nếu < 5
     if (filtered.length < 5) {
-      filtered = allProducts.filter((p) => {
-        const hasSuitableSize =
-          suggestedSizes.length === 0 ||
-          p.variants?.some((v) => suggestedSizes.includes(v.size) && v.stock > 0);
-        const occasionMatch =
-          occasionFilter.length === 0 ||
-          occasionFilter.includes(p.occasion?.toLowerCase());
-        return hasSuitableSize && occasionMatch;
-      });
+      filtered = allProducts.filter((p) =>
+        suggestedSizes.length === 0 ||
+        p.variants?.some((v) => suggestedSizes.includes(v.size) && v.stock > 0)
+      );
     }
 
-    // Fallback cuối: lấy tất cả nếu vẫn < 5
+    // Fallback cuối
     if (filtered.length < 5) filtered = allProducts.slice(0, 50);
-
-    // Sắp xếp: ưu tiên sản phẩm khớp màu lên đầu
-    if (colorKeywords.length > 0) {
-      filtered.sort((a, b) => {
-        const aMatch = colorKeywords.some((kw) =>
-          (a.color ?? "").toLowerCase().includes(kw) || kw.includes((a.color ?? "").toLowerCase())
-        );
-        const bMatch = colorKeywords.some((kw) =>
-          (b.color ?? "").toLowerCase().includes(kw) || kw.includes((b.color ?? "").toLowerCase())
-        );
-        if (aMatch && !bMatch) return -1;
-        if (!aMatch && bMatch) return 1;
-        return 0;
-      });
-    }
 
     // Giới hạn 30 sản phẩm gửi lên Gemini
     const candidates = filtered.slice(0, 30);
@@ -169,10 +133,16 @@ export class RecommendationsService {
 - Số đo: ${measurements}
 - Size phù hợp: ${sizes.join(", ")}
 - Màu yêu thích: ${dto.favoriteColors || "không có yêu cầu"}
-- Dịp mặc: ${dto.occasion || "không có yêu cầu"}
-- Phong cách: ${dto.style || "không có yêu cầu"}
+- Loại trang phục muốn tìm: ${dto.category || "không có yêu cầu"}
 
-${dto.favoriteColors ? `⚠️ QUAN TRỌNG: Khách hàng yêu cầu màu "${dto.favoriteColors}". Hãy ưu tiên chọn sản phẩm có màu này trước. Chỉ chọn màu khác nếu không còn lựa chọn nào phù hợp.` : ""}
+${dto.favoriteColors ? `⚠️ QUAN TRỌNG VỀ MÀU SẮC: Khách hàng muốn màu "${dto.favoriteColors}".
+Hãy duyệt qua từng sản phẩm trong danh sách, xem trường "color" của từng sản phẩm.
+Ưu tiên chọn sản phẩm có color chứa từ đồng nghĩa hoặc liên quan đến màu khách yêu cầu.
+Ví dụ: "hồng" → chấp nhận "hồng phấn", "hồng đào", "hồng pastel", "hồng nhạt"...
+Chỉ chọn màu khác nếu không có đủ 5 sản phẩm phù hợp màu.` : ""}
+
+${dto.category ? `⚠️ QUAN TRỌNG VỀ LOẠI TRANG PHỤC: Khách hàng muốn loại "${dto.category}".
+Ưu tiên sản phẩm có trường "category" khớp với loại này.` : ""}
 
 Danh sách sản phẩm có sẵn (JSON):
 ${JSON.stringify(products, null, 2)}

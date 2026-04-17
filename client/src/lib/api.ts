@@ -355,8 +355,7 @@ export type RecommendRequest = {
   waist?: number;
   hips?: number;
   favoriteColors?: string;
-  occasion?: string;
-  style?: string;
+  category?: string;
 };
 
 export type RecommendedProduct = {
