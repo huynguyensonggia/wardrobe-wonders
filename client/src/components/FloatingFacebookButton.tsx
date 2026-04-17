@@ -1,7 +1,7 @@
 import { Facebook } from "lucide-react";
 
 export function FloatingFacebookButton() {
-  const fbLink = "https://www.facebook.com/huonhuonv";
+  const fbLink = "https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr";
 
   return (
     <a

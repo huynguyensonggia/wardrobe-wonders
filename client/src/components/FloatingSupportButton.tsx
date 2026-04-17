@@ -3,7 +3,7 @@ import { Facebook, Headphones } from "lucide-react";
 
 export function FloatingSupportButton() {
   const [open, setOpen] = useState(false);
-  const fbLink = "https://www.facebook.com/huonhuonv";
+  const fbLink = "https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr";
   const zaloLink = "https://zalo.me/0963931349";
 
   return (

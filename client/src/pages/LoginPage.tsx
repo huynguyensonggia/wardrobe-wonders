@@ -130,13 +130,7 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-secondary rounded-lg">
-            <p className="text-sm font-medium mb-2">{t("auth.login.demo.title")}</p>
-            <p className="text-xs text-muted-foreground whitespace-pre-line">
-              {t("auth.login.demo.body")}
-            </p>
-          </div>
+          {/* Demo Credentials - đã ẩn */}
         </div>
       </div>
 
