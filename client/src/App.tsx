@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { CartProvider } from "@/contexts/CartContext";
 import { FloatingSupportButton } from "@/components/FloatingSupportButton";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 // Pages
 import HomePage from "@/pages/HomePage";
@@ -81,6 +82,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingSupportButton />
+            <PWAInstallPrompt />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>

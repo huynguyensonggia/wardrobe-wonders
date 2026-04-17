@@ -47,6 +47,12 @@ async function bootstrap() {
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port, "0.0.0.0");
 
+  // Health check endpoint — dùng để keep-alive ping (tránh Render cold start)
+  const httpAdapter = app.getHttpAdapter();
+  httpAdapter.get("/health", (_req: any, res: any) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   console.log(`Server is running on: http://0.0.0.0:${port}`);
   console.log(`API base: http://localhost:${port}/api`);
   console.log(
