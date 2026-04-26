@@ -9,7 +9,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { t, i18n } = useTranslation();
-  const lang = i18n.language; // "vi" | "en" | "ja"
+  const lang = i18n.language;
 
   const imgs: any[] = (product as any)?.images ?? [];
   const primaryImage = imgs.find((img) => img?.isPrimary) || imgs[0];
@@ -23,10 +23,10 @@ export function ProductCard({ product }: ProductCardProps) {
   const categoryName =
     (product as any)?.category?.name ?? t("productCard.fallback.category");
 
-  // Tên đa ngôn ngữ: ưu tiên nameVi/nameJa nếu có, fallback về name
-  const nameEn = (product as any)?.name ?? t("productCard.fallback.product");
-  const nameVi = (product as any)?.nameVi || nameEn;
-  const nameJa = (product as any)?.nameJa || nameEn;
+  // Tên đa ngôn ngữ: ưu tiên nameEn/nameJa nếu có, fallback về name gốc
+  const nameVi = (product as any)?.name ?? t("productCard.fallback.product");
+  const nameEn = (product as any)?.nameEn || nameVi;
+  const nameJa = (product as any)?.nameJa || nameVi;
   const productName = lang === "vi" ? nameVi : lang === "ja" ? nameJa : nameEn;
 
   const pricePerDay =
@@ -79,10 +79,6 @@ export function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider">
-          {categoryName}
-        </p>
-
         <h3 className="font-display text-lg font-medium group-hover:text-accent transition-colors">
           {productName}
         </h3>

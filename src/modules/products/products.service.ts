@@ -161,6 +161,10 @@ export class ProductService {
       color,
       imageUrl: null,
       description: dto.description ?? null,
+      nameEn: (dto as any).nameEn ?? null,
+      nameJa: (dto as any).nameJa ?? null,
+      descriptionEn: (dto as any).descriptionEn ?? null,
+      descriptionJa: (dto as any).descriptionJa ?? null,
       status: dto.status ?? ProductStatus.AVAILABLE,
     });
 
@@ -259,6 +263,10 @@ export class ProductService {
     if (dto.deposit !== undefined) product.deposit = dto.deposit;
     if (dto.color !== undefined) product.color = nextColor;
     if (dto.description !== undefined) product.description = dto.description;
+    if ((dto as any).nameEn !== undefined) product.nameEn = (dto as any).nameEn ?? null;
+    if ((dto as any).nameJa !== undefined) product.nameJa = (dto as any).nameJa ?? null;
+    if ((dto as any).descriptionEn !== undefined) product.descriptionEn = (dto as any).descriptionEn ?? null;
+    if ((dto as any).descriptionJa !== undefined) product.descriptionJa = (dto as any).descriptionJa ?? null;
     if (dto.status !== undefined) product.status = dto.status;
 
     await this.productRepo.save(product);
@@ -403,6 +411,10 @@ export class ProductService {
 
         const description = r.description ?? null;
         const imageUrl = r.imageUrl ?? null;
+        const nameEn = r.nameEn ? String(r.nameEn).trim() : null;
+        const nameJa = r.nameJa ? String(r.nameJa).trim() : null;
+        const descriptionEn = r.descriptionEn ? String(r.descriptionEn).trim() : null;
+        const descriptionJa = r.descriptionJa ? String(r.descriptionJa).trim() : null;
 
         // variantsJson
         let variants: any[] = [];
@@ -424,6 +436,10 @@ export class ProductService {
           color,
           imageUrl: null,
           description,
+          nameEn,
+          nameJa,
+          descriptionEn,
+          descriptionJa,
           status,
         });
 

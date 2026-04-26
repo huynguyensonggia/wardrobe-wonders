@@ -63,12 +63,11 @@ function calcRentalPrice(basePrice: number, days: number): number {
 }
 
 export default function ProductDetailPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const MIN_RENTAL_DAYS = 1;
 
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [dateRange, setDateRange] = useState<{
@@ -347,7 +346,7 @@ export default function ProductDetailPage() {
                   {(product as any).category?.name}
                 </p>
                 <h1 className="font-display text-3xl md:text-4xl font-semibold">
-                  {(product as any).name}
+                  {(i18n.language === "en" ? (product as any).nameEn : i18n.language === "ja" ? (product as any).nameJa : null) || (product as any).name}
                 </h1>
               </div>
               <div className="flex gap-2">
@@ -376,7 +375,7 @@ export default function ProductDetailPage() {
             )}
 
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              {(product as any).description}
+              {(i18n.language === "en" ? (product as any).descriptionEn : i18n.language === "ja" ? (product as any).descriptionJa : null) || (product as any).description}
             </p>
 
             {/* Size Selection */}

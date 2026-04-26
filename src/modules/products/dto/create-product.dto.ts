@@ -63,6 +63,22 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
+  @IsString()
+  nameEn?: string;
+
+  @IsOptional()
+  @IsString()
+  nameJa?: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionEn?: string;
+
+  @IsOptional()
+  @IsString()
+  descriptionJa?: string;
+
   // ✅ NEW: nhiều size + stock
   @IsArray()
   @ArrayMinSize(1)

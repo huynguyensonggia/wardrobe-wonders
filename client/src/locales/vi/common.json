@@ -60,7 +60,7 @@
         "color": "Màu",
         "allColors": "Tất cả màu",
         "availability": "Tình trạng",
-        "allStatus": "Tất cả",
+        "allStatus": "Trạng thái",
         "status": {
             "available": "Còn hàng",
             "rented": "Đang thuê"

@@ -29,6 +29,12 @@ export class Product {
   @Column({ name: "name", length: 150 })
   name: string;
 
+  @Column({ name: "name_en", length: 150, nullable: true })
+  nameEn: string | null;
+
+  @Column({ name: "name_ja", length: 150, nullable: true })
+  nameJa: string | null;
+
   // ===== CATEGORY =====
   @Column({ name: "category_id", type: "int" })
   categoryId: number;
@@ -72,6 +78,12 @@ export class Product {
 
   @Column({ name: "description", type: "text", nullable: true })
   description: string | null;
+
+  @Column({ name: "description_en", type: "text", nullable: true })
+  descriptionEn: string | null;
+
+  @Column({ name: "description_ja", type: "text", nullable: true })
+  descriptionJa: string | null;
 
   // ===== STATUS =====
   @Column({

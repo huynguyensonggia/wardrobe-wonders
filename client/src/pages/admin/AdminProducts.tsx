@@ -156,6 +156,10 @@ export default function AdminProducts() {
   const [rentPricePerDay, setRentPricePerDay] = useState("150");
   const [deposit, setDeposit] = useState("200");
   const [color, setColor] = useState("unknown");
+  const [nameEn, setNameEn] = useState("");
+  const [nameJa, setNameJa] = useState("");
+  const [descriptionEn, setDescriptionEn] = useState("");
+  const [descriptionJa, setDescriptionJa] = useState("");
 
   const [variants, setVariants] = useState<VariantForm[]>([
     { id: makeRowId(), size: "M", stock: "1", conditionNote: "" },
@@ -168,6 +172,10 @@ export default function AdminProducts() {
     setRentPricePerDay("150");
     setDeposit("200");
     setColor("unknown");
+    setNameEn("");
+    setNameJa("");
+    setDescriptionEn("");
+    setDescriptionJa("");
     setVariants([{ id: makeRowId(), size: "M", stock: "1", conditionNote: "" }]);
   };
 
@@ -194,6 +202,10 @@ export default function AdminProducts() {
     if (catId) setCategoryId(catId);
 
     setColor((p as any).color ?? "unknown");
+    setNameEn((p as any).nameEn ?? "");
+    setNameJa((p as any).nameJa ?? "");
+    setDescriptionEn((p as any).descriptionEn ?? "");
+    setDescriptionJa((p as any).descriptionJa ?? "");
 
     const vts = ((p as any).variants ?? []) as any[];
     if (Array.isArray(vts) && vts.length) {
@@ -292,6 +304,10 @@ export default function AdminProducts() {
       form.append("rentPricePerDay", rentPricePerDay);
       form.append("deposit", deposit);
       form.append("color", color);
+      if (nameEn.trim()) form.append("nameEn", nameEn.trim());
+      if (nameJa.trim()) form.append("nameJa", nameJa.trim());
+      if (descriptionEn.trim()) form.append("descriptionEn", descriptionEn.trim());
+      if (descriptionJa.trim()) form.append("descriptionJa", descriptionJa.trim());
 
       // IMPORTANT: multipart/form-data -> variants as JSON string
       form.append(
@@ -574,6 +590,29 @@ export default function AdminProducts() {
                 <div className="grid gap-2 max-w-[260px]">
                   <Label>{t("adminProducts.form.color")}</Label>
                   <Input value={color} onChange={(e) => setColor(e.target.value)} />
+                </div>
+              </div>
+
+              {/* Multilingual fields */}
+              <div className="border rounded-lg p-4 space-y-3">
+                <p className="text-sm font-medium">🌐 Tên & Mô tả đa ngôn ngữ <span className="text-muted-foreground font-normal">(không bắt buộc)</span></p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-1">
+                    <Label className="text-xs">Tên (English)</Label>
+                    <Input placeholder="Product name in English" value={nameEn} onChange={(e) => setNameEn(e.target.value)} />
+                  </div>
+                  <div className="grid gap-1">
+                    <Label className="text-xs">Tên (日本語)</Label>
+                    <Input placeholder="日本語の商品名" value={nameJa} onChange={(e) => setNameJa(e.target.value)} />
+                  </div>
+                  <div className="grid gap-1">
+                    <Label className="text-xs">Mô tả (English)</Label>
+                    <Input placeholder="Description in English" value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} />
+                  </div>
+                  <div className="grid gap-1">
+                    <Label className="text-xs">Mô tả (日本語)</Label>
+                    <Input placeholder="日本語の説明" value={descriptionJa} onChange={(e) => setDescriptionJa(e.target.value)} />
+                  </div>
                 </div>
               </div>
 
