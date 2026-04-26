@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Instagram, Twitter, Facebook } from "lucide-react";
+import { Facebook } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export function Footer() {
@@ -11,7 +11,10 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to="/" className="font-display text-2xl font-semibold tracking-tight">
+            <Link
+              to="/"
+              className="font-display text-2xl font-semibold tracking-tight"
+            >
               AI CLOSET
             </Link>
 
@@ -21,21 +24,9 @@ export function Footer() {
 
             <div className="flex gap-4 mt-6">
               <a
-                href="#"
-                className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
+                href="https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                 aria-label="Facebook"
               >
@@ -46,7 +37,9 @@ export function Footer() {
 
           {/* Shop */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">{t("footer.shop")}</h4>
+            <h4 className="font-display text-lg font-medium mb-4">
+              {t("footer.shop")}
+            </h4>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -85,7 +78,9 @@ export function Footer() {
 
           {/* Help */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">{t("footer.help")}</h4>
+            <h4 className="font-display text-lg font-medium mb-4">
+              {t("footer.help")}
+            </h4>
             <ul className="space-y-3">
               <li>
                 <Link
@@ -124,7 +119,9 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="font-display text-lg font-medium mb-4">{t("footer.company")}</h4>
+            <h4 className="font-display text-lg font-medium mb-4">
+              {t("footer.company")}
+            </h4>
             <ul className="space-y-3">
               <li>
                 <Link

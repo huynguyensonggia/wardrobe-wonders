@@ -30,6 +30,10 @@ import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminInventory from "@/pages/admin/AdminInventory";
 import CartPage from "@/pages/CartPage";
 import StyleAdvisorPage from "@/pages/StyleAdvisorPage";
+import HowItWorksPage from "@/pages/HowItWorksPage";
+import SizeGuidePage from "@/pages/SizeGuidePage";
+import ShippingReturnsPage from "@/pages/ShippingReturnsPage";
+import FAQPage from "@/pages/FAQPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -56,6 +60,13 @@ const App = () => (
                 <Route path="/products/:id" element={<ProductDetailPage />} />
                 <Route path="/try-on" element={<TryOnPage />} />
                 <Route path="/style-advisor" element={<StyleAdvisorPage />} />
+                <Route path="/how-it-works" element={<HowItWorksPage />} />
+                <Route path="/size-guide" element={<SizeGuidePage />} />
+                <Route
+                  path="/shipping-returns"
+                  element={<ShippingReturnsPage />}
+                />
+                <Route path="/faq" element={<FAQPage />} />
                 <Route path="/cart" element={<CartPage />} />
 
                 {/* ✅ NEW: Checkout */}

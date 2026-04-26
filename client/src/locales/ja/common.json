@@ -1,1031 +1,1574 @@
 {
-    "footer": {
-        "tagline": "現代の女性のためのプレミアムファッションレンタル。長期契約なしでデザイナーズアイテムを楽しめます。",
-        "shop": "ショップ",
-        "allCollections": "すべてのコレクション",
-        "dresses": "ドレス",
-        "outerwear": "アウター",
-        "tops": "トップス",
-        "help": "ヘルプ",
-        "howItWorks": "レンタルの流れ",
-        "sizeGuide": "サイズガイド",
-        "shippingReturns": "配送と返品",
-        "faq": "よくある質問",
-        "company": "会社情報",
-        "about": "AI Closet について",
-        "sustainability": "サステナビリティ",
-        "careers": "採用情報",
-        "contact": "お問い合わせ",
-        "privacy": "プライバシーポリシー",
-        "terms": "利用規約",
-        "copyright": "© {{year}} AI Closet. All rights reserved."
+  "footer": {
+    "tagline": "現代の女性のためのプレミアムファッションレンタル。長期契約なしでデザイナーズアイテムを楽しめます。",
+    "shop": "ショップ",
+    "allCollections": "すべてのコレクション",
+    "dresses": "ドレス",
+    "outerwear": "アウター",
+    "tops": "トップス",
+    "help": "ヘルプ",
+    "howItWorks": "レンタルの流れ",
+    "sizeGuide": "サイズガイド",
+    "shippingReturns": "配送と返品",
+    "faq": "よくある質問",
+    "company": "会社情報",
+    "about": "AI Closet について",
+    "sustainability": "サステナビリティ",
+    "careers": "採用情報",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "copyright": "© {{year}} AI Closet. All rights reserved."
+  },
+  "language": {
+    "label": "言語",
+    "en": "英語",
+    "vi": "ベトナム語",
+    "ja": "日本語"
+  },
+  "navbar": {
+    "collection": "コレクション",
+    "event": "イベント",
+    "trend": "トレンド",
+    "traditional": "トラディショナル",
+    "dresses": "ドレス",
+    "tops": "トップス",
+    "pants": "パンツ",
+    "outerwear": "アウター",
+    "aoDaiCaoCap": "プレミアムアオザイ",
+    "aoDai": "アオザイ",
+    "aiTryOn": "AI試着",
+    "styleAdvisor": "スタイル診断",
+    "cart": "カート",
+    "myRentals": "レンタル履歴",
+    "adminDashboard": "管理ダッシュボード",
+    "settings": "設定",
+    "signOut": "サインアウト",
+    "signIn": "サインイン",
+    "joinNow": "新規登録",
+    "menu": "メニュー"
+  },
+  "products": {
+    "title": "コレクション",
+    "piecesAvailable": "{{count}}点の商品があります",
+    "searchPlaceholder": "商品を検索...",
+    "filters": "フィルター",
+    "category": "カテゴリー",
+    "allCategories": "すべてのカテゴリー",
+    "size": "サイズ",
+    "allSizes": "すべてのサイズ",
+    "color": "カラー",
+    "allColors": "すべてのカラー",
+    "availability": "在庫状況",
+    "allStatus": "すべて",
+    "status": {
+      "available": "在庫あり",
+      "rented": "レンタル中"
     },
-    "language": {
-        "label": "言語",
-        "en": "英語",
-        "vi": "ベトナム語",
-        "ja": "日本語"
+    "clear": "クリア",
+    "loading": "読み込み中...",
+    "error": "商品の取得に失敗しました",
+    "noProducts": "商品が見つかりません",
+    "clearFilters": "フィルターをクリア"
+  },
+  "productDetail": {
+    "loading": "商品を読み込み中...",
+    "errorTitle": "商品の読み込みに失敗しました",
+    "notFoundTitle": "商品が見つかりません",
+    "backToCollection": "コレクションに戻る",
+    "perDay": "/日",
+    "deposit": "デポジット",
+    "unavailable": "現在利用できません",
+    "selectSize": "サイズを選択",
+    "sizeGuide": "サイズガイド",
+    "sizeChartTitle": "レディースサイズ表",
+    "sizeChartAlt": "レディースサイズ表",
+    "noVariantsWarning": "⚠️ APIからのバリアントがありません。",
+    "selectColor": "カラーを選択",
+    "rentalPeriod": "レンタル期間",
+    "selectDates": "日付を選択",
+    "minimumRentalHint": "最短レンタル期間:",
+    "minimumDays": "{{days}}日",
+    "minimumRentalError": "最低{{days}}日以上です。",
+    "days": "日",
+    "refundableDeposit": "返金可能なデポジット",
+    "totalDueToday": "本日支払い合計",
+    "rentNow": "今すぐレンタル",
+    "addToCart": "カートに追加",
+    "tryOnVirtually": "バーチャル試着",
+    "galleryImage": "ギャラリー画像 {{index}}",
+    "actions": {
+      "favorite": "お気に入りに追加",
+      "share": "共有"
     },
-    "navbar": {
-        "collection": "コレクション",
-        "event": "イベント",
-        "trend": "トレンド",
-        "traditional": "トラディショナル",
-        "dresses": "ドレス",
-        "tops": "トップス",
-        "pants": "パンツ",
-        "outerwear": "アウター",
-        "aoDaiCaoCap": "プレミアムアオザイ",
-        "aoDai": "アオザイ",
-        "aiTryOn": "AI試着",
-        "styleAdvisor": "スタイル診断",
-        "cart": "カート",
-        "myRentals": "レンタル履歴",
-        "adminDashboard": "管理ダッシュボード",
-        "settings": "設定",
-        "signOut": "サインアウト",
-        "signIn": "サインイン",
-        "joinNow": "新規登録",
-        "menu": "メニュー"
+    "tooltips": {
+      "variantInactive": "バリアント無効",
+      "outOfStock": "在庫切れ",
+      "stock": "在庫: {{stock}}"
     },
-    "products": {
-        "title": "コレクション",
-        "piecesAvailable": "{{count}}点の商品があります",
-        "searchPlaceholder": "商品を検索...",
-        "filters": "フィルター",
-        "category": "カテゴリー",
-        "allCategories": "すべてのカテゴリー",
-        "size": "サイズ",
-        "allSizes": "すべてのサイズ",
-        "color": "カラー",
-        "allColors": "すべてのカラー",
-        "availability": "在庫状況",
-        "allStatus": "すべて",
-        "status": {
-            "available": "在庫あり",
-            "rented": "レンタル中"
-        },
-        "clear": "クリア",
-        "loading": "読み込み中...",
-        "error": "商品の取得に失敗しました",
-        "noProducts": "商品が見つかりません",
-        "clearFilters": "フィルターをクリア"
+    "selectedVariant": "• 在庫: {{stock}}",
+    "features": {
+      "freeShipping": "400.000đ以上で送料無料",
+      "damageProtection": "破損補償込み"
     },
-    "productDetail": {
-        "loading": "商品を読み込み中...",
-        "errorTitle": "商品の読み込みに失敗しました",
-        "notFoundTitle": "商品が見つかりません",
-        "backToCollection": "コレクションに戻る",
-        "perDay": "/日",
-        "deposit": "デポジット",
-        "unavailable": "現在利用できません",
-        "selectSize": "サイズを選択",
-        "sizeGuide": "サイズガイド",
-        "sizeChartTitle": "レディースサイズ表",
-        "sizeChartAlt": "レディースサイズ表",
-        "noVariantsWarning": "⚠️ APIからのバリアントがありません。",
-        "selectColor": "カラーを選択",
-        "rentalPeriod": "レンタル期間",
-        "selectDates": "日付を選択",
-        "minimumRentalHint": "最短レンタル期間:",
-        "minimumDays": "{{days}}日",
-        "minimumRentalError": "最低{{days}}日以上です。",
-        "days": "日",
-        "refundableDeposit": "返金可能なデポジット",
-        "totalDueToday": "本日支払い合計",
-        "rentNow": "今すぐレンタル",
-        "addToCart": "カートに追加",
-        "tryOnVirtually": "バーチャル試着",
-        "galleryImage": "ギャラリー画像 {{index}}",
-        "actions": {
-            "favorite": "お気に入りに追加",
-            "share": "共有"
-        },
-        "tooltips": {
-            "variantInactive": "バリアント無効",
-            "outOfStock": "在庫切れ",
-            "stock": "在庫: {{stock}}"
-        },
-        "selectedVariant": "• 在庫: {{stock}}",
-        "features": {
-            "freeShipping": "400.000đ以上で送料無料",
-            "damageProtection": "破損補償込み"
-        },
-        "alerts": {
-            "selectSize": "サイズを選択してください",
-            "variantNotFound": "サイズ/バリアントが見つかりません。選び直してください。",
-            "outOfStock": "このサイズは在庫切れです。",
-            "selectDates": "レンタル日程を選択してください",
-            "minimumRental": "最低レンタル期間は{{days}}日です",
-            "addedToCart": "カートに追加しました！"
-        }
+    "alerts": {
+      "selectSize": "サイズを選択してください",
+      "variantNotFound": "サイズ/バリアントが見つかりません。選び直してください。",
+      "outOfStock": "このサイズは在庫切れです。",
+      "selectDates": "レンタル日程を選択してください",
+      "minimumRental": "最低レンタル期間は{{days}}日です",
+      "addedToCart": "カートに追加しました！"
+    }
+  },
+  "home": {
+    "loading": "読み込み中...",
+    "errors": {
+      "loadHomepage": "ホームページのデータ取得に失敗しました"
     },
-    "home": {
-        "loading": "読み込み中...",
-        "errors": {
-            "loadHomepage": "ホームページのデータ取得に失敗しました"
-        },
-        "hero": {
-            "imageAlt": "エレガントなファッション",
-            "titleLine1": "すぐにレンタルできる、",
-            "titleHighlight": "瞬間を自分のものに",
-            "subtitle": "所有せずにデザイナーファッションを楽しもう。サステナブルで手頃、そしていつもスタイリッシュ。",
-            "ctaExplore": "コレクションを見る",
-            "ctaTryOn": "AI試着"
-        },
-        "features": {
-            "ai": {
-                "title": "AI試着",
-                "desc": "レンタル前に着用イメージを確認"
-            },
-            "delivery": {
-                "title": "送料無料",
-                "desc": "400.000đ以上の注文で送料無料"
-            },
-            "insured": {
-                "title": "補償付き",
-                "desc": "破損補償で安心して着用"
-            },
-            "returns": {
-                "title": "簡単返品",
-                "desc": "返送ラベル付きで手間なく返品"
-            }
-        },
-        "categories": {
-            "title": "カテゴリーから探す",
-            "subtitle": "あらゆるシーンに合わせた厳選コレクション"
-        },
-        "featured": {
-            "title": "おすすめ",
-            "subtitle": "最新コレクションから厳選",
-            "viewAll": "すべて見る",
-            "viewAllMobile": "すべての商品を見る"
-        },
-        "tryOnCta": {
-            "title": "AIがコーデを提案",
-            "desc": "身長・体重・好きな色・シーンを入力するだけで、AIがコレクションの中からあなたにぴったりのアイテムを提案します。",
-            "button": "今すぐ試す"
-        },
-        "testimonial": {
-            "quote": "“AI Closetのおかげで服選びが変わりました。AI試着でレンタル前にフィット感を確認できるので、イベントごとに最高のコーデを選べます。”",
-            "name": "Sarah Mitchell",
-            "title": "ファッションエディター, Vogue"
-        }
+    "hero": {
+      "imageAlt": "エレガントなファッション",
+      "titleLine1": "すぐにレンタルできる、",
+      "titleHighlight": "瞬間を自分のものに",
+      "subtitle": "所有せずにデザイナーファッションを楽しもう。サステナブルで手頃、そしていつもスタイリッシュ。",
+      "ctaExplore": "コレクションを見る",
+      "ctaTryOn": "AI試着"
     },
-    "tryOn": {
-        "disclaimer": {
-            "title": "📸 バーチャル試着の前にご確認ください",
-            "body": "AIバーチャル試着は、コーディネートの全体的なスタイルをイメージしていただくための参考画像を生成します。\n\nAIによる画像処理のため、実際の体型・プロポーションと異なる場合があります — 特に体型によっては差が生じることがあります。\n\n👗 最適なサイズをお選びいただくために、レンタル前にサイズ表をご参照の上、バスト・ウエスト・ヒップをお測りください。",
-            "sizeGuideLink": "サイズ表を見る",
-            "confirm": "了解しました、試着を続ける"
-        },
-        "header": {
-            "title": "AI バーチャル試着",
-            "subtitle": "写真をアップロードして、1ステップで試着結果を生成します。"
-        },
-        "steps": {
-            "1": {
-                "title": "写真をアップロード",
-                "desc": "全身写真・明るい環境"
-            },
-            "2": {
-                "title": "試着を生成",
-                "desc": "AIが処理して結果を生成"
-            },
-            "3": {
-                "title": "保存＆レンタル",
-                "desc": "結果を保存してお気に入りをレンタル"
-            }
-        },
-        "upload": {
-            "yourPhotoAlt": "あなたの写真",
-            "change": "変更",
-            "title": "写真をアップロード",
-            "subtitle": "全身・正面・腕が見える写真"
-        },
-        "tips": {
-            "title": "より良い結果のコツ:",
-            "1": "• 明るい場所で撮影する",
-            "2": "• 体にフィットした服を着る",
-            "3": "• カメラを正面から見る",
-            "4": "• 全身が写るようにする"
-        },
-        "processing": {
-            "title": "試着結果を生成中...",
-            "subtitle": "数秒かかる場合があります",
-            "hint": "AIが処理中です（約20〜60秒）。しばらくお待ちください...",
-            "wakeUp": "AIサーバーを起動中です。初回リクエストは1〜2分かかる場合があります..."
-        },
-        "actions": {
-            "save": "保存"
-        },
-        "preview": {
-            "result": "結果",
-            "selectedProduct": "選択した商品",
-            "preview": "プレビュー",
-            "productFallback": "商品 #{{id}}",
-            "loadingProduct": "商品を読み込み中...",
-            "failedProduct": "商品の読み込みに失敗しました",
-            "noProductImage": "商品画像がありません",
-            "browseProducts": "商品を見る"
-        },
-        "mix": {
-            "title": "Mix & Match",
-            "restoreBase": "元に戻す",
-            "hintPickUpper": "下半身アイテムを試着しました。トップス/アウターを選んでミックスしてください。",
-            "hintPickLower": "上半身アイテムを試着しました。パンツを選んでミックスしてください。",
-            "unavailable": "このカテゴリ（例：ワンピース）はミックスできません。",
-            "noCandidates": "ミックスできるアイテムが見つかりません。",
-            "noCandidatesHint": "ヒント: API",
-            "noCandidatesHint2": "が正しい",
-            "noCandidatesHint3": "またはカテゴリ名（Tops/Pants/Outerwear）を返しているか確認してください。",
-            "category": "カテゴリ",
-            "selected": "選択中",
-            "footerHint": "上のアイテムを1つ選んで「Mix & Generate Again」を押してください。",
-            "onlyUpperLower": "現在は Upper-body ↔ Lower-body のミックスのみ推奨しています。"
-        },
-        "buttons": {
-            "processing": "処理中...",
-            "generate": "試着を生成",
-            "mixGenerate": "ミックスして再生成"
-        },
-        "rentCta": {
-            "question": "気に入りましたか？",
-            "button": "このアイテムをレンタル"
-        },
-        "errors": {
-            "imageOnly": "画像ファイルをアップロードしてください",
-            "imageTooLarge": "画像は10MB未満にしてください",
-            "selectMixItem": "ミックスするアイテムを選択してください",
-            "noResultUrl": "サーバーから resultUrl が返されませんでした",
-            "generateFailed": "試着画像の生成に失敗しました。もう一度お試しください。"
-        }
+    "features": {
+      "ai": {
+        "title": "AI試着",
+        "desc": "レンタル前に着用イメージを確認"
+      },
+      "delivery": {
+        "title": "送料無料",
+        "desc": "400.000đ以上の注文で送料無料"
+      },
+      "insured": {
+        "title": "補償付き",
+        "desc": "破損補償で安心して着用"
+      },
+      "returns": {
+        "title": "簡単返品",
+        "desc": "返送ラベル付きで手間なく返品"
+      }
     },
-    "auth": {
-        "register": {
-            "backHome": "ホームに戻る",
-            "title": "AI Closet に参加",
-            "subtitle": "アカウントを作成してデザイナーファッションのレンタルを始めましょう。",
-            "fullName": {
-                "label": "氏名",
-                "placeholder": "お名前"
-            },
-            "email": {
-                "label": "メール",
-                "placeholder": "you@example.com"
-            },
-            "password": {
-                "label": "パスワード",
-                "placeholder": "••••••••",
-                "hint": "6文字以上",
-                "show": "パスワードを表示",
-                "hide": "パスワードを非表示"
-            },
-            "terms": {
-                "prefix": "私は",
-                "tos": "利用規約",
-                "and": "および",
-                "privacy": "プライバシーポリシー",
-                "suffix": "に同意します"
-            },
-            "button": {
-                "loading": "アカウント作成中...",
-                "submit": "アカウント作成"
-            },
-            "haveAccount": "すでにアカウントをお持ちですか？",
-            "signIn": "ログイン",
-            "toast": {
-                "termsRequired": {
-                    "title": "同意が必要です",
-                    "desc": "利用規約に同意してください。"
-                },
-                "success": {
-                    "title": "AI Closet へようこそ！",
-                    "desc": "アカウントが作成されました。"
-                },
-                "error": {
-                    "title": "エラー",
-                    "desc": "アカウント作成に失敗しました"
-                }
-            },
-            "quote": {
-                "text": "\"スタイルは、言葉を使わずに自分を語る方法。\"",
-                "author": "— Rachel Zoe"
-            }
-        },
-        "login": {
-            "backHome": "ホームに戻る",
-            "title": "おかえりなさい",
-            "subtitle": "ログインしてレンタル状況を確認し、引き続き探索しましょう。",
-            "email": {
-                "label": "メール",
-                "placeholder": "you@example.com"
-            },
-            "password": {
-                "label": "パスワード",
-                "placeholder": "••••••••",
-                "show": "パスワードを表示",
-                "hide": "パスワードを非表示"
-            },
-            "forgot": "パスワードをお忘れですか？",
-            "button": {
-                "loading": "ログイン中...",
-                "submit": "ログイン"
-            },
-            "noAccount": "アカウントをお持ちでないですか？",
-            "createOne": "作成する",
-            "demo": {
-                "title": "デモ認証情報",
-                "body": "User: user@smartdress.com / 123456\nAdmin: admin@smartdress.com / admin123"
-            },
-            "toast": {
-                "success": {
-                    "title": "おかえりなさい！",
-                    "desc": "ログインに成功しました。"
-                },
-                "error": {
-                    "title": "エラー",
-                    "desc": "ログインに失敗しました"
-                }
-            },
-            "quote": {
-                "text": "\"ファッションとは夢を見ることであり、他人にも夢を見させること。\"",
-                "author": "— Donatella Versace"
-            }
-        }
+    "categories": {
+      "title": "カテゴリーから探す",
+      "subtitle": "あらゆるシーンに合わせた厳選コレクション"
     },
-    "cart": {
-        "title": "カート",
-        "itemsCount": "{{count}} 点",
-        "empty": {
-            "title": "カートは空です",
-            "desc": "レンタルする商品を追加してください。",
-            "browse": "商品を見る"
-        },
-        "alert": {
-            "missingVariant": "一部の商品でサイズ/バリアントが未選択です。選び直してください。"
-        },
-        "days": "{{days}} 日",
-        "size": "サイズ:",
-        "variantFallback": "Variant#{{id}}",
-        "perDay": "日",
-        "lineTotal": "小計",
-        "remove": "削除",
-        "qty": {
-            "decrease": "数量を減らす",
-            "increase": "数量を増やす"
-        },
-        "clear": "カートを空にする",
-        "total": "合計",
-        "checkout": "チェックアウト"
+    "featured": {
+      "title": "おすすめ",
+      "subtitle": "最新コレクションから厳選",
+      "viewAll": "すべて見る",
+      "viewAllMobile": "すべての商品を見る"
     },
-    "checkout": {
-        "empty": {
-            "title": "チェックアウトする商品がありません",
-            "desc": "チェックアウト前に商品を追加してください。",
-            "browse": "商品を見る"
-        },
-        "summary": {
-            "title": "注文内容",
-            "rentalPeriod": "レンタル期間:",
-            "perDay": "日",
-            "days": "{{days}} 日",
-            "qty": "数量",
-            "line": "小計",
-            "groupTotal": "グループ合計",
-            "total": "レンタル料金",
-            "deposit": "デポジット（返金可）",
-            "grandTotal": "本日支払い合計",
-            "backToCart": "カートに戻る"
-        },
-        "shipping": {
-            "title": "配送情報",
-            "fullName": "氏名",
-            "phone": "電話番号",
-            "street": "番地 / 通り",
-            "district": "区",
-            "ward": "地区",
-            "districtPlaceholder": "-- 区を選択 --",
-            "wardPlaceholder": "-- 地区を選択 --",
-            "wardNeedDistrict": "先に区を選択してください",
-            "combinedAddress": "結合住所",
-            "note": "メモ",
-            "notePlaceholder": "配送メモ（任意）"
-        },
-        "address": {
-            "wardPrefix": "地区 {{ward}}",
-            "districtPrefix": "区 {{district}}",
-            "city": "ダナン"
-        },
-        "order": {
-            "note": "チェックアウトから作成"
-        },
-        "pickup": {
-            "label": "受け取り方法",
-            "delivery": {
-                "title": "宅配",
-                "desc": "ご指定の住所にお届けします"
-            },
-            "store": {
-                "title": "店舗受け取り",
-                "desc": "店舗に直接お越しください"
-            }
-        },
-        "payment": {
-            "method": "お支払い方法",
-            "methods": {
-                "CASH": "代金引換（受け取り時に現金払い）",
-                "COD": "COD（代金引換）",
-                "BANK_TRANSFER": "銀行振込"
-            },
-            "depositNote": "デポジットが必要です",
-            "depositAmount": "デポジット金額",
-            "depositHint": "商品を良好な状態で返却後、デポジットは返金されます。"
-        },
-        "button": {
-            "creating": "作成中...",
-            "confirm": "確定してレンタル作成"
-        },
-        "alert": {
-            "fullName": "氏名を入力してください",
-            "phone": "電話番号を入力してください",
-            "street": "番地/通りを入力してください",
-            "district": "区を選択してください",
-            "ward": "地区を選択してください",
-            "address": "住所を入力してください",
-            "success": "注文が作成されました！",
-            "failed": "レンタル作成に失敗しました"
-        }
+    "tryOnCta": {
+      "title": "AIがコーデを提案",
+      "desc": "身長・体重・好きな色・シーンを入力するだけで、AIがコレクションの中からあなたにぴったりのアイテムを提案します。",
+      "button": "今すぐ試す"
     },
-    "admin": {
-        "title": "管理者ダッシュボード",
-        "subtitle": "レンタルプラットフォームを管理",
-        "backHome": "ホームへ戻る",
-        "sidebar": {
-            "aria": "管理者ナビゲーション",
-            "overview": "概要",
-            "users": "ユーザー",
-            "products": "商品",
-            "categories": "カテゴリー",
-            "rentals": "レンタル",
-            "inventory": "在庫管理"
-        }
+    "testimonial": {
+      "quote": "“AI Closetのおかげで服選びが変わりました。AI試着でレンタル前にフィット感を確認できるので、イベントごとに最高のコーデを選べます。”",
+      "name": "Sarah Mitchell",
+      "title": "ファッションエディター, Vogue"
+    }
+  },
+  "tryOn": {
+    "disclaimer": {
+      "title": "📸 バーチャル試着の前にご確認ください",
+      "body": "AIバーチャル試着は、コーディネートの全体的なスタイルをイメージしていただくための参考画像を生成します。\n\nAIによる画像処理のため、実際の体型・プロポーションと異なる場合があります — 特に体型によっては差が生じることがあります。\n\n👗 最適なサイズをお選びいただくために、レンタル前にサイズ表をご参照の上、バスト・ウエスト・ヒップをお測りください。",
+      "sizeGuideLink": "サイズ表を見る",
+      "confirm": "了解しました、試着を続ける"
     },
-    "common": {
-        "refresh": "更新",
-        "edit": "編集",
-        "save": "保存",
-        "cancel": "キャンセル",
-        "dash": "-",
-        "loading": {
-            "rentals": "レンタルを読み込み中...",
-            "rentalHistory": "レンタル履歴を読み込み中..."
-        },
-        "errors": {
-            "prefix": "エラー",
-            "loadRentalsFailed": "レンタルの読み込みに失敗しました",
-            "cancelFailed": "キャンセルに失敗しました",
-            "loadRentalHistoryFailed": "レンタル履歴の読み込みに失敗しました"
-        },
-        "retry": "再試行",
-        "browseCollection": "コレクションを見る",
-        "product": "商品"
+    "header": {
+      "title": "AI バーチャル試着",
+      "subtitle": "写真をアップロードして、1ステップで試着結果を生成します。"
     },
-    "rentals": {
-        "current": {
-            "title": "現在のレンタル",
-            "activeCount": "有効 {{count}} 件",
-            "emptyTitle": "現在のレンタルはありません",
-            "emptyDesc": "完了したレンタルはレンタル履歴に保存されます。",
-            "noItems": "このレンタルには商品がありません。"
-        },
-        "itemLine": "数量: {{qty}} • 日数: {{days}} • /日: {{pricePerDay}}đ",
-        "subtotal": "小計",
-        "total": "合計",
-        "deposit": "デポジット",
-        "extended": "延長済み",
-        "actions": {
-            "extend": "延長",
-            "cancel": "キャンセル"
-        },
-        "extend": {
-            "title": "レンタルを延長",
-            "newEndDate": "新しい終了日",
-            "confirm": "確認",
-            "cancel": "キャンセル",
-            "success": "延長しました！",
-            "error": "延長に失敗しました"
-        },
-        "refundDeposit": {
-            "success": "デポジットを返金しました！",
-            "error": "返金に失敗しました"
-        },
-        "history": {
-            "title": "レンタル履歴",
-            "emptyTitle": "レンタル履歴がありません",
-            "emptyDesc": "完了したレンタルはここに表示されます",
-            "noItems": "このレンタルには商品がありません。"
-        }
+    "steps": {
+      "1": {
+        "title": "写真をアップロード",
+        "desc": "全身写真・明るい環境"
+      },
+      "2": {
+        "title": "試着を生成",
+        "desc": "AIが処理して結果を生成"
+      },
+      "3": {
+        "title": "保存＆レンタル",
+        "desc": "結果を保存してお気に入りをレンタル"
+      }
     },
-    "pagination": {
-        "prev": "前へ",
-        "next": "次へ",
-        "page": "ページ"
+    "upload": {
+      "yourPhotoAlt": "あなたの写真",
+      "change": "変更",
+      "title": "写真をアップロード",
+      "subtitle": "全身・正面・腕が見える写真"
     },
-    "adminRentals": {
-        "title": "レンタル",
-        "loading": "レンタルを読み込み中...",
-        "empty": "レンタルはまだありません。",
-        "total": "合計",
-        "days": "日",
-        "perDay": "日",
-        "user": "ユーザー",
-        "userFallback": "ユーザー",
-        "productFallback": "商品",
-        "totalLabel": "合計",
-        "deposit": "デポジット",
-        "detailTitle": "レンタル詳細",
-        "selectHint": "詳細を見るにはレンタルを選択してください。",
-        "noActions": "操作なし",
-        "updatingStatus": "ステータス更新中...",
-        "savingShipping": "配送情報を保存中...",
-        "noItems": "商品がありません。",
-        "errors": {
-            "loadFailedTitle": "レンタルの読み込みに失敗しました",
-            "updateStatusFailed": "ステータス更新に失敗しました",
-            "updateShippingFailed": "配送情報の更新に失敗しました"
-        },
-        "actions": {
-            "startShipping": "発送開始",
-            "reject": "却下",
-            "customerReceived": "受け取り完了",
-            "complete": "完了",
-            "refundDeposit": "デポジット返金",
-            "depositRefunded": "返金済み"
-        },
-        "detail": {
-            "rental": "レンタル",
-            "status": "ステータス",
-            "shipping": "配送",
-            "items": "商品",
-            "note": "メモ",
-            "surcharges": "追加料金",
-            "payments": "支払い内訳"
-        },
-        "payment": {
-            "rent": "レンタル料",
-            "deposit": "デポジット",
-            "extension": "延長料金"
-        },
-        "shipping": {
-            "edit": "配送を編集",
-            "editableOnlyPendingShipping": "PENDING/SHIPPING のときのみ編集可能",
-            "name": "氏名",
-            "phone": "電話",
-            "address": "住所",
-            "note": "メモ"
-        },
-        "placeholders": {
-            "fullName": "氏名",
-            "phone": "電話番号",
-            "address": "住所",
-            "noteOptional": "メモ（任意）"
-        },
-        "item": {
-            "size": "サイズ",
-            "qty": "数量",
-            "subtotal": "小計"
-        },
-        "success": "成功",
-        "error": "エラー",
-        "edit": "編集",
-        "delete": "削除",
-        "cancel": "キャンセル",
-        "surcharge": {
-            "add": "追加料金を追加",
-            "amount": "金額",
-            "note": "メモ（任意）",
-            "success": "追加料金を追加しました",
-            "error": "追加料金の追加に失敗しました",
-            "types": {
-                "late_return": "延滞",
-                "damage": "破損",
-                "cleaning": "特別クリーニング",
-                "express_delivery": "速達配送",
-                "other": "その他"
-            }
-        }
+    "tips": {
+      "title": "より良い結果のコツ:",
+      "1": "• 明るい場所で撮影する",
+      "2": "• 体にフィットした服を着る",
+      "3": "• カメラを正面から見る",
+      "4": "• 全身が写るようにする"
     },
-    "adminProducts": {
-        "header": {
-            "title": "商品",
-            "subtitle": "商品を管理"
-        },
-        "buttons": {
-            "importExcel": "Excelをインポート",
-            "importing": "インポート中...",
-            "create": "商品を作成",
-            "addSize": "+ サイズ追加",
-            "remove": "削除",
-            "submit": "送信",
-            "update": "更新"
-        },
-        "dialog": {
-            "createTitle": "商品を作成",
-            "updateTitle": "商品を更新"
-        },
-        "form": {
-            "image": "画像",
-            "optional": "(任意)",
-            "previewAlt": "プレビュー",
-            "noImage": "画像なし",
-            "keepOldImageHint": "新しい画像を選択しない場合、既存の画像が保持されます。",
-            "name": "名前",
-            "category": "カテゴリ",
-            "selectCategory": "カテゴリを選択",
-            "occasion": "シーン",
-            "selectOccasion": "シーンを選択",
-            "rentPerDay": "日額レンタル",
-            "deposit": "デポジット",
-            "variants": "バリアント（サイズ + 在庫）",
-            "size": "サイズ",
-            "stock": "在庫",
-            "color": "色"
-        },
-        "occasions": {
-            "party": "パーティー",
-            "wedding": "結婚式",
-            "casual": "カジュアル"
-        },
-        "loadingProducts": "商品を読み込み中...",
-        "empty": "商品はまだありません。",
-        "validation": {
-            "missingName": {
-                "title": "名前が未入力",
-                "desc": "商品名を入力してください。"
-            },
-            "missingCategory": {
-                "title": "カテゴリ未選択",
-                "desc": "カテゴリを選択してください。"
-            },
-            "missingImage": {
-                "title": "画像が未選択",
-                "desc": "画像を選択してください。"
-            },
-            "missingVariants": {
-                "title": "サイズが未入力",
-                "desc": "少なくとも1つサイズを追加してください。"
-            },
-            "duplicateSize": {
-                "title": "サイズ重複",
-                "desc": "各サイズは1回のみ指定できます。",
-                "inline": "サイズが重複しています。各サイズは1回のみ指定してください。"
-            },
-            "invalidVariants": {
-                "title": "バリアントが無効",
-                "desc": "在庫は0以上の数値である必要があります。"
-            }
-        },
-        "deleteDialog": {
-            "title": "商品を削除しますか？",
-            "desc": "この操作は取り消せません。本当に削除しますか？"
-        },
-        "toasts": {
-            "loadCategoriesFailed": {
-                "title": "カテゴリの読み込みに失敗しました"
-            },
-            "loadProductsFailed": {
-                "title": "商品の読み込みに失敗しました"
-            },
-            "created": {
-                "desc": "商品を作成しました"
-            },
-            "updated": {
-                "desc": "商品を更新しました"
-            },
-            "createFailed": {
-                "title": "作成に失敗しました"
-            },
-            "updateFailed": {
-                "title": "更新に失敗しました"
-            },
-            "updateFailedMissingId": {
-                "title": "更新に失敗しました",
-                "desc": "商品IDがありません"
-            },
-            "deleted": {
-                "title": "削除しました",
-                "desc": "商品を削除しました"
-            },
-            "deleteFailed": {
-                "title": "削除に失敗しました"
-            },
-            "importDone": {
-                "title": "インポート完了",
-                "desc": "成功: {{imported}} | 失敗: {{failed}}"
-            },
-            "importFailed": {
-                "title": "インポートに失敗しました"
-            }
-        }
-    },
-    "adminCategories": {
-        "header": {
-            "title": "カテゴリ",
-            "subtitle": "カテゴリを管理"
-        },
-        "buttons": {
-            "create": "カテゴリを作成",
-            "submit": "送信",
-            "update": "更新"
-        },
-        "dialog": {
-            "createTitle": "カテゴリを作成",
-            "updateTitle": "カテゴリを更新"
-        },
-        "loading": "カテゴリを読み込み中...",
-        "empty": "カテゴリはまだありません。",
-        "list": {
-            "vton": "VTON"
-        },
-        "form": {
-            "name": "名前",
-            "slug": "スラッグ",
-            "slugPlaceholder": "例: dresses",
-            "slugHint": "バックエンドDTOではslugが必須のため、空にできません。",
-            "vtonLabel": "VTONカテゴリ（AI Try-On）",
-            "vtonPlaceholder": "VTONカテゴリを選択",
-            "vtonHint": "Try-On時にAIがマスクする身体部位を判断するために使用します。",
-            "descriptionOptional": "説明（任意）",
-            "descriptionPlaceholder": "短い説明..."
-        },
-        "validation": {
-            "missingName": {
-                "title": "名前が未入力",
-                "desc": "カテゴリ名を入力してください。"
-            },
-            "missingSlug": {
-                "title": "スラッグ未入力",
-                "desc": "slugは必須です（CreateCategoryDto.slug）。"
-            }
-        },
-        "deleteDialog": {
-            "title": "カテゴリを削除しますか？",
-            "desc": "この操作は取り消せません。商品で使用中の場合、バックエンドが削除をブロックする可能性があります。"
-        },
-        "toasts": {
-            "loadFailed": {
-                "title": "カテゴリの読み込みに失敗しました"
-            },
-            "created": {
-                "desc": "カテゴリを作成しました"
-            },
-            "updated": {
-                "desc": "カテゴリを更新しました"
-            },
-            "createFailed": {
-                "title": "作成に失敗しました"
-            },
-            "updateFailed": {
-                "title": "更新に失敗しました"
-            },
-            "updateFailedMissingId": {
-                "title": "更新に失敗しました",
-                "desc": "カテゴリIDがありません"
-            },
-            "deleted": {
-                "title": "削除しました",
-                "desc": "カテゴリを削除しました"
-            },
-            "deleteFailed": {
-                "title": "削除に失敗しました"
-            }
-        }
-    },
-    "adminInventory": {
-        "title": "在庫管理",
-        "itemCount": "点",
-        "addItem": "アイテム追加",
-        "saving": "保存中...",
-        "loading": "読み込み中...",
-        "empty": "アイテムがありません。",
-        "all": "すべて",
-        "searchBarcode": "バーコードで検索...",
-        "nearLimit": "上限近い",
-        "times": "回",
-        "more": "他",
-        "retirementWarning": "{{count}}点のアイテムが廃棄を検討すべきです（≥40回レンタル）",
-        "rentedCount": "レンタル {{count}}/{{max}} 回",
-        "condition": {
-            "good": "良好",
-            "normal": "普通",
-            "old": "古い",
-            "damaged": "破損"
-        },
-        "conditionModal": {
-            "title": "状態",
-            "condition": "状態",
-            "good": "良好",
-            "damaged": "破損",
-            "extraNote": "追加メモ",
-            "placeholder": "例: 90% - ほぼ新品、わずかに色あせ"
-        },
-        "status": {
-            "available": "利用可能",
-            "shipping": "配送中",
-            "rented": "レンタル中",
-            "returned": "返却済み",
-            "washing": "洗濯中",
-            "repairing": "修理中",
-            "retired": "廃棄済み"
-        },
-        "form": {
-            "title": "在庫にアイテムを追加",
-            "product": "商品",
-            "selectProduct": "商品を選択",
-            "size": "サイズ",
-            "selectSize": "サイズを選択",
-            "stock": "在庫",
-            "barcode": "バーコード",
-            "maxRentals": "最大レンタル回数",
-            "note": "状態メモ",
-            "notePlaceholder": "任意"
-        }
-    },
-    "adminUsers": {
-        "title": "ユーザー管理（管理者）",
-        "buttons": {
-            "refresh": "更新"
-        },
-        "table": {
-            "id": "ID",
-            "name": "名前",
-            "email": "メール",
-            "phone": "電話番号",
-            "rentals": "レンタル",
-            "actions": "操作"
-        },
-        "placeholders": {
-            "name": "名前",
-            "phone": "電話番号",
-            "newPasswordOptional": "新しいパスワード（任意）"
-        },
-        "hints": {
-            "keepPasswordIfEmpty": "空欄の場合は現在のパスワードを維持します。",
-            "cannotDeleteHasRentals": "レンタルあり → 削除できません"
-        },
-        "tooltips": {
-            "cannotDeleteHasRentals": "レンタルがあるため削除できません",
-            "deleteUser": "ユーザーを削除"
-        },
-        "confirm": {
-            "deleteUser": "ユーザー #{{id}} を削除しますか？"
-        },
-        "errors": {
-            "loadFailed": "ユーザーの読み込みに失敗しました",
-            "updateFailed": "更新に失敗しました",
-            "deleteFailed": "削除に失敗しました",
-            "cannotDeleteHasRentals": "レンタルがあるため削除できません。"
-        },
-        "empty": "ユーザーが見つかりません。"
-    },
-    "adminOverview": {
-        "title": "概要",
-        "subtitle": "サーバーからのライブデータ",
-        "loading": "ダッシュボードを読み込み中...",
-        "live": "ライブ",
-        "cards": {
-            "totalProducts": "商品数",
-            "activeRentals": "進行中レンタル",
-            "revenue": "売上",
-            "totalUsers": "ユーザー数"
-        },
-        "charts": {
-            "weeklyRentals": {
-                "title": "週間レンタル数",
-                "subtitle": "直近7日間",
-                "empty": "直近7日間のレンタルはありません。"
-            },
-            "monthlyRevenue": {
-                "title": "月間売上",
-                "subtitle": "直近6か月",
-                "empty": "売上データがまだありません。"
-            }
-        },
-        "errors": {
-            "loadFailed": "統計の読み込みに失敗しました"
-        }
-    },
-    "profile": {
-        "title": "プロフィール",
-        "updatedTitle": "更新完了",
-        "updatedDesc": "プロフィールが正常に更新されました。",
-        "errorTitle": "エラー",
-        "updateFailed": "プロフィールの更新に失敗しました",
-        "avatarAlt": "ユーザーアバター"
-    },
-    "form": {
-        "fullName": "氏名",
-        "email": "メールアドレス",
-        "phone": "電話番号",
-        "phonePlaceholder": "例: 0901 234 567"
+    "processing": {
+      "title": "試着結果を生成中...",
+      "subtitle": "数秒かかる場合があります",
+      "hint": "AIが処理中です（約20〜60秒）。しばらくお待ちください...",
+      "wakeUp": "AIサーバーを起動中です。初回リクエストは1〜2分かかる場合があります..."
     },
     "actions": {
-        "save": "変更を保存",
-        "saving": "保存中..."
+      "save": "保存"
     },
-    "productCard": {
-        "featured": "おすすめ",
-        "perDay": "/日",
-        "deposit": "デポジット",
-        "currency": "VND",
-        "priceFormat": "{{price}}₫/日",
-        "depositFormat": "{{deposit}}₫ デポジット",
-        "status": {
-            "currentlyRented": "レンタル中",
-            "unavailable": "利用できません",
-            "soldOut": "売り切れ"
-        },
-        "fallback": {
-            "product": "商品",
-            "category": "カテゴリ"
-        }
+    "preview": {
+      "result": "結果",
+      "selectedProduct": "選択した商品",
+      "preview": "プレビュー",
+      "productFallback": "商品 #{{id}}",
+      "loadingProduct": "商品を読み込み中...",
+      "failedProduct": "商品の読み込みに失敗しました",
+      "noProductImage": "商品画像がありません",
+      "browseProducts": "商品を見る"
     },
-    "dashboard": {
-        "header": {
-            "welcomeBack": "{{name}}さん、おかえりなさい",
-            "subtitle": "レンタルとアカウント設定を管理できます"
-        },
-        "sidebar": {
-            "aria": "ダッシュボードのナビゲーション",
-            "myRentals": "現在のレンタル",
-            "rentalHistory": "レンタル履歴",
-            "profile": "プロフィール",
-            "settings": "設定"
-        },
-        "fallback": {
-            "firstName": "こちら"
-        }
+    "mix": {
+      "title": "Mix & Match",
+      "restoreBase": "元に戻す",
+      "hintPickUpper": "下半身アイテムを試着しました。トップス/アウターを選んでミックスしてください。",
+      "hintPickLower": "上半身アイテムを試着しました。パンツを選んでミックスしてください。",
+      "unavailable": "このカテゴリ（例：ワンピース）はミックスできません。",
+      "noCandidates": "ミックスできるアイテムが見つかりません。",
+      "noCandidatesHint": "ヒント: API",
+      "noCandidatesHint2": "が正しい",
+      "noCandidatesHint3": "またはカテゴリ名（Tops/Pants/Outerwear）を返しているか確認してください。",
+      "category": "カテゴリ",
+      "selected": "選択中",
+      "footerHint": "上のアイテムを1つ選んで「Mix & Generate Again」を押してください。",
+      "onlyUpperLower": "現在は Upper-body ↔ Lower-body のミックスのみ推奨しています。"
     },
-    "tryOnSuggest": {
-        "header": {
-            "title": "バーチャル試着（おすすめ）",
-            "subtitle": "写真をアップロードすると、最適な商品をおすすめします。",
-            "note": "この機能はカテゴリに基づいて商品を提案します。AI試着はAI試着ページをご利用ください。"
-        },
-        "upload": {
-            "aria": "写真をアップロード",
-            "yourPhotoAlt": "あなたの写真",
-            "title": "写真をアップロード",
-            "hint": "全身写真・正面・腕が見えるもの",
-            "change": "変更"
-        },
-        "categories": {
-            "top": "トップス",
-            "pants": "パンツ",
-            "dress": "ドレス",
-            "outerwear": "アウター"
-        },
-        "preview": {
-            "yourPhoto": "あなたの写真",
-            "suggested": "おすすめ商品",
-            "empty": "プレビューなし"
-        },
-        "buttons": {
-            "generate": "おすすめ商品を探す",
-            "rentThisPiece": "この商品をレンタル"
-        },
-        "errors": {
-            "imageOnly": "画像ファイルをアップロードしてください",
-            "uploadYourPhoto": "写真をアップロードしてください",
-            "noProductForCategory": "このカテゴリの商品が見つかりません"
-        }
+    "buttons": {
+      "processing": "処理中...",
+      "generate": "試着を生成",
+      "mixGenerate": "ミックスして再生成"
     },
-    "settings": {
-        "title": "設定",
-        "notifications": {
-            "title": "通知",
-            "desc": "レンタルに関する更新の受け取り方法を管理します",
-            "email": {
-                "title": "メール通知",
-                "desc": "レンタル更新をメールで受け取る"
-            },
-            "sms": {
-                "title": "SMS通知",
-                "desc": "レンタルのリマインダーをSMSで受け取る"
-            },
-            "marketing": {
-                "title": "マーケティングメール",
-                "desc": "新しいコレクションのお知らせを受け取る"
-            }
-        },
-        "privacy": {
-            "title": "プライバシー",
-            "desc": "データとプライバシー設定を管理します",
-            "publicProfile": {
-                "title": "公開プロフィール",
-                "desc": "他の人にプロフィールを表示できるようにする"
-            }
-        }
+    "rentCta": {
+      "question": "気に入りましたか？",
+      "button": "このアイテムをレンタル"
+    },
+    "errors": {
+      "imageOnly": "画像ファイルをアップロードしてください",
+      "imageTooLarge": "画像は10MB未満にしてください",
+      "selectMixItem": "ミックスするアイテムを選択してください",
+      "noResultUrl": "サーバーから resultUrl が返されませんでした",
+      "generateFailed": "試着画像の生成に失敗しました。もう一度お試しください。"
     }
+  },
+  "auth": {
+    "register": {
+      "backHome": "ホームに戻る",
+      "title": "AI Closet に参加",
+      "subtitle": "アカウントを作成してデザイナーファッションのレンタルを始めましょう。",
+      "fullName": {
+        "label": "氏名",
+        "placeholder": "お名前"
+      },
+      "email": {
+        "label": "メール",
+        "placeholder": "you@example.com"
+      },
+      "password": {
+        "label": "パスワード",
+        "placeholder": "••••••••",
+        "hint": "6文字以上",
+        "show": "パスワードを表示",
+        "hide": "パスワードを非表示"
+      },
+      "terms": {
+        "prefix": "私は",
+        "tos": "利用規約",
+        "and": "および",
+        "privacy": "プライバシーポリシー",
+        "suffix": "に同意します"
+      },
+      "button": {
+        "loading": "アカウント作成中...",
+        "submit": "アカウント作成"
+      },
+      "haveAccount": "すでにアカウントをお持ちですか？",
+      "signIn": "ログイン",
+      "toast": {
+        "termsRequired": {
+          "title": "同意が必要です",
+          "desc": "利用規約に同意してください。"
+        },
+        "success": {
+          "title": "AI Closet へようこそ！",
+          "desc": "アカウントが作成されました。"
+        },
+        "error": {
+          "title": "エラー",
+          "desc": "アカウント作成に失敗しました"
+        }
+      },
+      "quote": {
+        "text": "\"スタイルは、言葉を使わずに自分を語る方法。\"",
+        "author": "— Rachel Zoe"
+      }
+    },
+    "login": {
+      "backHome": "ホームに戻る",
+      "title": "おかえりなさい",
+      "subtitle": "ログインしてレンタル状況を確認し、引き続き探索しましょう。",
+      "email": {
+        "label": "メール",
+        "placeholder": "you@example.com"
+      },
+      "password": {
+        "label": "パスワード",
+        "placeholder": "••••••••",
+        "show": "パスワードを表示",
+        "hide": "パスワードを非表示"
+      },
+      "forgot": "パスワードをお忘れですか？",
+      "button": {
+        "loading": "ログイン中...",
+        "submit": "ログイン"
+      },
+      "noAccount": "アカウントをお持ちでないですか？",
+      "createOne": "作成する",
+      "demo": {
+        "title": "デモ認証情報",
+        "body": "User: user@smartdress.com / 123456\nAdmin: admin@smartdress.com / admin123"
+      },
+      "toast": {
+        "success": {
+          "title": "おかえりなさい！",
+          "desc": "ログインに成功しました。"
+        },
+        "error": {
+          "title": "エラー",
+          "desc": "ログインに失敗しました"
+        }
+      },
+      "quote": {
+        "text": "\"ファッションとは夢を見ることであり、他人にも夢を見させること。\"",
+        "author": "— Donatella Versace"
+      }
+    }
+  },
+  "cart": {
+    "title": "カート",
+    "itemsCount": "{{count}} 点",
+    "empty": {
+      "title": "カートは空です",
+      "desc": "レンタルする商品を追加してください。",
+      "browse": "商品を見る"
+    },
+    "alert": {
+      "missingVariant": "一部の商品でサイズ/バリアントが未選択です。選び直してください。"
+    },
+    "days": "{{days}} 日",
+    "size": "サイズ:",
+    "variantFallback": "Variant#{{id}}",
+    "perDay": "日",
+    "lineTotal": "小計",
+    "remove": "削除",
+    "qty": {
+      "decrease": "数量を減らす",
+      "increase": "数量を増やす"
+    },
+    "clear": "カートを空にする",
+    "total": "合計",
+    "checkout": "チェックアウト"
+  },
+  "checkout": {
+    "empty": {
+      "title": "チェックアウトする商品がありません",
+      "desc": "チェックアウト前に商品を追加してください。",
+      "browse": "商品を見る"
+    },
+    "summary": {
+      "title": "注文内容",
+      "rentalPeriod": "レンタル期間:",
+      "perDay": "日",
+      "days": "{{days}} 日",
+      "qty": "数量",
+      "line": "小計",
+      "groupTotal": "グループ合計",
+      "total": "レンタル料金",
+      "deposit": "デポジット（返金可）",
+      "grandTotal": "本日支払い合計",
+      "backToCart": "カートに戻る"
+    },
+    "shipping": {
+      "title": "配送情報",
+      "fullName": "氏名",
+      "phone": "電話番号",
+      "street": "番地 / 通り",
+      "district": "区",
+      "ward": "地区",
+      "districtPlaceholder": "-- 区を選択 --",
+      "wardPlaceholder": "-- 地区を選択 --",
+      "wardNeedDistrict": "先に区を選択してください",
+      "combinedAddress": "結合住所",
+      "note": "メモ",
+      "notePlaceholder": "配送メモ（任意）"
+    },
+    "address": {
+      "wardPrefix": "地区 {{ward}}",
+      "districtPrefix": "区 {{district}}",
+      "city": "ダナン"
+    },
+    "order": {
+      "note": "チェックアウトから作成"
+    },
+    "pickup": {
+      "label": "受け取り方法",
+      "delivery": {
+        "title": "宅配",
+        "desc": "ご指定の住所にお届けします"
+      },
+      "store": {
+        "title": "店舗受け取り",
+        "desc": "店舗に直接お越しください"
+      }
+    },
+    "payment": {
+      "method": "お支払い方法",
+      "methods": {
+        "CASH": "代金引換（受け取り時に現金払い）",
+        "COD": "COD（代金引換）",
+        "BANK_TRANSFER": "銀行振込"
+      },
+      "depositNote": "デポジットが必要です",
+      "depositAmount": "デポジット金額",
+      "depositHint": "商品を良好な状態で返却後、デポジットは返金されます。"
+    },
+    "button": {
+      "creating": "作成中...",
+      "confirm": "確定してレンタル作成"
+    },
+    "alert": {
+      "fullName": "氏名を入力してください",
+      "phone": "電話番号を入力してください",
+      "street": "番地/通りを入力してください",
+      "district": "区を選択してください",
+      "ward": "地区を選択してください",
+      "address": "住所を入力してください",
+      "success": "注文が作成されました！",
+      "failed": "レンタル作成に失敗しました"
+    }
+  },
+  "admin": {
+    "title": "管理者ダッシュボード",
+    "subtitle": "レンタルプラットフォームを管理",
+    "backHome": "ホームへ戻る",
+    "sidebar": {
+      "aria": "管理者ナビゲーション",
+      "overview": "概要",
+      "users": "ユーザー",
+      "products": "商品",
+      "categories": "カテゴリー",
+      "rentals": "レンタル",
+      "inventory": "在庫管理"
+    }
+  },
+  "common": {
+    "refresh": "更新",
+    "edit": "編集",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "dash": "-",
+    "loading": {
+      "rentals": "レンタルを読み込み中...",
+      "rentalHistory": "レンタル履歴を読み込み中..."
+    },
+    "errors": {
+      "prefix": "エラー",
+      "loadRentalsFailed": "レンタルの読み込みに失敗しました",
+      "cancelFailed": "キャンセルに失敗しました",
+      "loadRentalHistoryFailed": "レンタル履歴の読み込みに失敗しました"
+    },
+    "retry": "再試行",
+    "browseCollection": "コレクションを見る",
+    "product": "商品"
+  },
+  "rentals": {
+    "current": {
+      "title": "現在のレンタル",
+      "activeCount": "有効 {{count}} 件",
+      "emptyTitle": "現在のレンタルはありません",
+      "emptyDesc": "完了したレンタルはレンタル履歴に保存されます。",
+      "noItems": "このレンタルには商品がありません。"
+    },
+    "itemLine": "数量: {{qty}} • 日数: {{days}} • /日: {{pricePerDay}}đ",
+    "subtotal": "小計",
+    "total": "合計",
+    "deposit": "デポジット",
+    "extended": "延長済み",
+    "actions": {
+      "extend": "延長",
+      "cancel": "キャンセル"
+    },
+    "extend": {
+      "title": "レンタルを延長",
+      "newEndDate": "新しい終了日",
+      "confirm": "確認",
+      "cancel": "キャンセル",
+      "success": "延長しました！",
+      "error": "延長に失敗しました"
+    },
+    "refundDeposit": {
+      "success": "デポジットを返金しました！",
+      "error": "返金に失敗しました"
+    },
+    "history": {
+      "title": "レンタル履歴",
+      "emptyTitle": "レンタル履歴がありません",
+      "emptyDesc": "完了したレンタルはここに表示されます",
+      "noItems": "このレンタルには商品がありません。"
+    }
+  },
+  "pagination": {
+    "prev": "前へ",
+    "next": "次へ",
+    "page": "ページ"
+  },
+  "adminRentals": {
+    "title": "レンタル",
+    "loading": "レンタルを読み込み中...",
+    "empty": "レンタルはまだありません。",
+    "total": "合計",
+    "days": "日",
+    "perDay": "日",
+    "user": "ユーザー",
+    "userFallback": "ユーザー",
+    "productFallback": "商品",
+    "totalLabel": "合計",
+    "deposit": "デポジット",
+    "detailTitle": "レンタル詳細",
+    "selectHint": "詳細を見るにはレンタルを選択してください。",
+    "noActions": "操作なし",
+    "updatingStatus": "ステータス更新中...",
+    "savingShipping": "配送情報を保存中...",
+    "noItems": "商品がありません。",
+    "errors": {
+      "loadFailedTitle": "レンタルの読み込みに失敗しました",
+      "updateStatusFailed": "ステータス更新に失敗しました",
+      "updateShippingFailed": "配送情報の更新に失敗しました"
+    },
+    "actions": {
+      "startShipping": "発送開始",
+      "reject": "却下",
+      "customerReceived": "受け取り完了",
+      "complete": "完了",
+      "refundDeposit": "デポジット返金",
+      "depositRefunded": "返金済み"
+    },
+    "detail": {
+      "rental": "レンタル",
+      "status": "ステータス",
+      "shipping": "配送",
+      "items": "商品",
+      "note": "メモ",
+      "surcharges": "追加料金",
+      "payments": "支払い内訳"
+    },
+    "payment": {
+      "rent": "レンタル料",
+      "deposit": "デポジット",
+      "extension": "延長料金"
+    },
+    "shipping": {
+      "edit": "配送を編集",
+      "editableOnlyPendingShipping": "PENDING/SHIPPING のときのみ編集可能",
+      "name": "氏名",
+      "phone": "電話",
+      "address": "住所",
+      "note": "メモ"
+    },
+    "placeholders": {
+      "fullName": "氏名",
+      "phone": "電話番号",
+      "address": "住所",
+      "noteOptional": "メモ（任意）"
+    },
+    "item": {
+      "size": "サイズ",
+      "qty": "数量",
+      "subtotal": "小計"
+    },
+    "success": "成功",
+    "error": "エラー",
+    "edit": "編集",
+    "delete": "削除",
+    "cancel": "キャンセル",
+    "surcharge": {
+      "add": "追加料金を追加",
+      "amount": "金額",
+      "note": "メモ（任意）",
+      "success": "追加料金を追加しました",
+      "error": "追加料金の追加に失敗しました",
+      "types": {
+        "late_return": "延滞",
+        "damage": "破損",
+        "cleaning": "特別クリーニング",
+        "express_delivery": "速達配送",
+        "other": "その他"
+      }
+    }
+  },
+  "adminProducts": {
+    "header": {
+      "title": "商品",
+      "subtitle": "商品を管理"
+    },
+    "buttons": {
+      "importExcel": "Excelをインポート",
+      "importing": "インポート中...",
+      "create": "商品を作成",
+      "addSize": "+ サイズ追加",
+      "remove": "削除",
+      "submit": "送信",
+      "update": "更新"
+    },
+    "dialog": {
+      "createTitle": "商品を作成",
+      "updateTitle": "商品を更新"
+    },
+    "form": {
+      "image": "画像",
+      "optional": "(任意)",
+      "previewAlt": "プレビュー",
+      "noImage": "画像なし",
+      "keepOldImageHint": "新しい画像を選択しない場合、既存の画像が保持されます。",
+      "name": "名前",
+      "category": "カテゴリ",
+      "selectCategory": "カテゴリを選択",
+      "occasion": "シーン",
+      "selectOccasion": "シーンを選択",
+      "rentPerDay": "日額レンタル",
+      "deposit": "デポジット",
+      "variants": "バリアント（サイズ + 在庫）",
+      "size": "サイズ",
+      "stock": "在庫",
+      "color": "色"
+    },
+    "occasions": {
+      "party": "パーティー",
+      "wedding": "結婚式",
+      "casual": "カジュアル"
+    },
+    "loadingProducts": "商品を読み込み中...",
+    "empty": "商品はまだありません。",
+    "validation": {
+      "missingName": {
+        "title": "名前が未入力",
+        "desc": "商品名を入力してください。"
+      },
+      "missingCategory": {
+        "title": "カテゴリ未選択",
+        "desc": "カテゴリを選択してください。"
+      },
+      "missingImage": {
+        "title": "画像が未選択",
+        "desc": "画像を選択してください。"
+      },
+      "missingVariants": {
+        "title": "サイズが未入力",
+        "desc": "少なくとも1つサイズを追加してください。"
+      },
+      "duplicateSize": {
+        "title": "サイズ重複",
+        "desc": "各サイズは1回のみ指定できます。",
+        "inline": "サイズが重複しています。各サイズは1回のみ指定してください。"
+      },
+      "invalidVariants": {
+        "title": "バリアントが無効",
+        "desc": "在庫は0以上の数値である必要があります。"
+      }
+    },
+    "deleteDialog": {
+      "title": "商品を削除しますか？",
+      "desc": "この操作は取り消せません。本当に削除しますか？"
+    },
+    "toasts": {
+      "loadCategoriesFailed": {
+        "title": "カテゴリの読み込みに失敗しました"
+      },
+      "loadProductsFailed": {
+        "title": "商品の読み込みに失敗しました"
+      },
+      "created": {
+        "desc": "商品を作成しました"
+      },
+      "updated": {
+        "desc": "商品を更新しました"
+      },
+      "createFailed": {
+        "title": "作成に失敗しました"
+      },
+      "updateFailed": {
+        "title": "更新に失敗しました"
+      },
+      "updateFailedMissingId": {
+        "title": "更新に失敗しました",
+        "desc": "商品IDがありません"
+      },
+      "deleted": {
+        "title": "削除しました",
+        "desc": "商品を削除しました"
+      },
+      "deleteFailed": {
+        "title": "削除に失敗しました"
+      },
+      "importDone": {
+        "title": "インポート完了",
+        "desc": "成功: {{imported}} | 失敗: {{failed}}"
+      },
+      "importFailed": {
+        "title": "インポートに失敗しました"
+      }
+    }
+  },
+  "adminCategories": {
+    "header": {
+      "title": "カテゴリ",
+      "subtitle": "カテゴリを管理"
+    },
+    "buttons": {
+      "create": "カテゴリを作成",
+      "submit": "送信",
+      "update": "更新"
+    },
+    "dialog": {
+      "createTitle": "カテゴリを作成",
+      "updateTitle": "カテゴリを更新"
+    },
+    "loading": "カテゴリを読み込み中...",
+    "empty": "カテゴリはまだありません。",
+    "list": {
+      "vton": "VTON"
+    },
+    "form": {
+      "name": "名前",
+      "slug": "スラッグ",
+      "slugPlaceholder": "例: dresses",
+      "slugHint": "バックエンドDTOではslugが必須のため、空にできません。",
+      "vtonLabel": "VTONカテゴリ（AI Try-On）",
+      "vtonPlaceholder": "VTONカテゴリを選択",
+      "vtonHint": "Try-On時にAIがマスクする身体部位を判断するために使用します。",
+      "descriptionOptional": "説明（任意）",
+      "descriptionPlaceholder": "短い説明..."
+    },
+    "validation": {
+      "missingName": {
+        "title": "名前が未入力",
+        "desc": "カテゴリ名を入力してください。"
+      },
+      "missingSlug": {
+        "title": "スラッグ未入力",
+        "desc": "slugは必須です（CreateCategoryDto.slug）。"
+      }
+    },
+    "deleteDialog": {
+      "title": "カテゴリを削除しますか？",
+      "desc": "この操作は取り消せません。商品で使用中の場合、バックエンドが削除をブロックする可能性があります。"
+    },
+    "toasts": {
+      "loadFailed": {
+        "title": "カテゴリの読み込みに失敗しました"
+      },
+      "created": {
+        "desc": "カテゴリを作成しました"
+      },
+      "updated": {
+        "desc": "カテゴリを更新しました"
+      },
+      "createFailed": {
+        "title": "作成に失敗しました"
+      },
+      "updateFailed": {
+        "title": "更新に失敗しました"
+      },
+      "updateFailedMissingId": {
+        "title": "更新に失敗しました",
+        "desc": "カテゴリIDがありません"
+      },
+      "deleted": {
+        "title": "削除しました",
+        "desc": "カテゴリを削除しました"
+      },
+      "deleteFailed": {
+        "title": "削除に失敗しました"
+      }
+    }
+  },
+  "adminInventory": {
+    "title": "在庫管理",
+    "itemCount": "点",
+    "addItem": "アイテム追加",
+    "saving": "保存中...",
+    "loading": "読み込み中...",
+    "empty": "アイテムがありません。",
+    "all": "すべて",
+    "searchBarcode": "バーコードで検索...",
+    "nearLimit": "上限近い",
+    "times": "回",
+    "more": "他",
+    "retirementWarning": "{{count}}点のアイテムが廃棄を検討すべきです（≥40回レンタル）",
+    "rentedCount": "レンタル {{count}}/{{max}} 回",
+    "condition": {
+      "good": "良好",
+      "normal": "普通",
+      "old": "古い",
+      "damaged": "破損"
+    },
+    "conditionModal": {
+      "title": "状態",
+      "condition": "状態",
+      "good": "良好",
+      "damaged": "破損",
+      "extraNote": "追加メモ",
+      "placeholder": "例: 90% - ほぼ新品、わずかに色あせ"
+    },
+    "status": {
+      "available": "利用可能",
+      "shipping": "配送中",
+      "rented": "レンタル中",
+      "returned": "返却済み",
+      "washing": "洗濯中",
+      "repairing": "修理中",
+      "retired": "廃棄済み"
+    },
+    "form": {
+      "title": "在庫にアイテムを追加",
+      "product": "商品",
+      "selectProduct": "商品を選択",
+      "size": "サイズ",
+      "selectSize": "サイズを選択",
+      "stock": "在庫",
+      "barcode": "バーコード",
+      "maxRentals": "最大レンタル回数",
+      "note": "状態メモ",
+      "notePlaceholder": "任意"
+    }
+  },
+  "adminUsers": {
+    "title": "ユーザー管理（管理者）",
+    "buttons": {
+      "refresh": "更新"
+    },
+    "table": {
+      "id": "ID",
+      "name": "名前",
+      "email": "メール",
+      "phone": "電話番号",
+      "rentals": "レンタル",
+      "actions": "操作"
+    },
+    "placeholders": {
+      "name": "名前",
+      "phone": "電話番号",
+      "newPasswordOptional": "新しいパスワード（任意）"
+    },
+    "hints": {
+      "keepPasswordIfEmpty": "空欄の場合は現在のパスワードを維持します。",
+      "cannotDeleteHasRentals": "レンタルあり → 削除できません"
+    },
+    "tooltips": {
+      "cannotDeleteHasRentals": "レンタルがあるため削除できません",
+      "deleteUser": "ユーザーを削除"
+    },
+    "confirm": {
+      "deleteUser": "ユーザー #{{id}} を削除しますか？"
+    },
+    "errors": {
+      "loadFailed": "ユーザーの読み込みに失敗しました",
+      "updateFailed": "更新に失敗しました",
+      "deleteFailed": "削除に失敗しました",
+      "cannotDeleteHasRentals": "レンタルがあるため削除できません。"
+    },
+    "empty": "ユーザーが見つかりません。"
+  },
+  "adminOverview": {
+    "title": "概要",
+    "subtitle": "サーバーからのライブデータ",
+    "loading": "ダッシュボードを読み込み中...",
+    "live": "ライブ",
+    "cards": {
+      "totalProducts": "商品数",
+      "activeRentals": "進行中レンタル",
+      "revenue": "売上",
+      "totalUsers": "ユーザー数"
+    },
+    "charts": {
+      "weeklyRentals": {
+        "title": "週間レンタル数",
+        "subtitle": "直近7日間",
+        "empty": "直近7日間のレンタルはありません。"
+      },
+      "monthlyRevenue": {
+        "title": "月間売上",
+        "subtitle": "直近6か月",
+        "empty": "売上データがまだありません。"
+      }
+    },
+    "errors": {
+      "loadFailed": "統計の読み込みに失敗しました"
+    }
+  },
+  "profile": {
+    "title": "プロフィール",
+    "updatedTitle": "更新完了",
+    "updatedDesc": "プロフィールが正常に更新されました。",
+    "errorTitle": "エラー",
+    "updateFailed": "プロフィールの更新に失敗しました",
+    "avatarAlt": "ユーザーアバター"
+  },
+  "form": {
+    "fullName": "氏名",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "phonePlaceholder": "例: 0901 234 567"
+  },
+  "actions": {
+    "save": "変更を保存",
+    "saving": "保存中..."
+  },
+  "productCard": {
+    "featured": "おすすめ",
+    "perDay": "/日",
+    "deposit": "デポジット",
+    "currency": "VND",
+    "priceFormat": "{{price}}₫/日",
+    "depositFormat": "{{deposit}}₫ デポジット",
+    "status": {
+      "currentlyRented": "レンタル中",
+      "unavailable": "利用できません",
+      "soldOut": "売り切れ"
+    },
+    "fallback": {
+      "product": "商品",
+      "category": "カテゴリ"
+    }
+  },
+  "dashboard": {
+    "header": {
+      "welcomeBack": "{{name}}さん、おかえりなさい",
+      "subtitle": "レンタルとアカウント設定を管理できます"
+    },
+    "sidebar": {
+      "aria": "ダッシュボードのナビゲーション",
+      "myRentals": "現在のレンタル",
+      "rentalHistory": "レンタル履歴",
+      "profile": "プロフィール",
+      "settings": "設定"
+    },
+    "fallback": {
+      "firstName": "こちら"
+    }
+  },
+  "tryOnSuggest": {
+    "header": {
+      "title": "バーチャル試着（おすすめ）",
+      "subtitle": "写真をアップロードすると、最適な商品をおすすめします。",
+      "note": "この機能はカテゴリに基づいて商品を提案します。AI試着はAI試着ページをご利用ください。"
+    },
+    "upload": {
+      "aria": "写真をアップロード",
+      "yourPhotoAlt": "あなたの写真",
+      "title": "写真をアップロード",
+      "hint": "全身写真・正面・腕が見えるもの",
+      "change": "変更"
+    },
+    "categories": {
+      "top": "トップス",
+      "pants": "パンツ",
+      "dress": "ドレス",
+      "outerwear": "アウター"
+    },
+    "preview": {
+      "yourPhoto": "あなたの写真",
+      "suggested": "おすすめ商品",
+      "empty": "プレビューなし"
+    },
+    "buttons": {
+      "generate": "おすすめ商品を探す",
+      "rentThisPiece": "この商品をレンタル"
+    },
+    "errors": {
+      "imageOnly": "画像ファイルをアップロードしてください",
+      "uploadYourPhoto": "写真をアップロードしてください",
+      "noProductForCategory": "このカテゴリの商品が見つかりません"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "notifications": {
+      "title": "通知",
+      "desc": "レンタルに関する更新の受け取り方法を管理します",
+      "email": {
+        "title": "メール通知",
+        "desc": "レンタル更新をメールで受け取る"
+      },
+      "sms": {
+        "title": "SMS通知",
+        "desc": "レンタルのリマインダーをSMSで受け取る"
+      },
+      "marketing": {
+        "title": "マーケティングメール",
+        "desc": "新しいコレクションのお知らせを受け取る"
+      }
+    },
+    "privacy": {
+      "title": "プライバシー",
+      "desc": "データとプライバシー設定を管理します",
+      "publicProfile": {
+        "title": "公開プロフィール",
+        "desc": "他の人にプロフィールを表示できるようにする"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "レンタルの仕組み",
+    "subtitle": "現代女性のためのプレミアムファッションレンタル。長期契約なしでデザイナーピースをレンタル。",
+    "steps": {
+      "support": {
+        "title": "サポート",
+        "description": "Facebookやホットラインでイベントに適した衣装についてご相談ください。",
+        "details": [
+          "適切なスタイルの無料相談",
+          "機会や好みに応じた衣装提案",
+          "FacebookとホットラインでのサポートFacebook",
+          "24/7サポート"
+        ]
+      },
+      "rental": {
+        "title": "レンタルの仕組み",
+        "description": "お気に入りの衣装を選び、詳細を確認して保証金を支払い、注文を完了します。",
+        "details": [
+          "ウェブサイトで多様なコレクションを閲覧",
+          "衣装とレンタル期間を選択",
+          "注文金額の30-50%を保証金として支払い",
+          "SMS/Eメールで注文確認を受信"
+        ]
+      },
+      "sizing": {
+        "title": "サイズガイド",
+        "description": "正確に体を測定し、サイズチャートを参照して最適なサイズを選択します。",
+        "details": [
+          "3つの主要部位の測定ガイド：バスト - ウエスト - ヒップ",
+          "各衣装タイプの詳細サイズチャート",
+          "必要に応じてビデオ通話でのサイズ相談",
+          "合わない場合の無料サイズ交換"
+        ]
+      },
+      "delivery": {
+        "title": "配送・返品",
+        "description": "自宅でアイテムを受け取り、指定時間内に簡単にチェック・返品できます。",
+        "details": [
+          "市内中心部への2-4時間での宅配",
+          "支払い前のアイテムチェック",
+          "最初の2時間以内でのサイズ/スタイル交換",
+          "遅延料金を避けるための時間通りの返却"
+        ]
+      },
+      "faq": {
+        "title": "よくある質問",
+        "description": "ポリシー、規制、その他の一般的な質問について詳しく学びます。",
+        "details": [
+          "衣装保険ポリシー",
+          "衛生・ケア規制",
+          "遅延料金と特別ケース",
+          "VIP顧客向け特典プログラム"
+        ]
+      }
+    },
+    "cta": {
+      "title": "始める準備はできましたか？",
+      "subtitle": "今日からプレミアムファッションコレクションを探索しましょう",
+      "viewCollection": "コレクションを見る",
+      "contact": "相談のお問い合わせ"
+    }
+  },
+  "sizeGuide": {
+    "title": "サイズガイド",
+    "subtitle": "正確に測定して適切なサイズを選択してください。合わない場合は無料でサイズ交換いたします。",
+    "tabs": {
+      "measure": "測定方法",
+      "charts": "サイズチャート"
+    },
+    "importantNotes": {
+      "title": "重要な注意事項",
+      "items": [
+        "厚い衣服の上からではなく、体に直接測定してください",
+        "硬い定規ではなく、柔らかいメジャーを使用してください",
+        "体がむくんでいない朝に測定してください",
+        "より正確な測定のために誰かに手伝ってもらってください"
+      ]
+    },
+    "measurements": {
+      "bust": {
+        "title": "バスト",
+        "description": "胸の最も豊かな部分の周りを測定し、テープを床と平行にします",
+        "tip": "普段のブラを着用し、深く息を吸ったり完全に息を吐いたりしないでください"
+      },
+      "waist": {
+        "title": "ウエスト",
+        "description": "ウエストの最も細い部分の周りを測定します。通常はへその2-3cm上です",
+        "tip": "自然にまっすぐ立ち、テープを強く引っ張らないでください"
+      },
+      "hip": {
+        "title": "ヒップ",
+        "description": "ヒップとお尻の最も豊かな部分の周りを測定します",
+        "tip": "足を揃えて立ち、テープを床と平行にしてください"
+      },
+      "shoulder": {
+        "title": "肩",
+        "description": "一方の肩のポイントからもう一方へ、背中を通って測定します",
+        "tip": "正確性のために他の人に測定を手伝ってもらう必要があります"
+      }
+    },
+    "sizeCharts": {
+      "dress": "ドレス",
+      "top": "トップス/ブレザー",
+      "bottom": "パンツ/スカート",
+      "measurements": {
+        "bust": "バスト (cm)",
+        "waist": "ウエスト (cm)",
+        "hip": "ヒップ (cm)",
+        "shoulder": "肩 (cm)",
+        "length": "丈 (cm)"
+      }
+    },
+    "recommendations": {
+      "title": "サイズ推奨事項",
+      "items": [
+        "測定値が2つのサイズの間にある場合は、大きいサイズを選択してください",
+        "フィットしたドレスの場合は、ぴったりフィットを選択してください",
+        "ブレザーの場合は、1サイズ大きめを選択できます",
+        "サイズについて不確かな場合は相談にお問い合わせください"
+      ]
+    },
+    "cta": {
+      "title": "まだサイズについて不確かですか？",
+      "subtitle": "心配しないでください！無料のサイズ相談と最初の2時間以内での交換を提供しています",
+      "consult": "サイズ相談を受ける",
+      "viewProducts": "商品を見る"
+    }
+  },
+  "shippingReturns": {
+    "title": "配送・返品",
+    "subtitle": "衣装レンタル時の安心のための迅速な配送ポリシーと柔軟な返品。",
+    "tabs": {
+      "shipping": "配送",
+      "returns": "返品"
+    },
+    "deliveryProcess": {
+      "title": "配送プロセス",
+      "steps": {
+        "confirm": {
+          "title": "注文確認",
+          "desc": "SMS/Eメールで確認を受信"
+        },
+        "prepare": {
+          "title": "アイテム準備",
+          "desc": "梱包と品質チェック"
+        },
+        "deliver": {
+          "title": "配送",
+          "desc": "配送員が連絡してドアまでお届け"
+        },
+        "check": {
+          "title": "アイテムチェック",
+          "desc": "支払い前にアイテムをチェック"
+        }
+      }
+    },
+    "deliveryZones": {
+      "title": "配送エリア",
+      "danang": {
+        "zone": "ダナンエリア",
+        "time": "2-4時間",
+        "fee": "無料 (< 5km) / 30,000đ (> 5km)",
+        "areas": "ダナン市内全区"
+      }
+    },
+    "shippingNotes": {
+      "title": "配送注意事項",
+      "items": [
+        "配送員は配送の15-30分前に電話します",
+        "お客様は支払い前にアイテムをチェックできます",
+        "現金または銀行振込での支払い",
+        "400,000đ以上の注文で送料無料（ダナンエリア）",
+        "週末・祝日を含む週7日配送"
+      ]
+    },
+    "returnPolicy": {
+      "title": "返品ポリシー",
+      "reasons": {
+        "wrongSize": {
+          "reason": "サイズ違い",
+          "timeLimit": "最初の2時間",
+          "fee": "無料",
+          "condition": "未使用でオリジナルタグ付きのアイテム"
+        },
+        "defective": {
+          "reason": "不良品",
+          "timeLimit": "24時間",
+          "fee": "無料",
+          "condition": "不良の写真、未使用アイテム"
+        },
+        "notSuitable": {
+          "reason": "不適合",
+          "timeLimit": "最初の2時間",
+          "fee": "配送料の50%",
+          "condition": "完璧な状態、未使用のアイテム"
+        },
+        "changeOfMind": {
+          "reason": "気が変わった",
+          "timeLimit": "最初の1時間",
+          "fee": "配送料の100%",
+          "condition": "未開封パッケージ、即座に連絡"
+        }
+      }
+    },
+    "returnProcess": {
+      "title": "返品プロセス",
+      "steps": {
+        "contact": {
+          "title": "連絡",
+          "desc": "ホットラインに電話またはFacebookメッセージ"
+        },
+        "confirm": {
+          "title": "確認",
+          "desc": "理由と返品時間を確認"
+        },
+        "pickup": {
+          "title": "集荷",
+          "desc": "配送員がアイテムを回収に来ます"
+        },
+        "refund": {
+          "title": "返金",
+          "desc": "24-48時間以内に返金"
+        }
+      }
+    },
+    "returnConditions": {
+      "title": "返品条件",
+      "items": [
+        "アイテムは完璧な状態で未使用である必要があります",
+        "タグ、ラベル、オリジナルパッケージが完備されている",
+        "臭い、汚れ、損傷がない",
+        "各ケースの指定時間内に連絡",
+        "レンタル期間の50%を超えて使用されたアイテムは返品不可"
+      ]
+    },
+    "cta": {
+      "title": "配送または返品サポートが必要ですか？",
+      "subtitle": "迅速で専用のサポートのために今すぐお問い合わせください",
+      "chatFacebook": "Facebook チャット"
+    }
+  },
+  "faq": {
+    "title": "よくある質問",
+    "subtitle": "ファッションレンタルサービスに関する一般的な質問への回答を見つけてください。回答が見つからない場合は、直接お問い合わせください。",
+    "categories": {
+      "service": {
+        "title": "レンタルサービスについて",
+        "questions": {
+          "whatIsAiCloset": {
+            "question": "AI Closetとは何ですか？",
+            "answer": "AI Closetは現代女性のためのプレミアムファッションレンタルサービスです。高価な購入なしで特別な機会にレンタルできる美しいデザイナー衣装を提供しています。"
+          },
+          "rentalDuration": {
+            "question": "衣装をどのくらいの期間レンタルできますか？",
+            "answer": "ニーズに応じて1-7日間の柔軟なレンタル期間。イベント用の短期パッケージと特別な機会用の長期パッケージがあります。"
+          },
+          "howToRent": {
+            "question": "衣装をレンタルするにはどうすればよいですか？",
+            "answer": "ウェブサイトでコレクションを閲覧し、お気に入りの衣装を選択し、レンタル期間を選択して保証金を支払います。確認のためにご連絡し、ドアまでお届けします。"
+          },
+          "deposit": {
+            "question": "どのくらいの保証金を支払う必要がありますか？",
+            "answer": "保証金は通常、衣装の種類とレンタル期間に応じて注文金額の30-50%です。残りの金額は配送時に支払います。"
+          }
+        }
+      },
+      "sizeQuality": {
+        "title": "サイズと品質",
+        "questions": {
+          "sizeSelection": {
+            "question": "適切なサイズを選ぶにはどうすればよいですか？",
+            "answer": "ウェブサイトの詳細なサイズチャートを参照するか、相談のためにお問い合わせください。合わない場合は最初の2時間以内に無料でサイズ交換も提供しています。"
+          },
+          "cleanliness": {
+            "question": "衣装は清潔で安全ですか？",
+            "answer": "すべての衣装は各レンタル後にプロフェッショナルにクリーニングされ、安全に消毒されています。お客様の衛生品質と安全性を保証します。"
+          },
+          "damage": {
+            "question": "衣装が損傷した場合はどうなりますか？",
+            "answer": "通常の使用による軽微な損傷については心配する必要はありません。大きな損傷については、規定に従って修理または補償料金を請求します。"
+          },
+          "tryBefore": {
+            "question": "レンタル前に衣装を試着できますか？",
+            "answer": "現在、試着前サービスは提供していませんが、配送時に注意深くチェックし、適さない場合は最初の2時間以内に返品できます。"
+          }
+        }
+      },
+      "deliveryPayment": {
+        "title": "配送と支払い",
+        "questions": {
+          "deliveryArea": {
+            "question": "どのエリアに配送しますか？",
+            "answer": "ダナンエリア内に配送します。5km未満の距離は送料無料、5km超の距離は30,000đ。400,000đ以上の注文は送料無料。"
+          },
+          "deliveryTime": {
+            "question": "配送時間はどのくらいですか？",
+            "answer": "ダナンエリア内の配送時間は2-4時間です。配送員は具体的な配送時間を通知するために15-30分前に連絡します。"
+          },
+          "paymentMethods": {
+            "question": "どのような支払い方法を受け付けていますか？",
+            "answer": "代金引換または銀行振込で支払いできます。一般的な支払い方法を受け付けています。"
+          },
+          "notHome": {
+            "question": "配送時に家にいない場合はどうなりますか？",
+            "answer": "配送員は到着前に電話します。家にいない場合は、配送時間を再スケジュールするか、家族に配送することができます。"
+          }
+        }
+      },
+      "returnsPolicy": {
+        "title": "返品とポリシー",
+        "questions": {
+          "returnCases": {
+            "question": "どのような場合に返品できますか？",
+            "answer": "これらの場合に返品できます：サイズ違い（最初の2時間、無料）、不良品（24時間、無料）、不適合（最初の2時間、配送料の50%）、気が変わった（最初の1時間、配送料の100%）。"
+          },
+          "returnProcess": {
+            "question": "返品プロセスはどのようなものですか？",
+            "answer": "ホットラインまたはFacebookに連絡し、返品理由を確認し、その後配送員がアイテムを回収し、24-48時間以内に返金します。"
+          },
+          "lateFee": {
+            "question": "遅れて返品した場合、料金が請求されますか？",
+            "answer": "はい、遅延返品には日割りの延滞料金が発生します。料金は衣装の種類と遅延時間によって異なります。延長が必要な場合は早めにご連絡ください。"
+          },
+          "insurance": {
+            "question": "衣装保険ポリシーとは何ですか？",
+            "answer": "プレミアム衣装には保険があります。お客様は規定の最大金額まで責任を負うだけで、大きなリスクについて心配する必要はありません。"
+          }
+        }
+      },
+      "promotionsMembership": {
+        "title": "プロモーションとメンバーシップ",
+        "questions": {
+          "promotions": {
+            "question": "プロモーションプログラムはありますか？",
+            "answer": "新規顧客、VIP顧客、ホリデーシーズン向けのプロモーションを定期的に行っています。最新のプロモーション更新についてはFacebookをフォローしてください。"
+          },
+          "vipMembership": {
+            "question": "VIP顧客になるにはどうすればよいですか？",
+            "answer": "頻繁な顧客または高い総レンタル価値を持つ顧客は、割引や優先予約などの特別な特典を持つVIPにアップグレードされます。"
+          },
+          "referral": {
+            "question": "友達を紹介できますか？",
+            "answer": "はい！紹介者と被紹介者の両方に特典がある魅力的な紹介プログラムがあります。詳細についてはお問い合わせください。"
+          },
+          "styleConsultation": {
+            "question": "スタイル相談サービスを提供していますか？",
+            "answer": "はい、機会や好みに最も適した衣装を選ぶのを助けるために、Facebookやビデオ通話を通じて無料のスタイル相談を提供しています。"
+          }
+        }
+      }
+    },
+    "cta": {
+      "title": "まだ質問がありますか？",
+      "subtitle": "私たちの相談チームは24/7いつでもサポートする準備ができています",
+      "chatFacebook": "Facebook チャット"
+    }
+  },
+  "sizeGuide": {
+    "title": "サイズガイド",
+    "subtitle": "正確に測定して完璧なフィットを選択してください。サイズが合わない場合は無料でサイズ交換を提供します。",
+    "tabs": {
+      "measure": "測定方法",
+      "charts": "サイズチャート"
+    },
+    "importantTips": {
+      "title": "重要な注意事項",
+      "tip1": "厚い服の上からではなく、体に直接測定してください",
+      "tip2": "硬い定規ではなく、柔らかいメジャーテープを使用してください",
+      "tip3": "体がむくんでいない朝に測定してください",
+      "tip4": "より正確に測定するために誰かに手伝ってもらってください"
+    },
+    "measurements": {
+      "bust": {
+        "title": "バスト",
+        "description": "胸の最も豊かな部分の周りを測定し、テープを床と平行に保ちます",
+        "tips": "普段のブラジャーを着用し、息を止めたり完全に息を吐いたりしないでください",
+        "label": "バスト (cm)"
+      },
+      "waist": {
+        "title": "ウエスト",
+        "description": "ウエストの最も細い部分、通常はへその2-3cm上を測定します",
+        "tips": "自然にまっすぐ立ち、テープを強く引っ張らないでください",
+        "label": "ウエスト (cm)"
+      },
+      "hip": {
+        "title": "ヒップ",
+        "description": "ヒップとお尻の最も豊かな部分の周りを測定します",
+        "tips": "足を揃えて立ち、テープを床と平行に保ちます",
+        "label": "ヒップ (cm)"
+      },
+      "shoulder": {
+        "title": "肩幅",
+        "description": "背中を通って一方の肩のポイントからもう一方まで測定します",
+        "tips": "最高の精度のために他の人に測定を手伝ってもらう必要があります",
+        "label": "肩幅 (cm)"
+      },
+      "length": {
+        "label": "丈 (cm)"
+      }
+    },
+    "charts": {
+      "dress": {
+        "title": "ドレス"
+      },
+      "top": {
+        "title": "トップス/ブレザー"
+      },
+      "bottom": {
+        "title": "パンツ/スカート"
+      }
+    },
+    "recommendations": {
+      "title": "サイズ推奨事項",
+      "tip1": "測定値が2つのサイズの間にある場合は、大きいサイズを選択してください",
+      "tip2": "フィットしたドレスの場合は、ぴったりとしたフィットを選択してください",
+      "tip3": "ブレザーの場合は、1サイズ大きいものを選択できます",
+      "tip4": "サイズについて不安な場合はご相談ください"
+    },
+    "support": {
+      "title": "まだサイズについて不安ですか？",
+      "description": "心配しないでください！無料のサイズ相談と最初の2時間以内の交換を提供しています",
+      "consultButton": "サイズ相談を受ける",
+      "viewProductsButton": "商品を見る"
+    }
+  },
+  "shippingReturns": {
+    "title": "配送・返品",
+    "subtitle": "迅速な配送ポリシーと柔軟な返品で、衣装レンタル時も安心してご利用いただけます。",
+    "tabs": {
+      "shipping": "配送",
+      "returns": "返品"
+    },
+    "shipping": {
+      "deliveryProcess": {
+        "title": "配送プロセス",
+        "steps": {
+          "confirm": {
+            "title": "注文確認",
+            "desc": "メールで確認を受信"
+          },
+          "prepare": {
+            "title": "商品準備",
+            "desc": "梱包と品質チェック"
+          },
+          "deliver": {
+            "title": "配送",
+            "desc": "配送業者が連絡してお届け"
+          },
+          "inspect": {
+            "title": "検査",
+            "desc": "支払い前に商品をチェック"
+          }
+        }
+      },
+      "deliveryZones": {
+        "title": "配送エリア",
+        "timeLabel": "時間",
+        "feeLabel": "配送料"
+      },
+      "zones": {
+        "danang": {
+          "name": "ダナンエリア",
+          "time": "2-4時間",
+          "fee": "無料 (< 5km) / 30,000đ (> 5km)",
+          "areas": "ダナン市内全区域"
+        }
+      },
+      "notes": {
+        "title": "配送に関する注意事項",
+        "note1": "配送業者は配送の15-30分前にお電話いたします",
+        "note2": "お客様は支払い前に商品を確認できます",
+        "note3": "現金または銀行振込でお支払い",
+        "note4": "400,000đ以上のご注文で配送無料（ダナンエリア）"
+      }
+    },
+    "returns": {
+      "policy": {
+        "title": "返品ポリシー",
+        "timeLimitLabel": "期限",
+        "feeLabel": "返品手数料"
+      },
+      "reasons": {
+        "wrongSize": {
+          "reason": "サイズが合わない",
+          "timeLimit": "最初の2時間",
+          "fee": "無料",
+          "condition": "未使用でタグ付きの商品"
+        },
+        "defective": {
+          "reason": "商品の不具合",
+          "timeLimit": "24時間",
+          "fee": "無料",
+          "condition": "不具合の写真証拠、未使用の商品"
+        },
+        "notSuitable": {
+          "reason": "適さない",
+          "timeLimit": "最初の2時間",
+          "fee": "配送料の50%",
+          "condition": "完璧な状態、未使用の商品"
+        },
+        "changeOfMind": {
+          "reason": "気が変わった",
+          "timeLimit": "最初の1時間",
+          "fee": "配送料の100%",
+          "condition": "未開封の包装、すぐに連絡"
+        }
+      },
+      "process": {
+        "title": "返品プロセス",
+        "steps": {
+          "contact": {
+            "title": "連絡",
+            "desc": "Facebookでメッセージ"
+          },
+          "confirm": {
+            "title": "確認",
+            "desc": "理由と返品時間を確認"
+          },
+          "pickup": {
+            "title": "回収",
+            "desc": "配送業者が商品を回収に来ます"
+          },
+          "refund": {
+            "title": "返金",
+            "desc": "24-48時間以内に返金"
+          }
+        }
+      },
+      "conditions": {
+        "title": "返品条件",
+        "condition1": "商品は完璧な状態で未使用である必要があります",
+        "condition2": "すべてのタグ、ラベル、元の包装が必要です",
+        "condition3": "香水、汚れ、損傷がないこと",
+        "condition4": "各ケースの指定期限内に連絡",
+        "condition5": "レンタル期間の50%を超えて使用した商品は返品不可"
+      }
+    },
+    "support": {
+      "title": "配送や返品のサポートが必要ですか？",
+      "description": "迅速で丁寧なサポートのため、すぐにお問い合わせください",
+      "chatButton": "Facebook チャット"
+    }
+  }
 }

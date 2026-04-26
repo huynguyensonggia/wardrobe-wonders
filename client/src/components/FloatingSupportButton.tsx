@@ -3,15 +3,17 @@ import { Facebook, Headphones } from "lucide-react";
 
 export function FloatingSupportButton() {
   const [open, setOpen] = useState(false);
-  const fbLink = "https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr";
-  const zaloLink = "https://zalo.me/0963931349";
+  const fbLink =
+    "https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr";
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
       {/* Sub buttons */}
       <div
         className={`flex flex-col items-center gap-3 transition-all duration-300 ${
-          open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+          open
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4 pointer-events-none"
         }`}
       >
         <a
@@ -22,16 +24,6 @@ export function FloatingSupportButton() {
           className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1877F2] shadow-lg transition hover:scale-110"
         >
           <Facebook className="h-6 w-6 text-white" />
-        </a>
-
-        <a
-          href={zaloLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Zalo"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A68FF] shadow-lg transition hover:scale-110"
-        >
-          <span className="text-white font-bold text-sm leading-none">Zalo</span>
         </a>
       </div>
 
