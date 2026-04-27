@@ -29,10 +29,10 @@ export class Product {
   @Column({ name: "name", length: 150 })
   name: string;
 
-  @Column({ name: "name_en", length: 150, nullable: true })
+  @Column({ name: "name_en", type: "varchar", length: 150, nullable: true })
   nameEn: string | null;
 
-  @Column({ name: "name_ja", length: 150, nullable: true })
+  @Column({ name: "name_ja", type: "varchar", length: 150, nullable: true })
   nameJa: string | null;
 
   // ===== CATEGORY =====

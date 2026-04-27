@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Product } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 interface ProductCardProps {
   product: Product;
@@ -23,38 +24,42 @@ export function ProductCard({ product }: ProductCardProps) {
   const categoryName =
     (product as any)?.category?.name ?? t("productCard.fallback.category");
 
-  // Tên đa ngôn ngữ: ưu tiên nameEn/nameJa nếu có, fallback về name gốc
-  const nameVi = (product as any)?.name ?? t("productCard.fallback.product");
-  const nameEn = (product as any)?.nameEn || nameVi;
-  const nameJa = (product as any)?.nameJa || nameVi;
-  const productName = lang === "vi" ? nameVi : lang === "ja" ? nameJa : nameEn;
+  // Tên đa ngôn ngữ sử dụng helper function
+  const productName = getLocalizedProductName(
+    product as any,
+    lang,
+    t("productCard.fallback.product")
+  );
 
   const pricePerDay =
-    (product as any)?.rentPricePerDay ??
-    (product as any)?.pricePerDay ??
-    0;
+    (product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0;
 
   const deposit = (product as any)?.deposit ?? 0;
 
   // Format giá theo ngôn ngữ
   const formatPrice = (amount: number) => {
-      return amount.toLocaleString("vi-VN") + "đ";
-    };
+    return amount.toLocaleString("vi-VN") + "đ";
+  };
 
   // Lấy tất cả sizes từ variants
   const variants: any[] = (product as any)?.variants ?? [];
-  const sizes = variants.length > 0
-    ? variants
-    : (product as any)?.sizes?.map((s: string) => ({ size: s, stock: 1 })) ?? [];
+  const sizes =
+    variants.length > 0
+      ? variants
+      : ((product as any)?.sizes?.map((s: string) => ({ size: s, stock: 1 })) ??
+        []);
 
   // Sold out khi tất cả variants đều hết hàng
-  const isSoldOut = sizes.length > 0 && sizes.every((v: any) => (v?.stock ?? 1) <= 0);
+  const isSoldOut =
+    sizes.length > 0 && sizes.every((v: any) => (v?.stock ?? 1) <= 0);
 
   return (
     <Link to={`/products/${product.id}`} className="group block">
       <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-secondary mb-4">
         <img
-          src={primaryImage?.url || "https://placehold.co/600x800?text=No+Image"}
+          src={
+            primaryImage?.url || "https://placehold.co/600x800?text=No+Image"
+          }
           alt={productName}
           className="w-full h-full object-cover image-zoom"
         />
@@ -65,8 +70,8 @@ export function ProductCard({ product }: ProductCardProps) {
               {isSoldOut
                 ? t("productCard.status.soldOut")
                 : isRented
-                ? t("productCard.status.currentlyRented")
-                : t("productCard.status.unavailable")}
+                  ? t("productCard.status.currentlyRented")
+                  : t("productCard.status.unavailable")}
             </Badge>
           </div>
         )}
@@ -104,7 +109,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
         <div className="flex items-baseline gap-2">
           <span className="text-sm font-medium">
-            {formatPrice(Number(pricePerDay))}{t("productCard.perDay")}
+            {formatPrice(Number(pricePerDay))}
+            {t("productCard.perDay")}
           </span>
           <span className="text-xs text-muted-foreground">
             {formatPrice(Number(deposit))} {t("productCard.deposit")}

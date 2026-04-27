@@ -14,6 +14,7 @@ import {
 } from "@/constants/daNangAddress";
 
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 // ================= TYPES =================
 type CheckoutItem = {
@@ -70,7 +71,7 @@ function calcRentalPrice(basePrice: number, days: number): number {
 }
 
 export default function CheckoutPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -123,9 +124,7 @@ export default function CheckoutPage() {
         <h2 className="text-xl font-medium mb-2">
           {t("checkout.empty.title")}
         </h2>
-        <p className="text-muted-foreground mb-6">
-          {t("checkout.empty.desc")}
-        </p>
+        <p className="text-muted-foreground mb-6">{t("checkout.empty.desc")}</p>
         <Button asChild>
           <Link to="/products">{t("checkout.empty.browse")}</Link>
         </Button>
@@ -151,7 +150,8 @@ export default function CheckoutPage() {
 
   const total = useMemo(() => {
     return checkoutItems.reduce(
-      (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
+      (sum, it) =>
+        sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
       0
     );
   }, [checkoutItems]);
@@ -195,11 +195,8 @@ export default function CheckoutPage() {
   const canSubmit =
     shipFullName.trim().length > 0 &&
     normalizePhone(shipPhone).length > 0 &&
-    (pickupType === "store" || (
-      street.trim().length > 0 &&
-      Boolean(district) &&
-      Boolean(ward)
-    ));
+    (pickupType === "store" ||
+      (street.trim().length > 0 && Boolean(district) && Boolean(ward)));
 
   // ================= CONFIRM =================
   const handleConfirm = async () => {
@@ -263,15 +260,16 @@ export default function CheckoutPage() {
 
         {groups.map((g) => {
           const groupTotal = g.list.reduce(
-            (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
+            (sum, it) =>
+              sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
             0
           );
 
           return (
             <div key={g.key} className="border rounded-lg p-4 space-y-3">
               <div className="text-sm text-muted-foreground">
-                {t("checkout.summary.rentalPeriod")}{" "}
-                <b>{g.startDate}</b> → <b>{g.endDate}</b>
+                {t("checkout.summary.rentalPeriod")} <b>{g.startDate}</b> →{" "}
+                <b>{g.endDate}</b>
               </div>
 
               {g.list.map((it) => {
@@ -295,17 +293,28 @@ export default function CheckoutPage() {
 
                     <div className="flex-1">
                       <div className="font-medium">
-                        {it.name} {it.size ? `(${it.size})` : ""}
+                        {getLocalizedProductName(
+                          it as any,
+                          i18n.language,
+                          it.name
+                        )}{" "}
+                        {it.size ? `(${it.size})` : ""}
                       </div>
 
                       <div className="text-sm text-muted-foreground">
-                        {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/{t("checkout.summary.perDay")} •{" "}
+                        {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/
+                        {t("checkout.summary.perDay")} •{" "}
                         {t("checkout.summary.days", { days: it.days })} •{" "}
                         {t("checkout.summary.qty")} {it.quantity}
                       </div>
 
                       <div className="text-sm font-medium">
-                        {t("checkout.summary.line")}: {(it.quantity * calcRentalPrice(it.rentPricePerDay, it.days)).toLocaleString("vi-VN")}đ
+                        {t("checkout.summary.line")}:{" "}
+                        {(
+                          it.quantity *
+                          calcRentalPrice(it.rentPricePerDay, it.days)
+                        ).toLocaleString("vi-VN")}
+                        đ
                       </div>
                     </div>
                   </div>
@@ -316,7 +325,9 @@ export default function CheckoutPage() {
                 <span className="text-muted-foreground">
                   {t("checkout.summary.groupTotal")}
                 </span>
-                <span className="font-medium">{groupTotal.toLocaleString("vi-VN")}đ</span>
+                <span className="font-medium">
+                  {groupTotal.toLocaleString("vi-VN")}đ
+                </span>
               </div>
             </div>
           );
@@ -326,18 +337,24 @@ export default function CheckoutPage() {
           <div className="text-sm space-y-1">
             <div>
               {t("checkout.summary.total")}:{" "}
-              <span className="font-medium">{total.toLocaleString("vi-VN")}đ</span>
+              <span className="font-medium">
+                {total.toLocaleString("vi-VN")}đ
+              </span>
             </div>
             {totalDeposit > 0 && (
               <div className="text-muted-foreground">
                 {t("checkout.summary.deposit")}:{" "}
-                <span className="font-medium text-foreground">{totalDeposit.toLocaleString("vi-VN")}đ</span>
+                <span className="font-medium text-foreground">
+                  {totalDeposit.toLocaleString("vi-VN")}đ
+                </span>
               </div>
             )}
             {totalDeposit > 0 && (
               <div className="font-medium">
                 {t("checkout.summary.grandTotal")}:{" "}
-                <span className="text-primary">{(total + totalDeposit).toLocaleString("vi-VN")}đ</span>
+                <span className="text-primary">
+                  {(total + totalDeposit).toLocaleString("vi-VN")}đ
+                </span>
               </div>
             )}
           </div>
@@ -369,7 +386,9 @@ export default function CheckoutPage() {
                     : "border-border hover:border-accent"
                 }`}
               >
-                <div className="font-medium">{t(`checkout.pickup.${p}.title`)}</div>
+                <div className="font-medium">
+                  {t(`checkout.pickup.${p}.title`)}
+                </div>
                 <div className="text-xs text-muted-foreground mt-0.5">
                   {t(`checkout.pickup.${p}.desc`)}
                 </div>
@@ -413,7 +432,10 @@ export default function CheckoutPage() {
           <>
             <div className="grid gap-2">
               <Label>{t("checkout.shipping.street")}</Label>
-              <Input value={street} onChange={(e) => setStreet(e.target.value)} />
+              <Input
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+              />
             </div>
 
             <div className="grid gap-2">
@@ -427,9 +449,13 @@ export default function CheckoutPage() {
                   setWard("");
                 }}
               >
-                <option value="">{t("checkout.shipping.districtPlaceholder")}</option>
+                <option value="">
+                  {t("checkout.shipping.districtPlaceholder")}
+                </option>
                 {DA_NANG_DISTRICTS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
                 ))}
               </select>
             </div>
@@ -443,10 +469,14 @@ export default function CheckoutPage() {
                 disabled={!district}
               >
                 <option value="">
-                  {district ? t("checkout.shipping.wardPlaceholder") : t("checkout.shipping.wardNeedDistrict")}
+                  {district
+                    ? t("checkout.shipping.wardPlaceholder")
+                    : t("checkout.shipping.wardNeedDistrict")}
                 </option>
                 {wardOptions.map((w) => (
-                  <option key={w} value={w}>{w}</option>
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
                 ))}
               </select>
             </div>
@@ -472,7 +502,9 @@ export default function CheckoutPage() {
                   onChange={() => setPaymentMethod(m)}
                   className="accent-primary"
                 />
-                <span className="text-sm">{t(`checkout.payment.methods.${m}`)}</span>
+                <span className="text-sm">
+                  {t(`checkout.payment.methods.${m}`)}
+                </span>
               </label>
             ))}
           </div>
@@ -481,9 +513,14 @@ export default function CheckoutPage() {
         {/* DEPOSIT INFO */}
         {totalDeposit > 0 && (
           <div className="rounded-md bg-muted px-4 py-3 text-sm space-y-1">
-            <div className="font-medium">{t("checkout.payment.depositNote")}</div>
+            <div className="font-medium">
+              {t("checkout.payment.depositNote")}
+            </div>
             <div className="text-muted-foreground">
-              {t("checkout.payment.depositAmount")}: <span className="font-medium text-foreground">{totalDeposit.toLocaleString("vi-VN")}đ</span>
+              {t("checkout.payment.depositAmount")}:{" "}
+              <span className="font-medium text-foreground">
+                {totalDeposit.toLocaleString("vi-VN")}đ
+              </span>
             </div>
             <div className="text-muted-foreground text-xs">
               {t("checkout.payment.depositHint")}
@@ -496,7 +533,9 @@ export default function CheckoutPage() {
           onClick={handleConfirm}
           disabled={submitting || !canSubmit}
         >
-          {submitting ? t("checkout.button.creating") : t("checkout.button.confirm")}
+          {submitting
+            ? t("checkout.button.creating")
+            : t("checkout.button.confirm")}
         </Button>
       </div>
     </div>

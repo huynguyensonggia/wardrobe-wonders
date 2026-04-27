@@ -16,7 +16,11 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   ChevronLeft,
   Heart,
@@ -29,14 +33,14 @@ import {
   ShoppingBag,
 } from "lucide-react";
 
-import {
-  format,
-  differenceInDays,
-  startOfDay,
-} from "date-fns";
+import { format, differenceInDays, startOfDay } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import {
+  getLocalizedProductName,
+  getLocalizedProductDescription,
+} from "@/utils/i18n";
 
 type VariantLite = {
   id: number;
@@ -81,7 +85,12 @@ export default function ProductDetailPage() {
 
   const { addItem } = useCart();
 
-  const { data: product, isLoading, isError, error } = useQuery({
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["product", id],
     queryFn: () => productsApi.getById(id!),
     enabled: !!id,
@@ -103,8 +112,14 @@ export default function ProductDetailPage() {
     [dateRange.to]
   );
 
-  const images = useMemo(() => ((product as any)?.images ?? []) as any[], [product]);
-  const colors = useMemo(() => ((product as any)?.colors ?? []) as string[], [product]);
+  const images = useMemo(
+    () => ((product as any)?.images ?? []) as any[],
+    [product]
+  );
+  const colors = useMemo(
+    () => ((product as any)?.colors ?? []) as string[],
+    [product]
+  );
 
   const variants: VariantLite[] = useMemo(() => {
     const raw = (product as any)?.variants ?? [];
@@ -129,7 +144,11 @@ export default function ProductDetailPage() {
 
   const selectedVariant = useMemo(() => {
     if (!selectedSize) return null;
-    return variants.find((v) => v.size === selectedSize && isVariantActive(v.isActive)) ?? null;
+    return (
+      variants.find(
+        (v) => v.size === selectedSize && isVariantActive(v.isActive)
+      ) ?? null
+    );
   }, [variants, selectedSize]);
 
   useEffect(() => {
@@ -150,7 +169,11 @@ export default function ProductDetailPage() {
   }, [canRent, selectedVariant?.id, selectedVariant?.stock, rentalDays]);
 
   const imageUrl = useMemo(() => {
-    return (product as any)?.imageUrl || (product as any)?.image_url || images?.[0]?.url;
+    return (
+      (product as any)?.imageUrl ||
+      (product as any)?.image_url ||
+      images?.[0]?.url
+    );
   }, [product, images]);
 
   const displayName = useMemo(() => {
@@ -159,7 +182,9 @@ export default function ProductDetailPage() {
   }, [product, selectedSize, selectedColor]);
 
   const totalPrice = useMemo(() => {
-    const pricePerDay = Number((product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0);
+    const pricePerDay = Number(
+      (product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0
+    );
     return calcRentalPrice(pricePerDay, rentalDays);
   }, [product, rentalDays]);
 
@@ -222,7 +247,9 @@ export default function ProductDetailPage() {
         size: selectedVariant!.size,
         name: displayName,
         imageUrl,
-        rentPricePerDay: Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0),
+        rentPricePerDay: Number(
+          (product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0
+        ),
         startDate,
         endDate,
         days: rentalDays,
@@ -245,7 +272,11 @@ export default function ProductDetailPage() {
           size: selectedVariant!.size,
           name: displayName,
           imageUrl,
-          rentPricePerDay: Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0),
+          rentPricePerDay: Number(
+            (product as any).rentPricePerDay ??
+              (product as any).pricePerDay ??
+              0
+          ),
           startDate,
           endDate,
           days: rentalDays,
@@ -258,7 +289,9 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-muted-foreground">{t("productDetail.loading")}</div>
+        <div className="text-center text-muted-foreground">
+          {t("productDetail.loading")}
+        </div>
       </div>
     );
   }
@@ -267,8 +300,12 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-2xl mb-2">{t("productDetail.errorTitle")}</h1>
-          <p className="text-muted-foreground mb-4">{(error as Error)?.message}</p>
+          <h1 className="font-display text-2xl mb-2">
+            {t("productDetail.errorTitle")}
+          </h1>
+          <p className="text-muted-foreground mb-4">
+            {(error as Error)?.message}
+          </p>
           <Button asChild>
             <Link to="/products">{t("productDetail.backToCollection")}</Link>
           </Button>
@@ -281,7 +318,9 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="font-display text-2xl mb-4">{t("productDetail.notFoundTitle")}</h1>
+          <h1 className="font-display text-2xl mb-4">
+            {t("productDetail.notFoundTitle")}
+          </h1>
           <Button asChild>
             <Link to="/products">{t("productDetail.backToCollection")}</Link>
           </Button>
@@ -323,9 +362,13 @@ export default function ProductDetailPage() {
                     onClick={() => setSelectedImage(i)}
                     className={cn(
                       "w-20 h-24 rounded-md overflow-hidden border-2 transition-colors",
-                      selectedImage === i ? "border-accent" : "border-transparent"
+                      selectedImage === i
+                        ? "border-accent"
+                        : "border-transparent"
                     )}
-                    aria-label={t("productDetail.galleryImage", { index: i + 1 })}
+                    aria-label={t("productDetail.galleryImage", {
+                      index: i + 1,
+                    })}
                   >
                     <img
                       src={img.url}
@@ -346,14 +389,26 @@ export default function ProductDetailPage() {
                   {(product as any).category?.name}
                 </p>
                 <h1 className="font-display text-3xl md:text-4xl font-semibold">
-                  {(i18n.language === "en" ? (product as any).nameEn : i18n.language === "ja" ? (product as any).nameJa : null) || (product as any).name}
+                  {getLocalizedProductName(
+                    product as any,
+                    i18n.language,
+                    (product as any).name || "Unnamed Product"
+                  )}
                 </h1>
               </div>
               <div className="flex gap-2">
-                <Button variant="icon" size="icon" aria-label={t("productDetail.actions.favorite")}>
+                <Button
+                  variant="icon"
+                  size="icon"
+                  aria-label={t("productDetail.actions.favorite")}
+                >
                   <Heart className="w-5 h-5" />
                 </Button>
-                <Button variant="icon" size="icon" aria-label={t("productDetail.actions.share")}>
+                <Button
+                  variant="icon"
+                  size="icon"
+                  aria-label={t("productDetail.actions.share")}
+                >
                   <Share2 className="w-5 h-5" />
                 </Button>
               </div>
@@ -361,10 +416,12 @@ export default function ProductDetailPage() {
 
             <div className="flex items-baseline gap-3 mb-6">
               <span className="text-2xl font-medium">
-                {Number((product as any).pricePerDay).toLocaleString("vi-VN")}đ{t("productDetail.perDay")}
+                {Number((product as any).pricePerDay).toLocaleString("vi-VN")}đ
+                {t("productDetail.perDay")}
               </span>
               <span className="text-muted-foreground">
-                {Number((product as any).deposit).toLocaleString("vi-VN")}đ {t("productDetail.deposit")}
+                {Number((product as any).deposit).toLocaleString("vi-VN")}đ{" "}
+                {t("productDetail.deposit")}
               </span>
             </div>
 
@@ -375,13 +432,19 @@ export default function ProductDetailPage() {
             )}
 
             <p className="text-muted-foreground mb-8 leading-relaxed">
-              {(i18n.language === "en" ? (product as any).descriptionEn : i18n.language === "ja" ? (product as any).descriptionJa : null) || (product as any).description}
+              {getLocalizedProductDescription(
+                product as any,
+                i18n.language,
+                (product as any).description || ""
+              )}
             </p>
 
             {/* Size Selection */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium">{t("productDetail.selectSize")}</label>
+                <label className="block text-sm font-medium">
+                  {t("productDetail.selectSize")}
+                </label>
 
                 <Dialog>
                   <DialogTrigger asChild>
@@ -395,7 +458,9 @@ export default function ProductDetailPage() {
 
                   <DialogContent className="max-w-3xl">
                     <DialogHeader>
-                      <DialogTitle>{t("productDetail.sizeChartTitle")}</DialogTitle>
+                      <DialogTitle>
+                        {t("productDetail.sizeChartTitle")}
+                      </DialogTitle>
                     </DialogHeader>
 
                     <div className="overflow-auto">
@@ -493,7 +558,10 @@ export default function ProductDetailPage() {
               </label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start text-left font-normal"
+                  >
                     <CalendarIcon className="w-4 h-4 mr-2" />
                     {dateRange.from ? (
                       dateRange.to ? (
@@ -519,14 +587,16 @@ export default function ProductDetailPage() {
                         return;
                       }
                       // Nếu chỉ chọn 1 ngày (from = to), cho phép
-                      setDateRange({ from: range.from, to: range.to ?? range.from });
+                      setDateRange({
+                        from: range.from,
+                        to: range.to ?? range.from,
+                      });
                     }}
                     disabled={disabledDays}
                     numberOfMonths={2}
                   />
                 </PopoverContent>
               </Popover>
-
             </div>
 
             {/* Price Summary */}
@@ -534,9 +604,17 @@ export default function ProductDetailPage() {
               <div className="bg-secondary rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>
-                    {Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0).toLocaleString("vi-VN")}đ
+                    {Number(
+                      (product as any).rentPricePerDay ??
+                        (product as any).pricePerDay ??
+                        0
+                    ).toLocaleString("vi-VN")}
+                    đ
                     {rentalDays > 1 && (
-                      <> + {((rentalDays - 1) * 10_000).toLocaleString("vi-VN")}đ</>
+                      <>
+                        {" "}
+                        + {((rentalDays - 1) * 10_000).toLocaleString("vi-VN")}đ
+                      </>
                     )}{" "}
                     ({rentalDays} {t("productDetail.days")})
                   </span>
@@ -544,13 +622,18 @@ export default function ProductDetailPage() {
                 </div>
                 <div className="flex justify-between text-sm mb-2">
                   <span>{t("productDetail.refundableDeposit")}</span>
-                  <span>{Number((product as any).deposit).toLocaleString("vi-VN")}đ</span>
+                  <span>
+                    {Number((product as any).deposit).toLocaleString("vi-VN")}đ
+                  </span>
                 </div>
                 <div className="border-t border-border pt-2 mt-2">
                   <div className="flex justify-between font-medium">
                     <span>{t("productDetail.totalDueToday")}</span>
                     <span>
-                      {(totalPrice + Number((product as any).deposit ?? 0)).toLocaleString("vi-VN")}đ
+                      {(
+                        totalPrice + Number((product as any).deposit ?? 0)
+                      ).toLocaleString("vi-VN")}
+                      đ
                     </span>
                   </div>
                 </div>
@@ -581,7 +664,12 @@ export default function ProductDetailPage() {
                 {t("productDetail.addToCart")}
               </Button>
 
-              <Button variant="hero-outline" size="lg" className="w-full" asChild>
+              <Button
+                variant="hero-outline"
+                size="lg"
+                className="w-full"
+                asChild
+              >
                 <Link to={`/try-on?product=${(product as any).id}`}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   {t("productDetail.tryOnVirtually")}

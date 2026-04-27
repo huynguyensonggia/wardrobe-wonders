@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 export default function CartPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { items, count, updateQty, removeItem, clear } = useCart();
   const navigate = useNavigate();
@@ -58,7 +59,9 @@ export default function CartPage() {
             <div key={key} className="border rounded-lg p-4 flex gap-4">
               <div className="w-20 h-20 bg-muted rounded-md overflow-hidden shrink-0">
                 <img
-                  src={it.imageUrl || "https://placehold.co/200x200?text=No+Image"}
+                  src={
+                    it.imageUrl || "https://placehold.co/200x200?text=No+Image"
+                  }
                   alt={it.name}
                   className="w-full h-full object-cover"
                 />
@@ -67,25 +70,35 @@ export default function CartPage() {
               <div className="flex-1">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="font-medium">{it.name}</div>
+                    <div className="font-medium">
+                      {getLocalizedProductName(
+                        it as any,
+                        i18n.language,
+                        it.name
+                      )}
+                    </div>
 
                     <div className="text-sm text-muted-foreground">
-                      {it.startDate} → {it.endDate} ({t("cart.days", { days: it.days })})
+                      {it.startDate} → {it.endDate} (
+                      {t("cart.days", { days: it.days })})
                     </div>
 
                     <div className="text-sm text-muted-foreground">
                       {t("cart.size")}{" "}
                       <span className="font-medium">
-                        {it.size ?? t("cart.variantFallback", { id: it.variantId })}
+                        {it.size ??
+                          t("cart.variantFallback", { id: it.variantId })}
                       </span>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                      {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/{t("cart.perDay")}
+                      {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/
+                      {t("cart.perDay")}
                     </div>
 
                     <div className="text-sm font-medium mt-1">
-                      {t("cart.lineTotal")}: {lineTotal.toLocaleString("vi-VN")}đ
+                      {t("cart.lineTotal")}: {lineTotal.toLocaleString("vi-VN")}
+                      đ
                     </div>
                   </div>
 
@@ -93,7 +106,12 @@ export default function CartPage() {
                     variant="ghost"
                     className="text-destructive"
                     onClick={() =>
-                      removeItem(it.productId, it.variantId, it.startDate, it.endDate)
+                      removeItem(
+                        it.productId,
+                        it.variantId,
+                        it.startDate,
+                        it.endDate
+                      )
                     }
                   >
                     {t("cart.remove")}
@@ -151,7 +169,10 @@ export default function CartPage() {
 
         <div className="flex items-center gap-4">
           <div className="text-sm">
-            {t("cart.total")}: <span className="font-medium">{total.toLocaleString("vi-VN")}đ</span>
+            {t("cart.total")}:{" "}
+            <span className="font-medium">
+              {total.toLocaleString("vi-VN")}đ
+            </span>
           </div>
           <Button onClick={handleCheckout}>{t("cart.checkout")}</Button>
         </div>

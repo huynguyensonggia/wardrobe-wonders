@@ -24,11 +24,13 @@ import {
   AlertCircle,
   Ruler,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { getLocalizedProductName } from "@/utils/i18n";
 import { useTranslation } from "react-i18next";
 
 // Fix EXIF orientation: vẽ lại ảnh lên canvas theo đúng hướng
-async function fixOrientation(file: File): Promise<{ dataUrl: string; blob: Blob }> {
+async function fixOrientation(
+  file: File
+): Promise<{ dataUrl: string; blob: Blob }> {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -71,7 +73,9 @@ function normVton(s: any) {
 }
 
 function inferVtonFromCategoryName(catName: any): MixVton | null {
-  const n = String(catName || "").toLowerCase().trim();
+  const n = String(catName || "")
+    .toLowerCase()
+    .trim();
   if (n.includes("pant")) return "lower-body";
   if (n.includes("top")) return "upper-body";
   if (n.includes("outerwear")) return "upper-body";
@@ -285,7 +289,8 @@ export default function TryOnPage() {
         personUrl: !isFirstRun ? resultImage! : undefined,
       });
 
-      const url = (resp as any)?.resultUrl ?? (resp as any)?.outputs?.[0] ?? null;
+      const url =
+        (resp as any)?.resultUrl ?? (resp as any)?.outputs?.[0] ?? null;
       if (!url) throw new Error(t("tryOn.errors.noResultUrl"));
 
       if (isFirstRun) setBaseResultImage(url);
@@ -333,9 +338,7 @@ export default function TryOnPage() {
                 {t("tryOn.disclaimer.body")
                   .split("\n")
                   .map((line, i) =>
-                    line.trim() === "" ? null : (
-                      <p key={i}>{line}</p>
-                    )
+                    line.trim() === "" ? null : <p key={i}>{line}</p>
                   )}
                 <div className="pt-1">
                   <button
@@ -415,7 +418,9 @@ export default function TryOnPage() {
                 <div
                   className={cn(
                     "relative aspect-[3/4] rounded-lg border-2 border-dashed transition-colors overflow-hidden",
-                    userImage ? "border-accent" : "border-border hover:border-accent/50",
+                    userImage
+                      ? "border-accent"
+                      : "border-border hover:border-accent/50",
                     !userImage && "cursor-pointer"
                   )}
                   onClick={() => !userImage && fileInputRef.current?.click()}
@@ -443,7 +448,9 @@ export default function TryOnPage() {
                   ) : (
                     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                       <Upload className="w-12 h-12 text-muted-foreground mb-4" />
-                      <p className="font-medium mb-1">{t("tryOn.upload.title")}</p>
+                      <p className="font-medium mb-1">
+                        {t("tryOn.upload.title")}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {t("tryOn.upload.subtitle")}
                       </p>
@@ -462,7 +469,9 @@ export default function TryOnPage() {
 
               {/* Photo Tips */}
               <div className="bg-secondary/50 rounded-lg p-4">
-                <h4 className="font-medium text-sm mb-2">{t("tryOn.tips.title")}</h4>
+                <h4 className="font-medium text-sm mb-2">
+                  {t("tryOn.tips.title")}
+                </h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li>{t("tryOn.tips.1")}</li>
                   <li>{t("tryOn.tips.2")}</li>
@@ -482,7 +491,9 @@ export default function TryOnPage() {
                       <div className="w-16 h-16 border-4 border-accent/30 border-t-accent rounded-full animate-spin" />
                       <Sparkles className="w-6 h-6 text-accent absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                     </div>
-                    <p className="mt-4 font-medium">{t("tryOn.processing.title")}</p>
+                    <p className="mt-4 font-medium">
+                      {t("tryOn.processing.title")}
+                    </p>
                     <p className="text-sm text-muted-foreground mt-1">
                       {elapsed < 10
                         ? t("tryOn.processing.wakeUp")
@@ -497,14 +508,24 @@ export default function TryOnPage() {
                     <img
                       src={previewUrl}
                       alt={previewLabel}
-                      className={cn("w-full h-full bg-secondary", "object-cover object-bottom [image-orientation:from-image]")}
+                      className={cn(
+                        "w-full h-full bg-secondary",
+                        "object-cover object-bottom [image-orientation:from-image]"
+                      )}
                     />
 
                     <div className="absolute top-3 left-3 rounded-md bg-background/80 backdrop-blur px-3 py-2">
-                      <div className="text-xs text-muted-foreground">{previewLabel}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {previewLabel}
+                      </div>
                       <div className="text-sm font-medium truncate max-w-[220px]">
-                        {(product as any)?.name ??
-                          t("tryOn.preview.productFallback", { id: selectedProduct })}
+                        {getLocalizedProductName(
+                          product as any,
+                          i18n.language,
+                          t("tryOn.preview.productFallback", {
+                            id: selectedProduct,
+                          })
+                        )}
                       </div>
                     </div>
 
@@ -528,13 +549,20 @@ export default function TryOnPage() {
                       {isLoadingProduct
                         ? t("tryOn.preview.loadingProduct")
                         : isProductError
-                        ? t("tryOn.preview.failedProduct")
-                        : t("tryOn.preview.noProductImage")}
+                          ? t("tryOn.preview.failedProduct")
+                          : t("tryOn.preview.noProductImage")}
                     </p>
 
                     {!selectedProduct && (
-                      <Button variant="secondary" size="sm" asChild className="mt-4">
-                        <Link to="/products">{t("tryOn.preview.browseProducts")}</Link>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        asChild
+                        className="mt-4"
+                      >
+                        <Link to="/products">
+                          {t("tryOn.preview.browseProducts")}
+                        </Link>
                       </Button>
                     )}
                   </div>
@@ -555,11 +583,17 @@ export default function TryOnPage() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <div className="font-medium">{t("tryOn.mix.title")}</div>
-                      <div className="text-sm text-muted-foreground">{mixHintText}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {mixHintText}
+                      </div>
                     </div>
 
                     {!!baseResultImage && baseResultImage !== resultImage && (
-                      <Button variant="outline" size="sm" onClick={restoreBaseResult}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={restoreBaseResult}
+                      >
                         {t("tryOn.mix.restoreBase")}
                       </Button>
                     )}
@@ -572,8 +606,10 @@ export default function TryOnPage() {
                           {t("tryOn.mix.noCandidates")}
                           <div className="text-xs mt-1">
                             {t("tryOn.mix.noCandidatesHint")}{" "}
-                            <code>/products</code> {t("tryOn.mix.noCandidatesHint2")}{" "}
-                            <code>category.vtonCategory</code> {t("tryOn.mix.noCandidatesHint3")}
+                            <code>/products</code>{" "}
+                            {t("tryOn.mix.noCandidatesHint2")}{" "}
+                            <code>category.vtonCategory</code>{" "}
+                            {t("tryOn.mix.noCandidatesHint3")}
                           </div>
                         </div>
                       ) : (
@@ -602,9 +638,14 @@ export default function TryOnPage() {
                                   </div>
 
                                   <div className="p-2">
-                                    <div className="text-sm font-medium line-clamp-1">{p.name}</div>
+                                    <div className="text-sm font-medium line-clamp-1">
+                                      {p.name}
+                                    </div>
                                     <div className="text-xs text-muted-foreground line-clamp-1">
-                                      {p.catName || (p.vton ? p.vton : t("tryOn.mix.category"))}
+                                      {p.catName ||
+                                        (p.vton
+                                          ? p.vton
+                                          : t("tryOn.mix.category"))}
                                     </div>
                                     {active && (
                                       <div className="mt-1 text-xs font-medium text-primary">
@@ -643,8 +684,8 @@ export default function TryOnPage() {
                   {isProcessing
                     ? t("tryOn.buttons.processing")
                     : !resultImage
-                    ? t("tryOn.buttons.generate")
-                    : t("tryOn.buttons.mixGenerate")}
+                      ? t("tryOn.buttons.generate")
+                      : t("tryOn.buttons.mixGenerate")}
                 </Button>
               </div>
 
