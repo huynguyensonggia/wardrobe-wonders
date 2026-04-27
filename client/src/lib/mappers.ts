@@ -76,8 +76,12 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
   return {
     id: String(p.id),
     name: p.name,
+    nameEn: (p as any).nameEn ?? null,
+    nameJa: (p as any).nameJa ?? null,
     slug: toSlug(p.name),
     description: p.description ?? "",
+    descriptionEn: (p as any).descriptionEn ?? null,
+    descriptionJa: (p as any).descriptionJa ?? null,
     category: cat,
     images: p.imageUrl ? [primaryImage] : [],
     sizes,

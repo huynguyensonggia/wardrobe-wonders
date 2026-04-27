@@ -34,6 +34,9 @@ import HowItWorksPage from "@/pages/HowItWorksPage";
 import SizeGuidePage from "@/pages/SizeGuidePage";
 import ShippingReturnsPage from "@/pages/ShippingReturnsPage";
 import FAQPage from "@/pages/FAQPage";
+import AboutPage from "@/pages/AboutPage";
+import PrivacyPage from "@/pages/PrivacyPage";
+import TermsPage from "@/pages/TermsPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -67,6 +70,9 @@ const App = () => (
                   element={<ShippingReturnsPage />}
                 />
                 <Route path="/faq" element={<FAQPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
                 <Route path="/cart" element={<CartPage />} />
 
                 {/* ✅ NEW: Checkout */}

@@ -133,22 +133,6 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/sustainability"
-                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-                >
-                  {t("footer.sustainability")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/careers"
-                  className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
-                >
-                  {t("footer.careers")}
-                </Link>
-              </li>
-              <li>
-                <Link
                   to="/contact"
                   className="text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors"
                 >

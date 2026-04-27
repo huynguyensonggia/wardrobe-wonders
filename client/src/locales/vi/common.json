@@ -14,6 +14,8 @@
     "company": "Về chúng tôi",
     "about": "Về AI Closet",
     "contact": "Liên hệ",
+    "sustainability": "Bền vững",
+    "careers": "Tuyển dụng",
     "privacy": "Chính sách bảo mật",
     "terms": "Điều khoản dịch vụ",
     "copyright": "© {{year}} AI Closet. Bảo lưu mọi quyền."
@@ -1049,11 +1051,11 @@
     "steps": {
       "support": {
         "title": "Hỗ trợ",
-        "description": "Liên hệ với chúng tôi qua Facebook hoặc hotline để được tư vấn về trang phục phù hợp với sự kiện của bạn.",
+        "description": "Liên hệ với chúng tôi qua Facebook để được tư vấn về trang phục phù hợp với sự kiện của bạn.",
         "details": [
           "Tư vấn miễn phí về phong cách phù hợp",
           "Gợi ý trang phục theo dịp và sở thích",
-          "Hỗ trợ 24/7 qua Facebook và hotline"
+          "Hỗ trợ 24/7 qua Facebook"
         ]
       },
       "rental": {
@@ -1251,7 +1253,7 @@
       "steps": {
         "contact": {
           "title": "Liên hệ",
-          "desc": "Gọi hotline hoặc nhắn tin Facebook"
+          "desc": "Nhắn tin Facebook"
         },
         "confirm": {
           "title": "Xác nhận",
@@ -1359,7 +1361,7 @@
           },
           "returnProcess": {
             "question": "Quy trình đổi trả như thế nào?",
-            "answer": "Bạn liên hệ hotline hoặc Facebook, chúng tôi xác nhận lý do đổi trả, sau đó shipper sẽ đến thu hồi sản phẩm và hoàn tiền trong 24-48 giờ."
+            "answer": "Bạn liên hệ qua Facebook, chúng tôi xác nhận lý do đổi trả, sau đó shipper sẽ đến thu hồi sản phẩm và hoàn tiền trong 24-48 giờ."
           },
           "lateFee": {
             "question": "Nếu tôi trả muộn thì có bị phạt không?",
@@ -1583,6 +1585,203 @@
       "title": "Cần hỗ trợ giao hàng hoặc đổi trả?",
       "description": "Liên hệ ngay với chúng tôi để được hỗ trợ nhanh chóng và tận tình",
       "chatButton": "Chat Facebook"
+    }
+  },
+  "styleAdvisor": {
+    "title": "Tư vấn phong cách AI",
+    "subtitle": "Điền thông tin của bạn, AI sẽ gợi ý những trang phục phù hợp nhất từ bộ sưu tập của chúng tôi.",
+    "categories": {
+      "dresses":   "👗 Váy / Đầm",
+      "tops":      "👚 Áo",
+      "pants":     "👖 Quần",
+      "outerwear": "🧥 Áo khoác",
+      "aodai":     "🥻 Áo dài"
+    },
+    "form": {
+      "measurements": {
+        "title":              "📏 Số đo cơ thể",
+        "height":             "Chiều cao (cm)",
+        "heightPlaceholder":  "VD: 160",
+        "weight":             "Cân nặng (kg)",
+        "weightPlaceholder":  "VD: 52",
+        "bust":               "Vòng ngực (cm)",
+        "bustPlaceholder":    "VD: 84",
+        "waist":              "Vòng eo (cm)",
+        "waistPlaceholder":   "VD: 64",
+        "hips":               "Vòng hông (cm)",
+        "hipsPlaceholder":    "VD: 90"
+      },
+      "category": {
+        "title": "👗 Loại trang phục",
+        "hint":  "Có thể chọn nhiều loại. Bỏ trống để AI tự chọn."
+      },
+      "colors": {
+        "title":       "🎨 Màu sắc yêu thích",
+        "placeholder": "VD: màu hồng, đỏ đô, xanh pastel...",
+        "hint":        "Điền màu bạn thích, AI sẽ tìm sản phẩm phù hợp nhất."
+      },
+      "submit": {
+        "label":   "Gợi ý trang phục cho tôi",
+        "loading": "AI đang phân tích..."
+      }
+    },
+    "results": {
+      "title":  "✨ Gợi ý dành riêng cho bạn",
+      "reset":  "Thử lại",
+      "empty":  "Không tìm thấy sản phẩm phù hợp. Hãy thử điều chỉnh thông tin.",
+      "size":   "Size",
+      "perDay": "/ngày",
+      "view":   "Xem",
+      "tryOn":  "Thử đồ"
+    },
+    "errors": {
+      "heightWeightRequired": "Vui lòng nhập chiều cao và cân nặng.",
+      "fetchFailed":          "Không thể lấy gợi ý. Vui lòng thử lại."
+    }
+  },
+  "privacy": {
+    "title": "Chính sách bảo mật",
+    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2025",
+    "intro": "AI Closet cam kết bảo vệ thông tin cá nhân của bạn. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu khi bạn sử dụng dịch vụ thuê thời trang của chúng tôi.",
+    "sections": [
+      {
+        "title": "Thông tin chúng tôi thu thập",
+        "content": "Chúng tôi thu thập các thông tin bạn cung cấp khi đăng ký tài khoản, đặt thuê hoặc liên hệ hỗ trợ, bao gồm: họ tên, địa chỉ email, số điện thoại, địa chỉ giao hàng và số đo cơ thể (nếu bạn sử dụng tính năng tư vấn phong cách).\n\nChúng tôi cũng tự động thu thập một số dữ liệu kỹ thuật như địa chỉ IP, loại trình duyệt và lịch sử truy cập để cải thiện trải nghiệm người dùng."
+      },
+      {
+        "title": "Mục đích sử dụng thông tin",
+        "content": "Thông tin của bạn được sử dụng để:\n• Xử lý đơn thuê và giao hàng\n• Gửi xác nhận đơn hàng và thông báo trạng thái\n• Cung cấp tư vấn phong cách và gợi ý sản phẩm phù hợp\n• Hỗ trợ khách hàng qua Facebook và các kênh liên lạc\n• Cải thiện chất lượng dịch vụ và trải nghiệm người dùng"
+      },
+      {
+        "title": "Chia sẻ thông tin",
+        "content": "AI Closet không bán hoặc cho thuê thông tin cá nhân của bạn cho bên thứ ba. Chúng tôi chỉ chia sẻ dữ liệu với các đối tác vận chuyển để thực hiện giao hàng, và chỉ ở mức tối thiểu cần thiết."
+      },
+      {
+        "title": "Bảo mật dữ liệu",
+        "content": "Chúng tôi áp dụng các biện pháp bảo mật kỹ thuật và tổ chức phù hợp để bảo vệ thông tin của bạn khỏi truy cập trái phép, mất mát hoặc tiết lộ. Mật khẩu tài khoản được mã hóa và không được lưu dưới dạng văn bản thuần."
+      },
+      {
+        "title": "Quyền của bạn",
+        "content": "Bạn có quyền:\n• Truy cập và xem thông tin cá nhân đang được lưu trữ\n• Yêu cầu chỉnh sửa thông tin không chính xác\n• Yêu cầu xóa tài khoản và dữ liệu liên quan\n• Từ chối nhận email marketing bất kỳ lúc nào\n\nĐể thực hiện các quyền này, vui lòng liên hệ chúng tôi qua Facebook."
+      },
+      {
+        "title": "Cookie",
+        "content": "Chúng tôi sử dụng cookie để duy trì phiên đăng nhập và ghi nhớ tùy chọn của bạn. Bạn có thể tắt cookie trong cài đặt trình duyệt, tuy nhiên một số tính năng của trang web có thể bị ảnh hưởng."
+      },
+      {
+        "title": "Thay đổi chính sách",
+        "content": "Chúng tôi có thể cập nhật chính sách bảo mật này theo thời gian. Mọi thay đổi quan trọng sẽ được thông báo qua email hoặc thông báo trên trang web. Việc tiếp tục sử dụng dịch vụ sau khi thay đổi có hiệu lực đồng nghĩa với việc bạn chấp nhận chính sách mới."
+      }
+    ],
+    "contact": "Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật, vui lòng liên hệ chúng tôi qua trang Facebook: AI Closet."
+  },
+  "terms": {
+    "title": "Điều khoản dịch vụ",
+    "lastUpdated": "Cập nhật lần cuối: tháng 4 năm 2025",
+    "intro": "Bằng cách sử dụng dịch vụ của AI Closet, bạn đồng ý với các điều khoản và điều kiện dưới đây. Vui lòng đọc kỹ trước khi đặt thuê.",
+    "sections": [
+      {
+        "title": "Dịch vụ thuê trang phục",
+        "content": "AI Closet cung cấp dịch vụ thuê trang phục cao cấp tại Đà Nẵng. Tất cả sản phẩm trong kho đều được kiểm tra chất lượng và vệ sinh chuyên nghiệp trước mỗi lần cho thuê. Chúng tôi bảo lưu quyền từ chối đơn thuê trong trường hợp sản phẩm không còn khả dụng."
+      },
+      {
+        "title": "Đặt thuê và thanh toán",
+        "content": "Đơn thuê được xác nhận sau khi bạn hoàn tất thanh toán tiền thuê và tiền cọc. Tiền cọc dao động từ 30–50% giá trị sản phẩm và sẽ được hoàn trả đầy đủ sau khi bạn trả đồ trong tình trạng tốt.\n\nChúng tôi chấp nhận thanh toán tiền mặt khi nhận hàng (COD) và chuyển khoản ngân hàng."
+      },
+      {
+        "title": "Thời gian thuê và gia hạn",
+        "content": "Thời gian thuê tối thiểu là 1 ngày. Bạn có thể gia hạn đơn thuê trước khi hết hạn thông qua tài khoản hoặc liên hệ trực tiếp. Phí gia hạn được tính theo ngày phát sinh thêm."
+      },
+      {
+        "title": "Giao nhận hàng",
+        "content": "Chúng tôi giao hàng trong nội thành Đà Nẵng trong vòng 2–4 giờ. Bạn cũng có thể nhận trực tiếp tại cửa hàng. Khi nhận hàng, vui lòng kiểm tra tình trạng sản phẩm trước khi ký nhận. Mọi khiếu nại về tình trạng sản phẩm cần được thông báo trong vòng 2 giờ kể từ khi nhận hàng."
+      },
+      {
+        "title": "Trách nhiệm của khách hàng",
+        "content": "Bạn có trách nhiệm giữ gìn trang phục trong thời gian thuê. Không được giặt, sửa chữa hoặc thay đổi sản phẩm. Trong trường hợp hư hỏng, mất mát hoặc trả trễ, phí phát sinh sẽ được tính dựa trên mức độ thiệt hại thực tế."
+      },
+      {
+        "title": "Hư hỏng và bồi thường",
+        "content": "Hao mòn tự nhiên trong quá trình sử dụng bình thường được chấp nhận và không tính phí. Các hư hỏng do sử dụng không đúng cách (rách, ố bẩn nặng, mất phụ kiện) sẽ bị tính phí bồi thường tương ứng, tối đa bằng giá trị sản phẩm."
+      },
+      {
+        "title": "Hủy đơn và hoàn tiền",
+        "content": "Bạn có thể hủy đơn thuê trước khi giao hàng và được hoàn tiền đầy đủ. Sau khi nhận hàng, đơn thuê không thể hủy nhưng có thể đổi size trong vòng 2 giờ đầu nếu sản phẩm thay thế còn hàng."
+      },
+      {
+        "title": "Giới hạn trách nhiệm",
+        "content": "AI Closet không chịu trách nhiệm cho các thiệt hại gián tiếp phát sinh từ việc sử dụng dịch vụ. Trách nhiệm tối đa của chúng tôi trong mọi trường hợp không vượt quá giá trị đơn thuê của bạn."
+      }
+    ],
+    "contact": "Nếu bạn có câu hỏi về điều khoản dịch vụ, vui lòng liên hệ chúng tôi qua trang Facebook: AI Closet."
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "Về chúng tôi",
+      "title": "Thời trang thông minh cho phụ nữ hiện đại",
+      "subtitle": "AI Closet ra đời từ một ý tưởng đơn giản: mọi phụ nữ đều xứng đáng được mặc đẹp mà không cần chi quá nhiều. Chúng tôi kết hợp công nghệ AI với kho trang phục cao cấp để mang đến trải nghiệm thuê đồ thông minh, tiện lợi và đầy cảm hứng."
+    },
+    "story": {
+      "title": "Câu chuyện của chúng tôi",
+      "p1": "AI Closet được xây dựng tại Đà Nẵng bởi những người trẻ đam mê thời trang và công nghệ. Chúng tôi nhận ra rằng nhiều bạn gái muốn mặc đẹp cho từng dịp đặc biệt — tiệc cưới, sự kiện, buổi hẹn — nhưng không muốn bỏ ra hàng triệu đồng cho một bộ đồ chỉ mặc một lần.",
+      "p2": "Từ đó, AI Closet ra đời: một nền tảng thuê thời trang cao cấp kết hợp tính năng thử đồ ảo bằng AI, giúp bạn hình dung trang phục trên cơ thể mình trước khi quyết định thuê. Không còn lo chọn sai size, không còn tiếc nuối sau khi mặc thử.",
+      "p3": "Chúng tôi tin rằng thời trang nên là niềm vui, không phải gánh nặng tài chính. Mỗi bộ trang phục trong kho của AI Closet đều được kiểm tra kỹ lưỡng, vệ sinh chuyên nghiệp và sẵn sàng để bạn tỏa sáng."
+    },
+    "values": {
+      "title": "Giá trị cốt lõi",
+      "ai": {
+        "title": "Công nghệ AI",
+        "desc": "Thử đồ ảo thông minh giúp bạn chọn đúng ngay từ lần đầu"
+      },
+      "quality": {
+        "title": "Chất lượng cao cấp",
+        "desc": "Trang phục được tuyển chọn kỹ, vệ sinh chuyên nghiệp sau mỗi lần thuê"
+      },
+      "accessible": {
+        "title": "Dễ tiếp cận",
+        "desc": "Mặc đồ thiết kế với chi phí hợp lý, không cần cam kết dài hạn"
+      },
+      "community": {
+        "title": "Cộng đồng",
+        "desc": "Kết nối những người yêu thời trang, chia sẻ phong cách và cảm hứng"
+      }
+    },
+    "diff": {
+      "title": "Điều làm chúng tôi khác biệt",
+      "items": {
+        "tryon": {
+          "title": "Thử đồ ảo bằng AI",
+          "desc": "Tải ảnh lên và xem trang phục trên cơ thể bạn trước khi thuê — tính năng độc quyền tại AI Closet"
+        },
+        "inventory": {
+          "title": "Kho hàng đa dạng",
+          "desc": "Hơn 200 trang phục từ váy dạ hội, áo dài cao cấp đến trang phục thường ngày, cập nhật liên tục theo xu hướng"
+        },
+        "delivery": {
+          "title": "Giao hàng nhanh tại Đà Nẵng",
+          "desc": "Giao tận nơi trong 2–4 giờ nội thành, hoặc nhận trực tiếp tại cửa hàng"
+        },
+        "support": {
+          "title": "Tư vấn tận tâm",
+          "desc": "Đội ngũ hỗ trợ qua Facebook, sẵn sàng giúp bạn chọn đúng trang phục cho từng dịp"
+        }
+      }
+    },
+    "location": {
+      "title": "Đặt tại Đà Nẵng",
+      "desc": "Phục vụ khách hàng toàn thành phố với dịch vụ giao nhận tận nơi"
+    },
+    "stats": {
+      "products": "Trang phục trong kho",
+      "tryon": "Thử đồ ảo",
+      "languages": "Ngôn ngữ hỗ trợ",
+      "clean": "Vệ sinh chuyên nghiệp"
+    },
+    "cta": {
+      "title": "Sẵn sàng tỏa sáng?",
+      "subtitle": "Khám phá bộ sưu tập và thử đồ ảo ngay hôm nay — hoàn toàn miễn phí.",
+      "explore": "Xem bộ sưu tập",
+      "contact": "Liên hệ chúng tôi"
     }
   }
 }

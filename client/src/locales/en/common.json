@@ -1015,11 +1015,11 @@
     "steps": {
       "support": {
         "title": "Support",
-        "description": "Contact us via Facebook or hotline for consultation on outfits suitable for your event.",
+        "description": "Contact us via Facebook for consultation on outfits suitable for your event.",
         "details": [
           "Free style consultation",
           "Outfit suggestions by occasion and preference",
-          "24/7 support via Facebook and hotline"
+          "24/7 support via Facebook"
         ]
       },
       "rental": {
@@ -1217,7 +1217,7 @@
       "steps": {
         "contact": {
           "title": "Contact",
-          "desc": "Call hotline or message Facebook"
+          "desc": "Contact message Facebook"
         },
         "confirm": {
           "title": "Confirm",
@@ -1325,7 +1325,7 @@
           },
           "returnProcess": {
             "question": "What is the return process?",
-            "answer": "Contact hotline or Facebook, we confirm return reason, then shipper will collect the item and refund within 24-48 hours."
+            "answer": "Contact Facebook, we confirm return reason, then shipper will collect the item and refund within 24-48 hours."
           },
           "lateFee": {
             "question": "Will I be charged if I return late?",
@@ -1549,6 +1549,203 @@
       "title": "Need shipping or return support?",
       "description": "Contact us immediately for quick and dedicated support",
       "chatButton": "Chat Facebook"
+    }
+  },
+  "styleAdvisor": {
+    "title": "AI Style Advisor",
+    "subtitle": "Enter your details and our AI will suggest the most suitable outfits from our collection.",
+    "categories": {
+      "dresses":   "👗 Dresses",
+      "tops":      "👚 Tops",
+      "pants":     "👖 Pants",
+      "outerwear": "🧥 Outerwear",
+      "aodai":     "🥻 Ao Dai"
+    },
+    "form": {
+      "measurements": {
+        "title":              "📏 Body Measurements",
+        "height":             "Height (cm)",
+        "heightPlaceholder":  "e.g. 160",
+        "weight":             "Weight (kg)",
+        "weightPlaceholder":  "e.g. 52",
+        "bust":               "Bust (cm)",
+        "bustPlaceholder":    "e.g. 84",
+        "waist":              "Waist (cm)",
+        "waistPlaceholder":   "e.g. 64",
+        "hips":               "Hips (cm)",
+        "hipsPlaceholder":    "e.g. 90"
+      },
+      "category": {
+        "title": "👗 Clothing Type",
+        "hint":  "Select multiple types. Leave empty to let AI decide."
+      },
+      "colors": {
+        "title":       "🎨 Favorite Colors",
+        "placeholder": "e.g. pink, burgundy, pastel blue...",
+        "hint":        "Enter your favorite colors and AI will find the best match."
+      },
+      "submit": {
+        "label":   "Suggest Outfits for Me",
+        "loading": "AI is analyzing..."
+      }
+    },
+    "results": {
+      "title":  "✨ Personalized Suggestions",
+      "reset":  "Try Again",
+      "empty":  "No matching products found. Try adjusting your details.",
+      "size":   "Size",
+      "perDay": "/day",
+      "view":   "View",
+      "tryOn":  "Try On"
+    },
+    "errors": {
+      "heightWeightRequired": "Please enter your height and weight.",
+      "fetchFailed":          "Could not fetch suggestions. Please try again."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: April 2025",
+    "intro": "AI Closet is committed to protecting your personal information. This policy explains how we collect, use, and safeguard your data when you use our fashion rental service.",
+    "sections": [
+      {
+        "title": "Information We Collect",
+        "content": "We collect information you provide when registering, placing a rental order, or contacting support, including: full name, email address, phone number, delivery address, and body measurements (if you use the style advisor feature).\n\nWe also automatically collect certain technical data such as IP address, browser type, and browsing history to improve your experience."
+      },
+      {
+        "title": "How We Use Your Information",
+        "content": "Your information is used to:\n• Process rental orders and deliveries\n• Send order confirmations and status updates\n• Provide style advice and personalized product recommendations\n• Offer customer support via Facebook and other channels\n• Improve service quality and user experience"
+      },
+      {
+        "title": "Sharing Your Information",
+        "content": "AI Closet does not sell or rent your personal information to third parties. We only share data with delivery partners to fulfill orders, and only to the minimum extent necessary."
+      },
+      {
+        "title": "Data Security",
+        "content": "We apply appropriate technical and organizational security measures to protect your information from unauthorized access, loss, or disclosure. Account passwords are encrypted and never stored in plain text."
+      },
+      {
+        "title": "Your Rights",
+        "content": "You have the right to:\n• Access and view your stored personal information\n• Request correction of inaccurate information\n• Request deletion of your account and associated data\n• Opt out of marketing emails at any time\n\nTo exercise these rights, please contact us via Facebook."
+      },
+      {
+        "title": "Cookies",
+        "content": "We use cookies to maintain your login session and remember your preferences. You can disable cookies in your browser settings, though some website features may be affected."
+      },
+      {
+        "title": "Policy Changes",
+        "content": "We may update this privacy policy from time to time. Any significant changes will be communicated via email or a notice on the website. Continued use of the service after changes take effect constitutes acceptance of the updated policy."
+      }
+    ],
+    "contact": "If you have any questions about this privacy policy, please contact us via our Facebook page: AI Closet."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: April 2025",
+    "intro": "By using AI Closet's services, you agree to the following terms and conditions. Please read carefully before placing a rental order.",
+    "sections": [
+      {
+        "title": "Fashion Rental Service",
+        "content": "AI Closet provides premium fashion rental services in Da Nang. All items in our inventory are quality-checked and professionally cleaned before each rental. We reserve the right to decline a rental order if the item is no longer available."
+      },
+      {
+        "title": "Booking and Payment",
+        "content": "A rental order is confirmed once you complete payment of the rental fee and deposit. The deposit ranges from 30–50% of the item's value and will be fully refunded upon return in good condition.\n\nWe accept cash on delivery (COD) and bank transfer."
+      },
+      {
+        "title": "Rental Period and Extension",
+        "content": "The minimum rental period is 1 day. You may extend your rental before it expires through your account or by contacting us directly. Extension fees are calculated per additional day."
+      },
+      {
+        "title": "Delivery and Pickup",
+        "content": "We deliver within Da Nang city within 2–4 hours. You may also pick up directly at our store. Upon receiving your order, please inspect the item before signing. Any complaints about item condition must be reported within 2 hours of receipt."
+      },
+      {
+        "title": "Customer Responsibilities",
+        "content": "You are responsible for taking care of the garment during the rental period. Washing, altering, or modifying the item is not permitted. In the event of damage, loss, or late return, additional fees will be charged based on the extent of the damage."
+      },
+      {
+        "title": "Damage and Compensation",
+        "content": "Normal wear from regular use is accepted at no charge. Damage caused by misuse (tears, heavy staining, missing accessories) will incur a compensation fee proportional to the damage, up to the full value of the item."
+      },
+      {
+        "title": "Cancellation and Refunds",
+        "content": "You may cancel a rental order before delivery for a full refund. After receiving the item, cancellation is not possible, but size exchanges are allowed within the first 2 hours if a replacement is available."
+      },
+      {
+        "title": "Limitation of Liability",
+        "content": "AI Closet is not liable for indirect damages arising from the use of our services. Our maximum liability in any case shall not exceed the value of your rental order."
+      }
+    ],
+    "contact": "If you have questions about these terms of service, please contact us via our Facebook page: AI Closet."
+  },
+  "about": {
+    "hero": {
+      "eyebrow": "About Us",
+      "title": "Smart Fashion for the Modern Woman",
+      "subtitle": "AI Closet was born from a simple idea: every woman deserves to dress beautifully without overspending. We combine AI technology with a curated wardrobe to deliver a smart, convenient, and inspiring rental experience."
+    },
+    "story": {
+      "title": "Our Story",
+      "p1": "AI Closet was built in Da Nang by young people passionate about fashion and technology. We noticed that many women want to look their best for special occasions — weddings, events, dates — but don't want to spend millions on an outfit worn just once.",
+      "p2": "So AI Closet was born: a premium fashion rental platform with an AI virtual try-on feature that lets you visualize outfits on your own body before committing. No more wrong sizes, no more regrets after trying something on.",
+      "p3": "We believe fashion should be a joy, not a financial burden. Every piece in the AI Closet wardrobe is carefully inspected, professionally cleaned, and ready for you to shine."
+    },
+    "values": {
+      "title": "Our Core Values",
+      "ai": {
+        "title": "AI Technology",
+        "desc": "Smart virtual try-on helps you choose the right outfit from the very first time"
+      },
+      "quality": {
+        "title": "Premium Quality",
+        "desc": "Carefully curated pieces, professionally cleaned after every rental"
+      },
+      "accessible": {
+        "title": "Accessible Fashion",
+        "desc": "Wear designer pieces at an affordable price, with no long-term commitment"
+      },
+      "community": {
+        "title": "Community",
+        "desc": "Connecting fashion lovers to share styles and inspire each other"
+      }
+    },
+    "diff": {
+      "title": "What Makes Us Different",
+      "items": {
+        "tryon": {
+          "title": "AI Virtual Try-On",
+          "desc": "Upload a photo and see the outfit on your body before renting — an exclusive AI Closet feature"
+        },
+        "inventory": {
+          "title": "Diverse Wardrobe",
+          "desc": "Over 200 pieces from evening gowns and premium ao dai to everyday wear, updated with the latest trends"
+        },
+        "delivery": {
+          "title": "Fast Delivery in Da Nang",
+          "desc": "Door-to-door delivery within 2–4 hours in the city, or pick up directly at our store"
+        },
+        "support": {
+          "title": "Dedicated Support",
+          "desc": "Our team is available via Facebook to help you choose the perfect outfit for every occasion"
+        }
+      }
+    },
+    "location": {
+      "title": "Based in Da Nang",
+      "desc": "Serving customers across the city with door-to-door pickup and delivery"
+    },
+    "stats": {
+      "products": "Pieces in wardrobe",
+      "tryon": "Virtual try-on",
+      "languages": "Languages supported",
+      "clean": "Professionally cleaned"
+    },
+    "cta": {
+      "title": "Ready to Shine?",
+      "subtitle": "Explore the collection and try on virtually today — completely free.",
+      "explore": "Browse Collection",
+      "contact": "Contact Us"
     }
   }
 }

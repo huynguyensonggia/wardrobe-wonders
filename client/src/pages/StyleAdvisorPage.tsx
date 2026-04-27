@@ -1,21 +1,24 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, ArrowRight, Loader2, RefreshCw } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recommendationsApi, type RecommendResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES = [
-  { label: "👗 Váy / Đầm", value: "Dresses" },
-  { label: "👚 Áo", value: "Tops" },
-  { label: "👖 Quần", value: "Pants" },
-  { label: "🧥 Áo khoác", value: "Outerwear" },
-  { label: "🥻 Áo dài", value: "Áo dài" },
-];
-
 export default function StyleAdvisorPage() {
+  const { t } = useTranslation();
+
+  const CATEGORIES = [
+    { label: t("styleAdvisor.categories.dresses"),   value: "Dresses" },
+    { label: t("styleAdvisor.categories.tops"),      value: "Tops" },
+    { label: t("styleAdvisor.categories.pants"),     value: "Pants" },
+    { label: t("styleAdvisor.categories.outerwear"), value: "Outerwear" },
+    { label: t("styleAdvisor.categories.aodai"),     value: "Áo dài" },
+  ];
+
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [bust, setBust] = useState("");
@@ -40,7 +43,7 @@ export default function StyleAdvisorPage() {
 
   const handleSubmit = async () => {
     if (!height || !weight) {
-      setError("Vui lòng nhập chiều cao và cân nặng.");
+      setError(t("styleAdvisor.errors.heightWeightRequired"));
       return;
     }
     setError(null);
@@ -51,15 +54,15 @@ export default function StyleAdvisorPage() {
       const data = await recommendationsApi.recommend({
         height: Number(height),
         weight: Number(weight),
-        bust: bust ? Number(bust) : undefined,
-        waist: waist ? Number(waist) : undefined,
-        hips: hips ? Number(hips) : undefined,
+        bust:   bust  ? Number(bust)  : undefined,
+        waist:  waist ? Number(waist) : undefined,
+        hips:   hips  ? Number(hips)  : undefined,
         favoriteColors: colorInput.trim() || undefined,
         category: selectedCategories.join(", ") || undefined,
       });
       setResults(data);
     } catch (e: any) {
-      setError(e?.message || "Không thể lấy gợi ý. Vui lòng thử lại.");
+      setError(e?.message || t("styleAdvisor.errors.fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -79,11 +82,10 @@ export default function StyleAdvisorPage() {
             <Sparkles className="w-8 h-8 text-gold" />
           </div>
           <h1 className="font-display text-3xl font-semibold mb-2">
-            Tư vấn phong cách AI
+            {t("styleAdvisor.title")}
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Điền thông tin của bạn, AI sẽ gợi ý những trang phục phù hợp nhất
-            từ bộ sưu tập của chúng tôi.
+            {t("styleAdvisor.subtitle")}
           </p>
         </div>
 
@@ -91,53 +93,53 @@ export default function StyleAdvisorPage() {
           <div className="border rounded-xl p-6 space-y-6">
             {/* Số đo */}
             <div>
-              <h3 className="font-medium mb-4">📏 Số đo cơ thể</h3>
+              <h3 className="font-medium mb-4">{t("styleAdvisor.form.measurements.title")}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label>
-                    Chiều cao (cm) <span className="text-destructive">*</span>
+                    {t("styleAdvisor.form.measurements.height")} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     type="number"
-                    placeholder="VD: 160"
+                    placeholder={t("styleAdvisor.form.measurements.heightPlaceholder")}
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
                   <Label>
-                    Cân nặng (kg) <span className="text-destructive">*</span>
+                    {t("styleAdvisor.form.measurements.weight")} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     type="number"
-                    placeholder="VD: 52"
+                    placeholder={t("styleAdvisor.form.measurements.weightPlaceholder")}
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>Vòng ngực (cm)</Label>
+                  <Label>{t("styleAdvisor.form.measurements.bust")}</Label>
                   <Input
                     type="number"
-                    placeholder="VD: 84"
+                    placeholder={t("styleAdvisor.form.measurements.bustPlaceholder")}
                     value={bust}
                     onChange={(e) => setBust(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label>Vòng eo (cm)</Label>
+                  <Label>{t("styleAdvisor.form.measurements.waist")}</Label>
                   <Input
                     type="number"
-                    placeholder="VD: 64"
+                    placeholder={t("styleAdvisor.form.measurements.waistPlaceholder")}
                     value={waist}
                     onChange={(e) => setWaist(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1 col-span-2 sm:col-span-1">
-                  <Label>Vòng hông (cm)</Label>
+                  <Label>{t("styleAdvisor.form.measurements.hips")}</Label>
                   <Input
                     type="number"
-                    placeholder="VD: 90"
+                    placeholder={t("styleAdvisor.form.measurements.hipsPlaceholder")}
                     value={hips}
                     onChange={(e) => setHips(e.target.value)}
                   />
@@ -147,7 +149,7 @@ export default function StyleAdvisorPage() {
 
             {/* Loại trang phục */}
             <div>
-              <h3 className="font-medium mb-3">👗 Loại trang phục</h3>
+              <h3 className="font-medium mb-3">{t("styleAdvisor.form.category.title")}</h3>
               <div className="flex flex-wrap gap-2">
                 {CATEGORIES.map((c) => (
                   <button
@@ -168,25 +170,23 @@ export default function StyleAdvisorPage() {
                 ))}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Có thể chọn nhiều loại. Bỏ trống để AI tự chọn.
+                {t("styleAdvisor.form.category.hint")}
               </p>
             </div>
 
             {/* Màu yêu thích */}
             <div>
-              <h3 className="font-medium mb-3">🎨 Màu sắc yêu thích</h3>
+              <h3 className="font-medium mb-3">{t("styleAdvisor.form.colors.title")}</h3>
               <Input
                 type="text"
-                placeholder="VD: màu hồng, đỏ đô, xanh pastel..."
+                placeholder={t("styleAdvisor.form.colors.placeholder")}
                 value={colorInput}
                 onChange={(e) => setColorInput(e.target.value)}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Điền màu bạn thích, AI sẽ tìm sản phẩm phù hợp nhất.
+                {t("styleAdvisor.form.colors.hint")}
               </p>
             </div>
-
-            {/* Dịp mặc - đã bỏ */}
 
             {error && (
               <p className="text-sm text-destructive">{error}</p>
@@ -202,12 +202,12 @@ export default function StyleAdvisorPage() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  AI đang phân tích...
+                  {t("styleAdvisor.form.submit.loading")}
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Gợi ý trang phục cho tôi
+                  {t("styleAdvisor.form.submit.label")}
                 </>
               )}
             </Button>
@@ -216,17 +216,17 @@ export default function StyleAdvisorPage() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">
-                ✨ Gợi ý dành riêng cho bạn
+                {t("styleAdvisor.results.title")}
               </h2>
               <Button variant="outline" size="sm" onClick={handleReset}>
                 <RefreshCw className="w-4 h-4 mr-1" />
-                Thử lại
+                {t("styleAdvisor.results.reset")}
               </Button>
             </div>
 
             {results.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                Không tìm thấy sản phẩm phù hợp. Hãy thử điều chỉnh thông tin.
+                {t("styleAdvisor.results.empty")}
               </div>
             ) : (
               <div className="space-y-4">
@@ -243,10 +243,7 @@ export default function StyleAdvisorPage() {
                     {/* Image */}
                     <div className="shrink-0 w-20 h-24 rounded-lg overflow-hidden bg-muted">
                       <img
-                        src={
-                          product.imageUrl ||
-                          "https://placehold.co/200x240?text=No+Image"
-                        }
+                        src={product.imageUrl || "https://placehold.co/200x240?text=No+Image"}
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
@@ -260,14 +257,14 @@ export default function StyleAdvisorPage() {
                       </div>
                       {product.sizes.length > 0 && (
                         <div className="text-xs text-muted-foreground mt-0.5">
-                          Size: {product.sizes.join(", ")}
+                          {t("styleAdvisor.results.size")}: {product.sizes.join(", ")}
                         </div>
                       )}
                       <p className="text-sm text-muted-foreground mt-2 italic">
                         "{reason}"
                       </p>
                       <div className="mt-2 text-sm font-medium">
-                        {product.rentPricePerDay.toLocaleString("vi-VN")}đ/ngày
+                        {product.rentPricePerDay.toLocaleString("vi-VN")}đ{t("styleAdvisor.results.perDay")}
                       </div>
                     </div>
 
@@ -275,13 +272,13 @@ export default function StyleAdvisorPage() {
                     <div className="shrink-0 flex flex-col gap-2 justify-center">
                       <Button size="sm" asChild>
                         <Link to={`/products/${product.id}`}>
-                          Xem
+                          {t("styleAdvisor.results.view")}
                           <ArrowRight className="w-3 h-3 ml-1" />
                         </Link>
                       </Button>
                       <Button size="sm" variant="outline" asChild>
                         <Link to={`/try-on?product=${product.id}`}>
-                          Thử đồ
+                          {t("styleAdvisor.results.tryOn")}
                         </Link>
                       </Button>
                     </div>
