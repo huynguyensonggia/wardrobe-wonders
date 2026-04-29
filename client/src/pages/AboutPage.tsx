@@ -110,7 +110,7 @@ export default function AboutPage() {
               </div>
               <div className="border-t border-border pt-6 grid grid-cols-2 gap-6 text-center">
                 <div>
-                  <p className="font-display text-3xl font-semibold">200+</p>
+                  <p className="font-display text-3xl font-semibold">100+</p>
                   <p className="text-sm text-muted-foreground mt-1">{t("about.stats.products")}</p>
                 </div>
                 <div>

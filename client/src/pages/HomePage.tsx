@@ -196,7 +196,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
                   <h3 className="font-display text-xl text-white font-medium">
-                    {category.name}
+                    {t(`home.categoryNames.${category.slug}`, { defaultValue: category.name })}
                   </h3>
                   <p className="text-sm text-white/80 mt-1">
                     {category.description}

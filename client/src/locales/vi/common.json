@@ -60,7 +60,7 @@
     "color": "Màu",
     "allColors": "Tất cả màu",
     "availability": "Tình trạng",
-    "allStatus": "Tất cả",
+    "allStatus": "Trạng thái",
     "status": {
       "available": "Còn hàng",
       "rented": "Đang thuê"
@@ -172,6 +172,14 @@
     "categories": {
       "title": "Mua theo danh mục",
       "subtitle": "Khám phá bộ sưu tập được tuyển chọn cho mọi dịp"
+    },
+    "categoryNames": {
+      "dresses":   "Váy / Đầm",
+      "tops":      "Áo",
+      "pants":     "Quần",
+      "outerwear": "Áo khoác",
+      "ao-dai":    "Áo dài",
+      "ao-dai-cao-cap": "Áo dài cao cấp"
     },
     "featured": {
       "title": "Sản phẩm nổi bật",
