@@ -18,7 +18,7 @@
     "contact": "お問い合わせ",
     "privacy": "プライバシーポリシー",
     "terms": "利用規約",
-    "copyright": "© {{year}} AI Closet. All rights reserved."
+    "copyright": "© {{year}} AI Closet. 無断転載禁止。"
   },
   "language": {
     "label": "言語",
@@ -118,6 +118,13 @@
       "selectDates": "レンタル日程を選択してください",
       "minimumRental": "最低レンタル期間は{{days}}日です",
       "addedToCart": "カートに追加しました！"
+    },
+    "notify": {
+      "title": "このアイテムは現在レンタル中です",
+      "desc": "このアイテムが再び利用可能になったらすぐにお知らせします。",
+      "cta": "在庫が戻ったら通知する",
+      "cancel": "通知をキャンセル",
+      "registered": "✓ 在庫が戻り次第、Facebookよりご連絡いたします。"
     }
   },
   "home": {
@@ -444,7 +451,7 @@
       "methods": {
         "CASH": "代金引換（受け取り時に現金払い）",
         "COD": "COD（代金引換）",
-        "BANK_TRANSFER": "銀行振込"
+        "BANK_TRANSFER": "受け取り時に銀行振込"
       },
       "depositNote": "デポジットが必要です",
       "depositAmount": "デポジット金額",
@@ -625,6 +632,12 @@
     }
   },
   "adminProducts": {
+    "status": {
+      "available": "在庫あり",
+      "rented": "レンタル中",
+      "maintenance": "メンテナンス中",
+      "soldOut": "在庫切れ"
+    },
     "header": {
       "title": "商品",
       "subtitle": "商品を管理"
@@ -845,7 +858,8 @@
       "returned": "返却済み",
       "washing": "洗濯中",
       "repairing": "修理中",
-      "retired": "廃棄済み"
+      "retired": "廃棄済み",
+      "reserved": "予約済み（注文待ち）"
     },
     "form": {
       "title": "在庫にアイテムを追加",
@@ -1630,6 +1644,50 @@
       "heightWeightRequired": "身長と体重を入力してください。",
       "fetchFailed":          "提案を取得できませんでした。もう一度お試しください。"
     }
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "いつでもサポートいたします。Facebookでメッセージを送るか、店舗にお越しください。",
+    "facebook": {
+      "title": "Facebookでメッセージ",
+      "desc": "スタイル相談やレンタルサポートを最速で受け取る方法です。",
+      "cta": "今すぐメッセージ"
+    },
+    "address": {
+      "title": "店舗住所"
+    },
+    "hours": {
+      "title": "営業時間",
+      "value": "月曜〜日曜：8:00〜20:00"
+    }
+  },
+  "notFound": {
+    "title": "ページが見つかりません",
+    "desc": "お探しのページは削除されたか、名前が変更されたか、一時的に利用できない可能性があります。",
+    "backHome": "ホームへ戻る",
+    "browseCollection": "コレクションを見る"
+  },
+  "orderSuccess": {
+    "title": "ご注文が完了しました！",
+    "subtitle": "レンタル注文を受け付けました。確認のためすぐにご連絡いたします。",
+    "days": "日",
+    "perDay": "日",
+    "qty": "数量",
+    "shipping": "配送情報",
+    "pickupDelivery": "宅配",
+    "pickupStore": "店舗受け取り",
+    "payment": "お支払い",
+    "rentalTotal": "レンタル料金",
+    "deposit": "デポジット（返金可）",
+    "grandTotal": "本日支払い合計",
+    "paymentMethod": {
+      "CASH": "代金引換",
+      "COD": "COD",
+      "BANK_TRANSFER": "銀行振込"
+    },
+    "nextSteps": "Facebookよりご注文の確認と配送手配のためご連絡いたします。通知を受け取れるようお電話をお手元にご用意ください。",
+    "viewRentals": "レンタル状況を確認",
+    "continueShopping": "ショッピングを続ける"
   },
   "privacy": {
     "title": "プライバシーポリシー",

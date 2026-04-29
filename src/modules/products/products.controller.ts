@@ -7,17 +7,19 @@ import { ProductStatus } from "./enums/product-status.enum";
 export class ProductController {
   constructor(private readonly service: ProductService) {}
 
-  // GET /products?categoryId=1&status=available
+  // GET /products?categoryId=1&status=available&search=váy
   @Get()
   getAll(
     @Query("categoryId") categoryId?: string,
     @Query("status") status?: ProductStatus,
-    @Query("occasion") occasion?: string
+    @Query("occasion") occasion?: string,
+    @Query("search") search?: string,
   ) {
     return this.service.findAll({
       categoryId: categoryId ? Number(categoryId) : undefined,
       status: status || undefined,
       occasion: occasion || undefined,
+      search: search || undefined,
     });
   }
 

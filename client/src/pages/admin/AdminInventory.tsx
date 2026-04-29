@@ -331,30 +331,40 @@ export default function AdminInventory() {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <select
-                  className={`text-xs border rounded-md px-2 py-1.5 bg-background transition ${
-                    !MANUALLY_EDITABLE.includes(item.conditionStatus)
-                      ? "opacity-40 cursor-not-allowed"
-                      : ""
-                  }`}
-                  value={item.conditionStatus}
-                  disabled={
-                    !MANUALLY_EDITABLE.includes(item.conditionStatus) ||
-                    item.conditionStatus === "retired" ||
-                    updateMutation.isPending
-                  }
-                  onChange={(e) => updateMutation.mutate({ id: item.id, status: e.target.value as ConditionStatus })}
-                >
-                  {/* Nếu item đang ở trạng thái không editable, hiện trạng thái đó như readonly */}
-                  {!MANUALLY_EDITABLE.includes(item.conditionStatus) && (
-                    <option value={item.conditionStatus}>{t(`adminInventory.status.${item.conditionStatus}`)}</option>
-                  )}
-                  {MANUAL_STATUSES.map((s) => (
-                    <option key={s} value={s}>{t(`adminInventory.status.${s}`)}</option>
-                  ))}
-                </select>
+                {(() => {
+                  const cs = item.conditionStatus;
+                  // Options theo trạng thái hiện tại
+                  const optionsMap: Record<ConditionStatus, ConditionStatus[]> = {
+                    available:  ["available", "washing", "repairing", "retired"],
+                    returned:   ["returned", "washing", "repairing", "retired"],  // không có "available"
+                    washing:    ["washing", "available"],
+                    repairing:  ["repairing", "available"],
+                    // readonly — quản lý bởi rental
+                    shipping:   ["shipping"],
+                    rented:     ["rented"],
+                    retired:    ["retired"],
+                  };
+                  const isEditable = ["available", "returned", "washing", "repairing"].includes(cs);
+                  const options = optionsMap[cs] ?? [cs];
 
-                {MANUALLY_EDITABLE.includes(item.conditionStatus) && item.conditionStatus !== "retired" && (
+                  return (
+                    <select
+                      className={`text-xs border rounded-md px-2 py-1.5 bg-background transition ${
+                        !isEditable ? "opacity-40 cursor-not-allowed" : ""
+                      }`}
+                      value={cs}
+                      disabled={!isEditable || cs === "retired" || updateMutation.isPending}
+                      onChange={(e) => updateMutation.mutate({ id: item.id, status: e.target.value as ConditionStatus })}
+                    >
+                      {options.map((s) => (
+                        <option key={s} value={s}>{t(`adminInventory.status.${s}`)}</option>
+                      ))}
+                    </select>
+                  );
+                })()}
+
+                {["available", "returned", "washing", "repairing"].includes(item.conditionStatus) &&
+                  item.conditionStatus !== "retired" && (
                   <ConditionNoteButton
                     item={item}
                     onSave={(note) =>

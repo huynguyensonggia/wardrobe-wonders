@@ -154,25 +154,27 @@ export function Navbar() {
             {/* Language selector */}
             <LanguageSwitcher />
 
-            {/* Cart button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative"
-              onClick={() => navigate("/cart")}
-              aria-label={t("navbar.cart")}
-            >
-              <ShoppingBag className="w-5 h-5" />
-              {count > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full
-                  bg-destructive text-destructive-foreground text-xs
-                  flex items-center justify-center"
-                >
-                  {count}
-                </span>
-              )}
-            </Button>
+            {/* Cart button — ẩn với admin */}
+            {user?.role !== "ADMIN" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => navigate("/cart")}
+                aria-label={t("navbar.cart")}
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {count > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full
+                    bg-destructive text-destructive-foreground text-xs
+                    flex items-center justify-center"
+                  >
+                    {count}
+                  </span>
+                )}
+              </Button>
+            )}
 
             {isAuthenticated ? (
               <DropdownMenu>
@@ -341,16 +343,18 @@ export function Navbar() {
                 {t("navbar.styleAdvisor")}
               </Link>
 
-              {/* Cart in mobile menu */}
-              <button
-                className="text-left text-sm font-medium py-2"
-                onClick={() => {
-                  navigate("/cart");
-                  setIsOpen(false);
-                }}
-              >
-                {t("navbar.cart")} {count > 0 ? `(${count})` : ""}
-              </button>
+              {/* Cart in mobile menu — ẩn với admin */}
+              {user?.role !== "ADMIN" && (
+                <button
+                  className="text-left text-sm font-medium py-2"
+                  onClick={() => {
+                    navigate("/cart");
+                    setIsOpen(false);
+                  }}
+                >
+                  {t("navbar.cart")} {count > 0 ? `(${count})` : ""}
+                </button>
+              )}
 
               <div className="pt-4 border-t border-border">
                 {isAuthenticated ? (

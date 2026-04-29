@@ -280,10 +280,6 @@ export default function HomePage() {
             <blockquote className="font-display text-2xl md:text-3xl italic leading-relaxed">
               {t("home.testimonial.quote")}
             </blockquote>
-            <div className="mt-6">
-              <p className="font-medium">{t("home.testimonial.name")}</p>
-              <p className="text-sm text-muted-foreground">{t("home.testimonial.title")}</p>
-            </div>
           </div>
         </div>
       </section>

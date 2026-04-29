@@ -263,6 +263,11 @@ export class RentalsService {
 
     await this.rentalItemsRepo.save(itemEntities);
 
+    // ✅ Trừ stock ngay khi tạo đơn PENDING để tránh race condition
+    for (const item of preparedItems) {
+      await this.variantsRepo.decrement({ id: item.variant.id }, "stock", item.quantity);
+    }
+
     // =========================
     // TẠO PAYMENT RECORD (tiền cọc + tiền thuê, phương thức CASH mặc định)
     // =========================
@@ -428,44 +433,20 @@ export class RentalsService {
             where: { rental: { id } as any },
           });
 
-          // ✅ Trừ stock khi chuyển sang ACTIVE
-          const shouldDeduct =
-            nextStatus === RentalStatus.ACTIVE && prevStatus !== RentalStatus.ACTIVE;
-
-          // ✅ Cộng lại khi từ ACTIVE -> COMPLETED/CANCELLED/REJECTED
+          // ✅ Trừ stock: KHÔNG trừ nữa khi ACTIVE (đã trừ lúc tạo đơn PENDING)
+          // ✅ Hoàn stock khi CANCELLED hoặc REJECTED (hàng không giao, về kho ngay)
+          // ✅ COMPLETED: KHÔNG hoàn stock ở đây — stock được hoàn khi admin
+          //    đổi inventory: washing/repairing → available (hàng đã giặt/sửa xong)
           const shouldReturn =
-            prevStatus === RentalStatus.ACTIVE &&
-            (nextStatus === RentalStatus.COMPLETED ||
-              nextStatus === RentalStatus.CANCELLED ||
-              nextStatus === RentalStatus.REJECTED);
-
-          if (shouldDeduct) {
-            for (const it of items) {
-              const v = await variantsRepo.findOne({
-                where: { id: it.variantId },
-                lock: { mode: "pessimistic_write" },
-              });
-              if (!v) throw new BadRequestException(`Variant not found: ${it.variantId}`);
-
-              if (v.stock < it.quantity) {
-                throw new BadRequestException(`Out of stock for variant ${v.id}`);
-              }
-
-              v.stock -= it.quantity;
-              await variantsRepo.save(v);
-            }
-          }
+            (nextStatus === RentalStatus.CANCELLED ||
+             nextStatus === RentalStatus.REJECTED) &&
+            prevStatus !== RentalStatus.COMPLETED &&
+            prevStatus !== RentalStatus.CANCELLED &&
+            prevStatus !== RentalStatus.REJECTED;
 
           if (shouldReturn) {
             for (const it of items) {
-              const v = await variantsRepo.findOne({
-                where: { id: it.variantId },
-                lock: { mode: "pessimistic_write" },
-              });
-              if (!v) throw new BadRequestException(`Variant not found: ${it.variantId}`);
-
-              v.stock += it.quantity;
-              await variantsRepo.save(v);
+              await variantsRepo.increment({ id: it.variantId }, "stock", it.quantity);
             }
           }
 
@@ -486,7 +467,9 @@ export class RentalsService {
       const allItems = await this.rentalItemsRepo.find({ where: { rental: { id } as any } });
       await Promise.all(
         allItems.map((ri) =>
-          this.inventoryService.syncFromRental(ri.id, ri.variantId, nextStatus!).catch(() => {})
+          this.inventoryService.syncFromRental(ri.id, ri.variantId, nextStatus!).catch((e) => {
+            console.error(`[syncFromRental] Failed for variantId=${ri.variantId}:`, e?.message);
+          })
         )
       );
     }
@@ -641,6 +624,7 @@ export class RentalsService {
   async cancelMine(userId: number, id: number) {
     const rental = await this.rentalsRepo.findOne({
       where: { id, user: { id: userId } as any },
+      relations: ["items"],
     });
     if (!rental) throw new NotFoundException("Rental not found");
 
@@ -651,7 +635,14 @@ export class RentalsService {
     }
 
     rental.status = RentalStatus.CANCELLED;
-    return this.rentalsRepo.save(rental);
+    const saved = await this.rentalsRepo.save(rental);
+
+    // ✅ Hoàn stock khi user cancel PENDING
+    for (const it of rental.items) {
+      await this.variantsRepo.increment({ id: it.variantId }, "stock", it.quantity);
+    }
+
+    return saved;
   }
 
   // =========================

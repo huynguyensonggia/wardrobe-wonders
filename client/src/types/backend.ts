@@ -21,6 +21,8 @@ export interface BECategory {
 export interface BEProduct {
   id: number;
   name: string;
+  nameEn: string | null;
+  nameJa: string | null;
 
   categoryId: number;
   category?: BECategory;

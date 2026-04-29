@@ -209,6 +209,12 @@ export default function CheckoutPage() {
       if (!fullName) return alert(t("checkout.alert.fullName"));
       if (!phone) return alert(t("checkout.alert.phone"));
 
+      // Validate tất cả items phải có variantId hợp lệ
+      const missingVariant = checkoutItems.find((it) => !it.variantId);
+      if (missingVariant) {
+        return alert(t("cart.alert.missingVariant"));
+      }
+
       // Chỉ validate địa chỉ khi chọn giao tận nơi
       if (pickupType === "delivery") {
         if (!street.trim()) return alert(t("checkout.alert.street"));
@@ -221,8 +227,9 @@ export default function CheckoutPage() {
 
       const finalAddress = pickupType === "store" ? STORE_ADDRESS : address;
 
+      const rentalCodes: string[] = [];
       for (const g of groups) {
-        await rentalsApi.create({
+        const res = await rentalsApi.create({
           startDate: g.startDate,
           endDate: g.endDate,
           items: g.list.map((x) => ({
@@ -238,12 +245,36 @@ export default function CheckoutPage() {
           paymentMethod,
           pickupType,
         } as any);
+        const code = (res as any)?.rentalCode ?? (res as any)?.data?.rentalCode;
+        if (code) rentalCodes.push(code);
       }
 
       if (state.source === "cart") clear();
 
-      alert(t("checkout.alert.success"));
-      navigate("/dashboard");
+      navigate("/order-success", {
+        state: {
+          rentalCodes,
+          checkoutRef: `CHK-${Date.now()}`,
+          shipFullName: fullName,
+          shipAddress: finalAddress,
+          paymentMethod,
+          pickupType,
+          total,
+          totalDeposit,
+          groups: groups.map((g) => ({
+            startDate: g.startDate,
+            endDate: g.endDate,
+            items: g.list.map((it) => ({
+              name: it.name,
+              size: it.size,
+              imageUrl: it.imageUrl,
+              quantity: it.quantity,
+              rentPricePerDay: it.rentPricePerDay,
+              days: it.days,
+            })),
+          })),
+        },
+      });
     } catch (e: any) {
       alert(e?.message || t("checkout.alert.failed"));
     } finally {
@@ -273,7 +304,7 @@ export default function CheckoutPage() {
               </div>
 
               {g.list.map((it) => {
-                const lineTotal = it.quantity * it.rentPricePerDay * it.days;
+                const lineTotal = it.quantity * calcRentalPrice(it.rentPricePerDay, it.days);
 
                 return (
                   <div

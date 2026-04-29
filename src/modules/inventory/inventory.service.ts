@@ -84,7 +84,8 @@ export class InventoryService {
   }
 
   // ========================
-  // Đổi trạng thái + điều chỉnh stock
+  // Đổi trạng thái thủ công (admin) — chỉ cho phép sau khi returned
+  // shipping/rented được quản lý tự động bởi rental sync
   // ========================
   async updateStatus(id: number, status: ConditionStatus, note?: string) {
     return this.dataSource.transaction(async (manager) => {
@@ -96,17 +97,31 @@ export class InventoryService {
 
       const prev = item.conditionStatus;
 
-      // Không cho đổi từ retired sang trạng thái khác
       if (prev === ConditionStatus.RETIRED && status !== ConditionStatus.RETIRED) {
         throw new BadRequestException("Không thể thay đổi trạng thái món đã loại bỏ");
       }
 
-      // Không cho đổi nếu giống nhau - nhưng vẫn cho update note
-      if (prev === status) {
-        if (note !== undefined) {
-          item.conditionNote = note;
-          return itemRepo.save(item);
+      // ✅ Chỉ cho admin đổi thủ công khi item đang RETURNED hoặc AVAILABLE
+      // shipping/rented được quản lý tự động bởi rental
+      const adminAllowedFrom = [ConditionStatus.RETURNED, ConditionStatus.AVAILABLE, ConditionStatus.WASHING, ConditionStatus.REPAIRING];
+      if (!adminAllowedFrom.includes(prev)) {
+        throw new BadRequestException(
+          `Không thể đổi thủ công khi đang ở trạng thái "${prev}". Trạng thái này được quản lý tự động theo đơn thuê.`
+        );
+      }
+
+      // ✅ Khi returned: chỉ được đổi sang washing hoặc repairing (bắt buộc qua quy trình)
+      if (prev === ConditionStatus.RETURNED) {
+        const allowedFromReturned = [ConditionStatus.WASHING, ConditionStatus.REPAIRING, ConditionStatus.RETIRED];
+        if (!allowedFromReturned.includes(status)) {
+          throw new BadRequestException(
+            `Sau khi trả hàng, phải chuyển sang "Đang giặt" hoặc "Đang sửa" trước khi về "Sẵn sàng".`
+          );
         }
+      }
+
+      if (prev === status) {
+        if (note !== undefined) { item.conditionNote = note; return itemRepo.save(item); }
         return item;
       }
 
@@ -116,37 +131,28 @@ export class InventoryService {
       });
       if (!variant) throw new NotFoundException("Variant not found");
 
-      // === LOGIC STOCK ===
-      // Trước đây available → giờ chuyển sang reducing: trừ stock
-      const wasAvailable = prev === ConditionStatus.AVAILABLE || prev === ConditionStatus.RETURNED;
-      const nowReducing = WAS_REDUCING(status);
+      // === STOCK LOGIC (chỉ khi admin đổi thủ công) ===
+      // returned/available → washing/repairing/retired: trừ stock
+      // Nhưng "returned" thực ra stock đã = 0 (rental đã trừ khi PENDING, chưa hoàn)
+      // → chỉ trừ stock khi từ AVAILABLE (hàng đang sẵn sàng cho thuê)
+      const wasAvailable = prev === ConditionStatus.AVAILABLE;
+      const nowReducing = [ConditionStatus.WASHING, ConditionStatus.REPAIRING, ConditionStatus.RETIRED].includes(status);
 
-      // Trước đây reducing → giờ chuyển về available/returned: cộng stock
-      const wasReducing = WAS_REDUCING(prev);
-      const nowAvailable = status === ConditionStatus.AVAILABLE || status === ConditionStatus.RETURNED;
+      // washing/repairing → available: cộng stock (hàng xong giặt/sửa, sẵn sàng lại)
+      const wasReducing = [ConditionStatus.WASHING, ConditionStatus.REPAIRING].includes(prev);
+      const nowAvailable = status === ConditionStatus.AVAILABLE;
 
       if (wasAvailable && nowReducing) {
-        // Chỉ trừ stock khi từ available/returned → reducing
-        // Không trừ khi chuyển giữa các reducing statuses (shipping→rented, v.v.)
-        if (variant.stock <= 0) throw new BadRequestException("Stock đã về 0, không thể chuyển trạng thái này");
+        if (variant.stock <= 0) throw new BadRequestException("Stock đã về 0");
         variant.stock -= 1;
       } else if (wasReducing && nowAvailable) {
         variant.stock += 1;
       }
-      // Chuyển giữa reducing statuses (shipping→rented, rented→returned, v.v.) → không đổi stock
+      // returned → washing/repairing: stock không đổi (đã = 0, chờ giặt/sửa xong mới +1)
 
       await variantRepo.save(variant);
 
-      // === CẬP NHẬT ITEM ===
-      // Khi trả về (rented → returned): tăng totalRentals
-      if (prev === ConditionStatus.RENTED && status === ConditionStatus.RETURNED) {
-        item.totalRentals += 1;
-      }
-
-      if (status === ConditionStatus.RETIRED) {
-        item.retiredDate = new Date();
-      }
-
+      if (status === ConditionStatus.RETIRED) item.retiredDate = new Date();
       item.conditionStatus = status;
       if (note !== undefined) item.conditionNote = note;
 
@@ -155,7 +161,8 @@ export class InventoryService {
   }
 
   // ========================
-  // Sync từ rental status (tự động)
+  // Sync từ rental status (tự động) — CHỈ đổi conditionStatus, KHÔNG đụng stock
+  // Stock đã được quản lý bởi rentals.service (trừ khi PENDING, hoàn khi CANCELLED/REJECTED)
   // ========================
   async syncFromRental(rentalItemId: number, variantId: number, rentalStatus: string) {
     const statusMap: Record<string, ConditionStatus> = {
@@ -169,18 +176,17 @@ export class InventoryService {
     const newStatus = statusMap[rentalStatus];
     if (!newStatus) return;
 
-    // Tìm inventory item của variant này đang ở trạng thái phù hợp để sync
-    // Ưu tiên item đang ở trạng thái trước đó trong luồng
+    // Tìm item phù hợp theo thứ tự ưu tiên
     const prevStatusMap: Record<string, ConditionStatus[]> = {
       shipping:  [ConditionStatus.AVAILABLE],
       active:    [ConditionStatus.SHIPPING, ConditionStatus.AVAILABLE],
-      completed: [ConditionStatus.RENTED, ConditionStatus.SHIPPING],
-      rejected:  [ConditionStatus.SHIPPING],
+      completed: [ConditionStatus.RENTED, ConditionStatus.SHIPPING, ConditionStatus.AVAILABLE],
+      cancelled: [ConditionStatus.AVAILABLE, ConditionStatus.SHIPPING, ConditionStatus.RENTED],
+      rejected:  [ConditionStatus.AVAILABLE, ConditionStatus.SHIPPING, ConditionStatus.RENTED],
     };
 
     const expectedPrevStatuses = prevStatusMap[rentalStatus] ?? [];
 
-    // Tìm item của variant đang ở trạng thái phù hợp
     let item: InventoryItem | null = null;
     for (const prevStatus of expectedPrevStatuses) {
       item = await this.repo.findOne({
@@ -191,14 +197,28 @@ export class InventoryService {
     }
 
     if (!item) {
-      console.log(`[syncFromRental] No item found for variantId=${variantId} with statuses=${JSON.stringify(expectedPrevStatuses)}`);
+      console.log(`[syncFromRental] No item found for variantId=${variantId}, statuses=${JSON.stringify(expectedPrevStatuses)}`);
       return;
     }
 
     if (item.conditionStatus === newStatus) return;
 
-    console.log(`[syncFromRental] Updating item ${item.id} (${item.barcode}) from ${item.conditionStatus} → ${newStatus}`);
-    await this.updateStatus(item.id, newStatus);
+    console.log(`[syncFromRental] ${item.barcode}: ${item.conditionStatus} → ${newStatus}`);
+
+    // ✅ Cập nhật conditionStatus trực tiếp — KHÔNG đụng stock
+    // Stock được quản lý hoàn toàn bởi rentals.service:
+    //   - Trừ khi tạo đơn PENDING
+    //   - Hoàn khi COMPLETED / CANCELLED / REJECTED
+    // Khi trả về (rented → returned): tăng totalRentals
+    const wasRented = item.conditionStatus === ConditionStatus.RENTED;
+
+    item.conditionStatus = newStatus;
+
+    if (wasRented && newStatus === ConditionStatus.RETURNED) {
+      item.totalRentals += 1;
+    }
+
+    await this.repo.save(item);
   }
 
   // ========================

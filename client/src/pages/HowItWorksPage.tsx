@@ -128,12 +128,7 @@ export default function HowItWorksPage() {
             <Button asChild size="lg" variant="secondary">
               <Link to="/products">{t("howItWorks.cta.viewCollection")}</Link>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
-            >
+            <Button asChild size="lg" variant="secondary">
               <a
                 href="https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr"
                 target="_blank"

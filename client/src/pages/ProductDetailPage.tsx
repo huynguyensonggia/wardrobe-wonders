@@ -31,6 +31,8 @@ import {
   Shield,
   ArrowRight,
   ShoppingBag,
+  Bell,
+  BellOff,
 } from "lucide-react";
 
 import { format, differenceInDays, startOfDay } from "date-fns";
@@ -245,11 +247,15 @@ export default function ProductDetailPage() {
         productId: Number((product as any).id),
         variantId: Number(selectedVariant!.id),
         size: selectedVariant!.size,
-        name: displayName,
+        name: (product as any).name ?? "",
+        nameEn: (product as any).nameEn ?? null,
+        nameJa: (product as any).nameJa ?? null,
         imageUrl,
         rentPricePerDay: Number(
           (product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0
         ),
+        deposit: Number((product as any).deposit ?? 0),
+        stock: selectedVariant!.stock ?? 1,
         startDate,
         endDate,
         days: rentalDays,
@@ -284,6 +290,24 @@ export default function ProductDetailPage() {
         },
       },
     });
+  };
+
+  // ===== Notify when available =====
+  const NOTIFY_KEY = `notify_${(product as any)?.id ?? id}`;
+  const [notifyRegistered, setNotifyRegistered] = useState(false);
+
+  useEffect(() => {
+    setNotifyRegistered(!!localStorage.getItem(NOTIFY_KEY));
+  }, [NOTIFY_KEY]);
+
+  const handleNotify = () => {
+    if (notifyRegistered) {
+      localStorage.removeItem(NOTIFY_KEY);
+      setNotifyRegistered(false);
+    } else {
+      localStorage.setItem(NOTIFY_KEY, "1");
+      setNotifyRegistered(true);
+    }
   };
 
   if (isLoading) {
@@ -642,39 +666,96 @@ export default function ProductDetailPage() {
 
             {/* Actions */}
             <div className="space-y-3">
-              <Button
-                variant="hero"
-                size="xl"
-                className="w-full"
-                disabled={!canAddToCart}
-                onClick={handleRentNow}
-              >
-                {t("productDetail.rentNow")}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+              {!canRent ? (
+                /* ── Sản phẩm đang được thuê / không khả dụng ── */
+                <div className="rounded-xl border border-border bg-secondary p-5 space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Bell className="w-5 h-5 text-accent mt-0.5 shrink-0" />
+                    <div>
+                      <p className="font-medium text-sm">
+                        {t("productDetail.notify.title")}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t("productDetail.notify.desc")}
+                      </p>
+                    </div>
+                  </div>
 
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full"
-                onClick={handleAddToCart}
-                disabled={!canAddToCart}
-              >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                {t("productDetail.addToCart")}
-              </Button>
+                  <Button
+                    variant={notifyRegistered ? "outline" : "hero"}
+                    size="lg"
+                    className="w-full"
+                    onClick={handleNotify}
+                  >
+                    {notifyRegistered ? (
+                      <>
+                        <BellOff className="w-4 h-4 mr-2" />
+                        {t("productDetail.notify.cancel")}
+                      </>
+                    ) : (
+                      <>
+                        <Bell className="w-4 h-4 mr-2" />
+                        {t("productDetail.notify.cta")}
+                      </>
+                    )}
+                  </Button>
 
-              <Button
-                variant="hero-outline"
-                size="lg"
-                className="w-full"
-                asChild
-              >
-                <Link to={`/try-on?product=${(product as any).id}`}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {t("productDetail.tryOnVirtually")}
-                </Link>
-              </Button>
+                  {notifyRegistered && (
+                    <p className="text-xs text-center text-muted-foreground">
+                      {t("productDetail.notify.registered")}
+                    </p>
+                  )}
+
+                  <Button
+                    variant="hero-outline"
+                    size="lg"
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to={`/try-on?product=${(product as any).id}`}>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      {t("productDetail.tryOnVirtually")}
+                    </Link>
+                  </Button>
+                </div>
+              ) : (
+                /* ── Sản phẩm còn hàng ── */
+                <>
+                  <Button
+                    variant="hero"
+                    size="xl"
+                    className="w-full"
+                    disabled={!canAddToCart}
+                    onClick={handleRentNow}
+                  >
+                    {t("productDetail.rentNow")}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleAddToCart}
+                    disabled={!canAddToCart}
+                  >
+                    <ShoppingBag className="w-4 h-4 mr-2" />
+                    {t("productDetail.addToCart")}
+                  </Button>
+
+                  <Button
+                    variant="hero-outline"
+                    size="lg"
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to={`/try-on?product=${(product as any).id}`}>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      {t("productDetail.tryOnVirtually")}
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Features */}

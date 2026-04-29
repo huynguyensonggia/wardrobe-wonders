@@ -6,9 +6,12 @@ export type CartItem = {
   variantId: number;
   size?: string;
   name: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   imageUrl?: string;
   rentPricePerDay: number;
   deposit: number;
+  stock: number;        // tồn kho thực tế của variant
   quantity: number;
   startDate: string;
   endDate: string;

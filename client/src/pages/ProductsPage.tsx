@@ -25,9 +25,25 @@ export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
+  // Debounced search để không gọi API mỗi keystroke
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchInput);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (searchInput) next.set("search", searchInput);
+        else next.delete("search");
+        return next;
+      });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput, setSearchParams]);
+
   // ✅ State filters (khởi tạo từ URL)
   const [filters, setFilters] = useState({
-    search: searchParams.get("search") || "",
     category: searchParams.get("category") || "",
     occasion: searchParams.get("occasion") || "",
     size: searchParams.get("size") || "",
@@ -40,7 +56,6 @@ export default function ProductsPage() {
   const sp = searchParams.toString();
   useEffect(() => {
     setFilters({
-      search: searchParams.get("search") || "",
       category: searchParams.get("category") || "",
       occasion: searchParams.get("occasion") || "",
       size: searchParams.get("size") || "",
@@ -65,17 +80,18 @@ export default function ProductsPage() {
 
   const clearFilters = () => {
     setFilters({
-      search: "",
       category: "",
       occasion: "",
       size: "",
       color: "",
       status: "" as ProductStatus | "",
     });
+    setSearchInput("");
+    setDebouncedSearch("");
     setSearchParams({});
   };
 
-  const hasActiveFilters = Object.values(filters).some((v) => v);
+  const hasActiveFilters = Object.values(filters).some((v) => v) || !!searchInput;
   const getSelectValue = (value: string) => value || ALL_VALUE;
 
   // 1) Fetch categories
@@ -92,34 +108,30 @@ export default function ProductsPage() {
     return cat?.id ? Number(cat.id) : undefined;
   }, [filters.category, categories]);
 
-  // 2) Fetch products
+  // 2) Fetch products — search gọi BE, size/color filter client-side
   const {
     data: productsFromApi = [],
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["products", filters.category, categoryId, filters.status, filters.occasion],
+    queryKey: ["products", filters.category, categoryId, filters.status, filters.occasion, debouncedSearch],
     queryFn: () =>
       productsApi.getAll({
         categoryId,
         status: (filters.status as ProductStatus) || undefined,
         occasion: filters.occasion || undefined,
+        search: debouncedSearch || undefined,
       } as any),
     staleTime: 60_000,
     enabled: filters.category ? categoryId !== undefined : true,
   });
 
-  // 3) Client-side filter
+  // 3) Client-side filter chỉ còn size và color (search đã xử lý ở BE)
   const filteredProducts = useMemo(() => {
     const list = productsFromApi as any[];
 
     return list.filter((product) => {
-      if (filters.search) {
-        const name = String(product?.name ?? "").toLowerCase();
-        if (!name.includes(filters.search.toLowerCase())) return false;
-      }
-
       if (filters.size) {
         const sizes: string[] = product?.sizes ?? [];
         if (!sizes.includes(filters.size)) return false;
@@ -134,7 +146,7 @@ export default function ProductsPage() {
 
       return true;
     });
-  }, [productsFromApi, filters.search, filters.size, filters.color, filters.status, filters.occasion]);
+  }, [productsFromApi, filters.size, filters.color, filters.status]);
 
   // derive sizes/colors
   const allSizes = useMemo(() => {
@@ -182,8 +194,8 @@ export default function ProductsPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={t("products.searchPlaceholder")}
-              value={filters.search}
-              onChange={(e) => updateFilter("search", e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               className="pl-10"
             />
           </div>

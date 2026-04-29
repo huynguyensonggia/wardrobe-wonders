@@ -118,6 +118,13 @@
       "selectDates": "Please select rental dates",
       "minimumRental": "Minimum rental is {{days}} days",
       "addedToCart": "Added to cart!"
+    },
+    "notify": {
+      "title": "This item is currently rented out",
+      "desc": "Sign up to be notified as soon as this item becomes available again.",
+      "cta": "Notify Me When Available",
+      "cancel": "Cancel Notification",
+      "registered": "✓ We'll reach out via Facebook when this item is back in stock."
     }
   },
   "home": {
@@ -443,7 +450,7 @@
       "methods": {
         "CASH": "Cash on delivery (pay when received)",
         "COD": "COD (Cash on Delivery)",
-        "BANK_TRANSFER": "Bank transfer"
+        "BANK_TRANSFER": "Bank transfer on delivery"
       },
       "depositNote": "Deposit required",
       "depositAmount": "Deposit amount",
@@ -624,6 +631,12 @@
     }
   },
   "adminProducts": {
+    "status": {
+      "available": "Available",
+      "rented": "Rented",
+      "maintenance": "Maintenance",
+      "soldOut": "Sold Out"
+    },
     "header": {
       "title": "Products",
       "subtitle": "Manage products"
@@ -844,7 +857,8 @@
       "returned": "Returned",
       "washing": "Washing",
       "repairing": "Repairing",
-      "retired": "Retired"
+      "retired": "Retired",
+      "reserved": "Reserved (Pending Order)"
     },
     "form": {
       "title": "Add item to inventory",
@@ -1610,6 +1624,50 @@
       "heightWeightRequired": "Please enter your height and weight.",
       "fetchFailed":          "Could not fetch suggestions. Please try again."
     }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're always here to help. Message us on Facebook or visit our store.",
+    "facebook": {
+      "title": "Message on Facebook",
+      "desc": "The fastest way to get style advice and rental support.",
+      "cta": "Message Now"
+    },
+    "address": {
+      "title": "Store Address"
+    },
+    "hours": {
+      "title": "Opening Hours",
+      "value": "Monday – Sunday: 8:00 AM – 8:00 PM"
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "desc": "The page you're looking for may have been removed, renamed, or is temporarily unavailable.",
+    "backHome": "Back to Home",
+    "browseCollection": "Browse Collection"
+  },
+  "orderSuccess": {
+    "title": "Order Placed Successfully!",
+    "subtitle": "We've received your rental order and will contact you to confirm shortly.",
+    "days": "days",
+    "perDay": "day",
+    "qty": "Qty",
+    "shipping": "Shipping Information",
+    "pickupDelivery": "Home delivery",
+    "pickupStore": "Store pickup",
+    "payment": "Payment",
+    "rentalTotal": "Rental total",
+    "deposit": "Deposit (refundable)",
+    "grandTotal": "Total due today",
+    "paymentMethod": {
+      "CASH": "Cash on delivery",
+      "COD": "COD",
+      "BANK_TRANSFER": "Bank transfer"
+    },
+    "nextSteps": "We'll reach out via Facebook to confirm your order and arrange delivery. Please keep your phone nearby for updates.",
+    "viewRentals": "View My Rentals",
+    "continueShopping": "Continue Shopping"
   },
   "privacy": {
     "title": "Privacy Policy",

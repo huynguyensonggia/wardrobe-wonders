@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import { productsApi, tryOnApi } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -109,7 +110,7 @@ function pickProductImage(p: any): string {
 }
 
 export default function TryOnPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [searchParams] = useSearchParams();
   const preselectedProduct = searchParams.get("product"); // /try-on?product=3

@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 const sidebarLinks = [
-  { to: "/dashboard", icon: ShoppingBag, labelKey: "dashboard.sidebar.myRentals", exact: true },
-  { to: "/dashboard/history", icon: Clock, labelKey: "dashboard.sidebar.rentalHistory" },
+  { to: "/dashboard", icon: ShoppingBag, labelKey: "dashboard.sidebar.myRentals", exact: true, adminHide: true },
+  { to: "/dashboard/history", icon: Clock, labelKey: "dashboard.sidebar.rentalHistory", adminHide: true },
   { to: "/dashboard/profile", icon: User, labelKey: "dashboard.sidebar.profile" },
   { to: "/dashboard/settings", icon: Settings, labelKey: "dashboard.sidebar.settings" },
 ];
@@ -45,7 +45,9 @@ export default function UserDashboard() {
         <div className="grid lg:grid-cols-[250px_1fr] gap-8">
           {/* Sidebar */}
           <nav className="space-y-1" aria-label={t("dashboard.sidebar.aria")}>
-            {sidebarLinks.map((link) => {
+            {sidebarLinks
+              .filter((link) => !(link.adminHide && user?.role === "ADMIN"))
+              .map((link) => {
               const isActive = link.exact
                 ? location.pathname === link.to
                 : location.pathname.startsWith(link.to);

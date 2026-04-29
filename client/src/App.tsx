@@ -37,6 +37,9 @@ import FAQPage from "@/pages/FAQPage";
 import AboutPage from "@/pages/AboutPage";
 import PrivacyPage from "@/pages/PrivacyPage";
 import TermsPage from "@/pages/TermsPage";
+import OrderSuccessPage from "@/pages/OrderSuccessPage";
+import PrivateRoute from "@/components/auth/PrivateRoute";
+import ContactPage from "@/pages/ContactPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -71,15 +74,35 @@ const App = () => (
                 />
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
-                <Route path="/cart" element={<CartPage />} />
+                <Route path="/cart" element={
+                  <PrivateRoute>
+                    <CartPage />
+                  </PrivateRoute>
+                } />
 
                 {/* ✅ NEW: Checkout */}
-                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route
+                  path="/checkout"
+                  element={
+                    <PrivateRoute>
+                      <CheckoutPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route path="/order-success" element={<OrderSuccessPage />} />
 
                 {/* User Dashboard */}
-                <Route path="/dashboard" element={<UserDashboard />}>
+                <Route
+                  path="/dashboard"
+                  element={
+                    <PrivateRoute>
+                      <UserDashboard />
+                    </PrivateRoute>
+                  }
+                >
                   <Route index element={<MyRentals />} />
                   <Route path="history" element={<RentalHistory />} />
                   <Route path="profile" element={<Profile />} />
@@ -87,7 +110,14 @@ const App = () => (
                 </Route>
 
                 {/* Admin Dashboard */}
-                <Route path="/admin" element={<AdminDashboard />}>
+                <Route
+                  path="/admin"
+                  element={
+                    <PrivateRoute adminOnly>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  }
+                >
                   <Route path="products" element={<AdminProducts />} />
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="rentals" element={<AdminRentals />} />

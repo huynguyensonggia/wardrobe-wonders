@@ -394,6 +394,20 @@ export default function AdminProducts() {
     }
   };
 
+  /* ===== SEARCH ===== */
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return products;
+    const kw = searchQuery.toLowerCase();
+    return products.filter((p) =>
+      String((p as any).name ?? "").toLowerCase().includes(kw) ||
+      String((p as any).nameEn ?? "").toLowerCase().includes(kw) ||
+      String((p as any).color ?? "").toLowerCase().includes(kw) ||
+      String((p as any).category?.name ?? "").toLowerCase().includes(kw)
+    );
+  }, [products, searchQuery]);
+
   return (
     <div className="space-y-6">
       {/* Header + Create + Import */}
@@ -431,7 +445,7 @@ export default function AdminProducts() {
 
         {/* Shared Dialog for Create/Update */}
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="sm:max-w-[560px]">
+          <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{dialogTitle}</DialogTitle>
             </DialogHeader>
@@ -624,17 +638,50 @@ export default function AdminProducts() {
         </Dialog>
       </div>
 
+      {/* ===== SEARCH BAR ===== */}
+      <div className="relative max-w-sm">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <Input
+          placeholder="Tìm sản phẩm..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
+        />
+      </div>
+
       {/* ===== GRID LIST ===== */}
       {loadingProducts ? (
         <div className="text-sm text-muted-foreground">{t("adminProducts.loadingProducts")}</div>
-      ) : products.length > 0 ? (
+      ) : filteredProducts.length > 0 ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-          {products.map((product, i) => (
+          {filteredProducts.map((product, i) => {
+            const status = String((product as any).status ?? "").toUpperCase();
+            // Dùng stock thực tế từ variants để xác định trạng thái hiển thị
+            const variants: any[] = (product as any).variants ?? [];
+            const totalStock = variants.reduce((s: number, v: any) => s + (Number(v.stock) || 0), 0);
+            const effectiveStatus = totalStock === 0 ? "SOLDOUT" : status;
+
+            const statusBadge =
+              effectiveStatus === "SOLDOUT"
+                ? { label: t("productCard.status.soldOut"), cls: "bg-red-100 text-red-800" }
+                : effectiveStatus === "RENTED"
+                ? { label: t("adminProducts.status.rented"), cls: "bg-yellow-100 text-yellow-800" }
+                : effectiveStatus === "MAINTENANCE"
+                ? { label: t("adminProducts.status.maintenance"), cls: "bg-gray-100 text-gray-600" }
+                : { label: t("adminProducts.status.available"), cls: "bg-green-100 text-green-800" };
+            return (
             <div
               key={product.id}
               className="animate-fade-in relative group"
               style={{ animationDelay: `${i * 0.05}s` }}
             >
+              {/* Badge trạng thái — góc trái */}
+              <div className="absolute top-2 left-2 z-10 pointer-events-none">
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${statusBadge.cls}`}>
+                  {statusBadge.label}
+                </span>
+              </div>
+
               <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button
                   size="icon"
@@ -686,7 +733,8 @@ export default function AdminProducts() {
 
               <ProductCard product={product} />
             </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-sm text-muted-foreground">{t("adminProducts.empty")}</div>
@@ -698,42 +746,58 @@ export default function AdminProducts() {
           <div className="bg-background rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b">
               <div>
-                <h3 className="font-medium text-lg">📦 Kho vận: {(detailProduct as any).name}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">{inventoryItems.length} món đồ trong kho</p>
+                <h3 className="font-medium text-lg">📦 {t("adminInventory.title")}: {(detailProduct as any).name}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{inventoryItems.length} {t("adminInventory.itemCount")}</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setDetailProductId(null)}>✕</Button>
             </div>
 
             <div className="p-5 space-y-4">
               {loadingInventory ? (
-                <div className="text-sm text-muted-foreground">Đang tải...</div>
+                <div className="text-sm text-muted-foreground">{t("adminInventory.loading")}</div>
               ) : inventoryItems.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Chưa có món đồ nào trong kho.</div>
+                <div className="text-sm text-muted-foreground">{t("adminInventory.empty")}</div>
               ) : (
                 Array.from(new Set(inventoryItems.map((i: any) => i.variant?.size))).map((size) => {
                   const sizeItems = inventoryItems.filter((i: any) => i.variant?.size === size);
                   return (
                     <div key={size} className="border rounded-md p-3 space-y-2">
-                      <div className="text-sm font-medium">Size {size} — {sizeItems.length} món</div>
+                      <div className="text-sm font-medium">Size {size} — {sizeItems.length} {t("adminInventory.itemCount")}</div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {sizeItems.map((item: any) => (
+                        {sizeItems.map((item: any) => {
+                          const cs = item.conditionStatus as string;
+                          // Nếu conditionStatus = available nhưng variant stock = 0
+                          // → đang bị giữ bởi đơn PENDING chưa giao
+                          const variant = (detailProduct as any).variants?.find(
+                            (v: any) => String(v.id) === String(item.variantId) || v.size === item.variant?.size
+                          );
+                          const isHeldByOrder = cs === "available" && (variant?.stock ?? 1) <= 0;
+
+                          const statusLabel = isHeldByOrder
+                            ? t("adminInventory.status.reserved", { defaultValue: "Đang giữ chỗ" })
+                            : t(`adminInventory.status.${cs}`, { defaultValue: cs });
+                          const statusCls = isHeldByOrder
+                            ? "bg-orange-100 text-orange-800"
+                            : cs === "available"  ? "bg-green-100 text-green-800" :
+                              cs === "washing"    ? "bg-cyan-100 text-cyan-800" :
+                              cs === "repairing"  ? "bg-red-100 text-red-800" :
+                              cs === "retired"    ? "bg-gray-100 text-gray-500" :
+                              cs === "rented"     ? "bg-yellow-100 text-yellow-800" :
+                              cs === "shipping"   ? "bg-blue-100 text-blue-800" :
+                              cs === "returned"   ? "bg-purple-100 text-purple-800" :
+                              "bg-indigo-100 text-indigo-800";
+                          return (
                           <div key={item.id} className="flex items-center justify-between bg-muted/40 rounded px-3 py-2 text-xs">
                             <div>
                               <span className="font-mono font-medium">{item.barcode}</span>
                               {item.conditionNote && <span className="text-muted-foreground ml-2">• {item.conditionNote}</span>}
                             </div>
-                            <span className={`px-2 py-0.5 rounded-full font-medium ${
-                              item.conditionStatus === "available" ? "bg-green-100 text-green-800" :
-                              item.conditionStatus === "washing" ? "bg-cyan-100 text-cyan-800" :
-                              item.conditionStatus === "repairing" ? "bg-red-100 text-red-800" :
-                              item.conditionStatus === "retired" ? "bg-gray-100 text-gray-500" :
-                              item.conditionStatus === "rented" ? "bg-yellow-100 text-yellow-800" :
-                              "bg-indigo-100 text-indigo-800"
-                            }`}>
-                              {item.conditionStatus}
+                            <span className={`px-2 py-0.5 rounded-full font-medium ${statusCls}`}>
+                              {statusLabel}
                             </span>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   );

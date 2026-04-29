@@ -4,6 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getLocalizedProductName } from "@/utils/i18n";
 
+/** Công thức đồng bộ với ProductDetailPage: ngày đầu = basePrice, mỗi ngày thêm +10.000đ */
+function calcRentalPrice(basePrice: number, days: number): number {
+  if (days <= 0) return 0;
+  return basePrice + (days - 1) * 10_000;
+}
+
 export default function CartPage() {
   const { t, i18n } = useTranslation();
 
@@ -22,9 +28,9 @@ export default function CartPage() {
     );
   }
 
-  // ✅ tổng tiền = sum(subtotal từng item)
+  // tổng tiền = sum(subtotal từng item) theo đúng công thức nghiệp vụ
   const total = items.reduce(
-    (sum, it) => sum + it.quantity * it.rentPricePerDay * it.days,
+    (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
     0
   );
 
@@ -51,7 +57,7 @@ export default function CartPage() {
 
       <div className="space-y-3">
         {items.map((it) => {
-          const lineTotal = it.quantity * it.rentPricePerDay * it.days;
+          const lineTotal = it.quantity * calcRentalPrice(it.rentPricePerDay, it.days);
 
           const key = `${it.productId}_${it.variantId}_${it.startDate}_${it.endDate}`;
 
@@ -151,10 +157,17 @@ export default function CartPage() {
                         it.quantity + 1
                       )
                     }
+                    disabled={it.quantity >= (it.stock ?? 1)}
                     aria-label={t("cart.qty.increase")}
                   >
                     +
                   </Button>
+
+                  {it.stock != null && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      / {it.stock}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

@@ -136,6 +136,13 @@
       "selectDates": "Vui lòng chọn ngày thuê",
       "minimumRental": "Thời gian thuê tối thiểu {{days}} ngày",
       "addedToCart": "Đã thêm vào giỏ hàng!"
+    },
+    "notify": {
+      "title": "Sản phẩm đang được thuê",
+      "desc": "Đăng ký để nhận thông báo ngay khi sản phẩm này có sẵn trở lại.",
+      "cta": "Thông báo khi có hàng",
+      "cancel": "Huỷ thông báo",
+      "registered": "✓ Chúng tôi sẽ liên hệ bạn qua Facebook khi sản phẩm có hàng."
     }
   },
   "home": {
@@ -461,7 +468,7 @@
       "methods": {
         "CASH": "Tiền mặt khi nhận hàng",
         "COD": "COD (Thanh toán khi nhận)",
-        "BANK_TRANSFER": "Chuyển khoản ngân hàng"
+        "BANK_TRANSFER": "Chuyển khoản khi nhận hàng"
       },
       "depositNote": "Yêu cầu đặt cọc",
       "depositAmount": "Số tiền cọc",
@@ -642,6 +649,12 @@
     }
   },
   "adminProducts": {
+    "status": {
+      "available": "Còn hàng",
+      "rented": "Đang thuê",
+      "maintenance": "Bảo trì",
+      "soldOut": "Hết hàng"
+    },
     "header": {
       "title": "Sản phẩm",
       "subtitle": "Quản lý sản phẩm"
@@ -862,7 +875,8 @@
       "returned": "Đã trả",
       "washing": "Đang giặt",
       "repairing": "Đang sửa",
-      "retired": "Đã loại bỏ"
+      "retired": "Đã loại bỏ",
+      "reserved": "Đang giữ chỗ"
     },
     "form": {
       "title": "Thêm món đồ vào kho",
@@ -1646,6 +1660,50 @@
       "heightWeightRequired": "Vui lòng nhập chiều cao và cân nặng.",
       "fetchFailed":          "Không thể lấy gợi ý. Vui lòng thử lại."
     }
+  },
+  "contact": {
+    "title": "Liên hệ",
+    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn. Nhắn tin qua Facebook hoặc ghé thăm cửa hàng.",
+    "facebook": {
+      "title": "Nhắn tin Facebook",
+      "desc": "Cách nhanh nhất để được tư vấn và hỗ trợ đặt thuê.",
+      "cta": "Nhắn tin ngay"
+    },
+    "address": {
+      "title": "Địa chỉ cửa hàng"
+    },
+    "hours": {
+      "title": "Giờ mở cửa",
+      "value": "Thứ 2 – Chủ nhật: 8:00 – 20:00"
+    }
+  },
+  "notFound": {
+    "title": "Trang không tồn tại",
+    "desc": "Trang bạn đang tìm kiếm có thể đã bị xóa, đổi tên hoặc tạm thời không khả dụng.",
+    "backHome": "Về trang chủ",
+    "browseCollection": "Xem bộ sưu tập"
+  },
+  "orderSuccess": {
+    "title": "Đặt thuê thành công!",
+    "subtitle": "Chúng tôi đã nhận được đơn của bạn và sẽ liên hệ xác nhận sớm nhất.",
+    "days": "ngày",
+    "perDay": "ngày",
+    "qty": "SL",
+    "shipping": "Thông tin giao hàng",
+    "pickupDelivery": "Giao tận nơi",
+    "pickupStore": "Nhận tại cửa hàng",
+    "payment": "Thanh toán",
+    "rentalTotal": "Tiền thuê",
+    "deposit": "Tiền cọc (hoàn lại)",
+    "grandTotal": "Tổng thanh toán",
+    "paymentMethod": {
+      "CASH": "Tiền mặt khi nhận hàng",
+      "COD": "COD",
+      "BANK_TRANSFER": "Chuyển khoản khi nhận hàng"
+    },
+    "nextSteps": "Chúng tôi sẽ liên hệ qua Facebook để xác nhận đơn và sắp xếp giao hàng. Vui lòng giữ điện thoại để nhận thông báo.",
+    "viewRentals": "Xem đơn thuê của tôi",
+    "continueShopping": "Tiếp tục mua sắm"
   },
   "privacy": {
     "title": "Chính sách bảo mật",
