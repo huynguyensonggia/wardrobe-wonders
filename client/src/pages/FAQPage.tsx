@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp, HelpCircle, MessageCircle } from "lucide-react"
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { FACEBOOK_URL } from "@/constants/app";
 
 export default function FAQPage() {
   const { t } = useTranslation();
@@ -125,7 +126,7 @@ export default function FAQPage() {
           </p>
           <Button asChild size="lg" variant="secondary">
             <a
-              href="https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr"
+              href={FACEBOOK_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2"

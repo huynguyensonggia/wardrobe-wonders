@@ -104,7 +104,8 @@
     "tooltips": {
       "variantInactive": "Biến thể đang tắt",
       "outOfStock": "Hết hàng",
-      "stock": "Tồn kho: {{stock}}"
+      "stock": "Tồn kho: {{stock}}",
+      "stockRemaining": "{{stock}} còn"
     },
     "products": {
         "title": "Bộ sưu tập",
@@ -1658,7 +1659,10 @@
     },
     "errors": {
       "heightWeightRequired": "Vui lòng nhập chiều cao và cân nặng.",
-      "fetchFailed":          "Không thể lấy gợi ý. Vui lòng thử lại."
+      "invalidHeight": "Chiều cao phải từ 100–250 cm.",
+      "invalidWeight": "Cân nặng phải từ 30–200 kg.",
+      "invalidMeasurement": "Số đo không hợp lệ. Vui lòng kiểm tra lại.",
+      "fetchFailed": "Không thể lấy gợi ý. Vui lòng thử lại."
     }
   },
   "contact": {

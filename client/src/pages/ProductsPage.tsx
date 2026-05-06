@@ -17,6 +17,7 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { productsApi, categoriesApi } from "@/lib/api";
 import type { ProductStatus } from "@/types";
 import { useTranslation } from "react-i18next";
+import { LoadingState, ErrorState } from "@/components/common";
 
 const ALL_VALUE = "all";
 
@@ -157,10 +158,14 @@ export default function ProductsPage() {
     return [...new Set((productsFromApi as any[]).flatMap((p) => p.colors ?? []))].sort();
   }, [productsFromApi]);
 
+  const isSearching = searchInput !== debouncedSearch;
+
   if (isLoading) {
     return (
       <div className="min-h-screen py-8">
-        <div className="container mx-auto px-4 py-24">{t("products.loading")}</div>
+        <div className="container mx-auto px-4">
+          <LoadingState text={t("products.loading")} />
+        </div>
       </div>
     );
   }
@@ -168,8 +173,8 @@ export default function ProductsPage() {
   if (isError) {
     return (
       <div className="min-h-screen py-8">
-        <div className="container mx-auto px-4 py-24 text-destructive">
-          {(error as Error)?.message || t("products.error")}
+        <div className="container mx-auto px-4">
+          <ErrorState message={(error as Error)?.message || t("products.error")} />
         </div>
       </div>
     );
@@ -196,8 +201,13 @@ export default function ProductsPage() {
               placeholder={t("products.searchPlaceholder")}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="pl-10"
+              className="pl-10 pr-10"
             />
+            {isSearching && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                <div className="w-4 h-4 border-2 border-muted-foreground/40 border-t-muted-foreground rounded-full animate-spin" />
+              </div>
+            )}
           </div>
 
           <div className="flex gap-2">

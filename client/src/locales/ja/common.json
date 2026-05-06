@@ -104,7 +104,8 @@
     "tooltips": {
       "variantInactive": "バリアント無効",
       "outOfStock": "在庫切れ",
-      "stock": "在庫: {{stock}}"
+      "stock": "在庫: {{stock}}",
+      "stockRemaining": "残り{{stock}}点"
     },
     "selectedVariant": "• 在庫: {{stock}}",
     "features": {
@@ -1642,7 +1643,10 @@
     },
     "errors": {
       "heightWeightRequired": "身長と体重を入力してください。",
-      "fetchFailed":          "提案を取得できませんでした。もう一度お試しください。"
+      "invalidHeight": "身長は100〜250cmの範囲で入力してください。",
+      "invalidWeight": "体重は30〜200kgの範囲で入力してください。",
+      "invalidMeasurement": "無効なサイズです。入力内容を確認してください。",
+      "fetchFailed": "提案を取得できませんでした。もう一度お試しください。"
     }
   },
   "contact": {

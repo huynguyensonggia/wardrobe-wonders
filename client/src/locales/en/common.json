@@ -104,7 +104,8 @@
     "tooltips": {
       "variantInactive": "Variant inactive",
       "outOfStock": "Out of stock",
-      "stock": "Stock: {{stock}}"
+      "stock": "Stock: {{stock}}",
+      "stockRemaining": "{{stock}} left"
     },
     "selectedVariant": "• Stock: {{stock}}",
     "features": {
@@ -1622,7 +1623,10 @@
     },
     "errors": {
       "heightWeightRequired": "Please enter your height and weight.",
-      "fetchFailed":          "Could not fetch suggestions. Please try again."
+      "invalidHeight": "Height must be between 100–250 cm.",
+      "invalidWeight": "Weight must be between 30–200 kg.",
+      "invalidMeasurement": "Invalid measurement. Please check and try again.",
+      "fetchFailed": "Could not fetch suggestions. Please try again."
     }
   },
   "contact": {

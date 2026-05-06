@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recommendationsApi, type RecommendResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { ErrorState } from "@/components/common";
 
 export default function StyleAdvisorPage() {
   const { t } = useTranslation();
@@ -42,18 +43,43 @@ export default function StyleAdvisorPage() {
   };
 
   const handleSubmit = async () => {
+    // Validate bắt buộc
     if (!height || !weight) {
       setError(t("styleAdvisor.errors.heightWeightRequired"));
       return;
     }
+    const h = Number(height);
+    const w = Number(weight);
+    if (isNaN(h) || h < 100 || h > 250) {
+      setError(t("styleAdvisor.errors.invalidHeight"));
+      return;
+    }
+    if (isNaN(w) || w < 30 || w > 200) {
+      setError(t("styleAdvisor.errors.invalidWeight"));
+      return;
+    }
+    // Validate số đo tuỳ chọn nếu có nhập
+    if (bust && (Number(bust) < 50 || Number(bust) > 200)) {
+      setError(t("styleAdvisor.errors.invalidMeasurement"));
+      return;
+    }
+    if (waist && (Number(waist) < 40 || Number(waist) > 200)) {
+      setError(t("styleAdvisor.errors.invalidMeasurement"));
+      return;
+    }
+    if (hips && (Number(hips) < 50 || Number(hips) > 200)) {
+      setError(t("styleAdvisor.errors.invalidMeasurement"));
+      return;
+    }
+
     setError(null);
     setLoading(true);
     setResults(null);
 
     try {
       const data = await recommendationsApi.recommend({
-        height: Number(height),
-        weight: Number(weight),
+        height: h,
+        weight: w,
         bust:   bust  ? Number(bust)  : undefined,
         waist:  waist ? Number(waist) : undefined,
         hips:   hips  ? Number(hips)  : undefined,
@@ -103,6 +129,7 @@ export default function StyleAdvisorPage() {
                     type="number"
                     placeholder={t("styleAdvisor.form.measurements.heightPlaceholder")}
                     value={height}
+                    min={100} max={250}
                     onChange={(e) => setHeight(e.target.value)}
                   />
                 </div>
@@ -114,6 +141,7 @@ export default function StyleAdvisorPage() {
                     type="number"
                     placeholder={t("styleAdvisor.form.measurements.weightPlaceholder")}
                     value={weight}
+                    min={30} max={200}
                     onChange={(e) => setWeight(e.target.value)}
                   />
                 </div>
@@ -224,7 +252,13 @@ export default function StyleAdvisorPage() {
               </Button>
             </div>
 
-            {results.length === 0 ? (
+            {error ? (
+              <ErrorState
+                message={error}
+                onRetry={handleSubmit}
+                retryLabel={t("common.retry")}
+              />
+            ) : results.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 {t("styleAdvisor.results.empty")}
               </div>

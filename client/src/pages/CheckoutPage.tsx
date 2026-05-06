@@ -12,6 +12,7 @@ import {
   DA_NANG_WARDS,
   type DaNangDistrict,
 } from "@/constants/daNangAddress";
+import { STORE_ADDRESS } from "@/constants/app";
 
 import { useTranslation } from "react-i18next";
 import { getLocalizedProductName } from "@/utils/i18n";
@@ -54,9 +55,6 @@ type CheckoutState =
 
 type PaymentMethod = "CASH" | "COD" | "BANK_TRANSFER";
 type PickupType = "delivery" | "store";
-
-// Địa chỉ store
-const STORE_ADDRESS = "14 Doãn Uẩn, Quận Ngũ Hành Sơn, Đà Nẵng";
 
 function normalizePhone(s: string) {
   return String(s || "")
@@ -284,9 +282,10 @@ export default function CheckoutPage() {
 
   // ================= RENDER =================
   return (
-    <div className="container mx-auto px-4 py-10 grid lg:grid-cols-2 gap-8">
+    <div className="container mx-auto px-4 py-10">
+      <div className="grid lg:grid-cols-2 gap-8 items-start">
       {/* LEFT: Items */}
-      <div className="space-y-4">
+      <div className="space-y-4 order-2 lg:order-1">
         <h2 className="text-xl font-medium">{t("checkout.summary.title")}</h2>
 
         {groups.map((g) => {
@@ -399,7 +398,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* RIGHT: Shipping */}
-      <div className="border rounded-lg p-5 space-y-4">
+      <div className="border rounded-lg p-5 space-y-4 order-1 lg:order-2 lg:sticky lg:top-24 lg:self-start">
         <h2 className="text-xl font-medium">{t("checkout.shipping.title")}</h2>
 
         {/* PICKUP TYPE */}
@@ -569,6 +568,7 @@ export default function CheckoutPage() {
             : t("checkout.button.confirm")}
         </Button>
       </div>
+    </div>
     </div>
   );
 }

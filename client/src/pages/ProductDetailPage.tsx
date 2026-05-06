@@ -533,7 +533,9 @@ export default function ProductDetailPage() {
                     >
                       <div>{size}</div>
                       <div className="text-xs font-normal opacity-70">
-                        {disabled ? "Hết" : `${stock} còn`}
+                        {disabled
+                          ? t("productDetail.tooltips.outOfStock")
+                          : t("productDetail.tooltips.stockRemaining", { stock })}
                       </div>
                     </button>
                   );
@@ -712,7 +714,7 @@ export default function ProductDetailPage() {
                     className="w-full"
                     asChild
                   >
-                    <Link to={`/try-on?product=${(product as any).id}`}>
+                    <Link to={`/try-on?product=${(product as any).id ?? ""}`}>
                       <Sparkles className="w-4 h-4 mr-2" />
                       {t("productDetail.tryOnVirtually")}
                     </Link>
@@ -749,7 +751,7 @@ export default function ProductDetailPage() {
                     className="w-full"
                     asChild
                   >
-                    <Link to={`/try-on?product=${(product as any).id}`}>
+                    <Link to={`/try-on?product=${(product as any).id ?? ""}`}>
                       <Sparkles className="w-4 h-4 mr-2" />
                       {t("productDetail.tryOnVirtually")}
                     </Link>

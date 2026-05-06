@@ -418,7 +418,7 @@ export default function TryOnPage() {
               <div>
                 <div
                   className={cn(
-                    "relative aspect-[3/4] rounded-lg border-2 border-dashed transition-colors overflow-hidden",
+                    "relative aspect-[3/4] max-h-[420px] sm:max-h-none rounded-lg border-2 border-dashed transition-colors overflow-hidden",
                     userImage
                       ? "border-accent"
                       : "border-border hover:border-accent/50",
@@ -485,7 +485,7 @@ export default function TryOnPage() {
             {/* Result Section */}
             <div className="space-y-6">
               {/* Preview */}
-              <div className="relative aspect-[3/4] rounded-lg bg-secondary overflow-hidden">
+              <div className="relative aspect-[3/4] max-h-[420px] sm:max-h-none rounded-lg bg-secondary overflow-hidden">
                 {isProcessing ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
                     <div className="relative">

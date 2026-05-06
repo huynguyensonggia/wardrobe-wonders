@@ -256,7 +256,7 @@ export function Navbar() {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="lg:hidden border-t border-border py-4 animate-slide-down">
+          <div className="lg:hidden border-t border-border py-4 animate-slide-down max-h-[calc(100vh-4rem)] overflow-y-auto">
             <div className="flex flex-col gap-4">
 
               {/* Auth buttons - hiện trên cùng khi chưa đăng nhập */}
