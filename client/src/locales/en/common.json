@@ -858,7 +858,7 @@
       "washing": "Washing",
       "repairing": "Repairing",
       "retired": "Retired",
-      "reserved": "Reserved (Pending Order)"
+      "reserved": "Awaiting inventory update"
     },
     "form": {
       "title": "Add item to inventory",

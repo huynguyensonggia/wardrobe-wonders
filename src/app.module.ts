@@ -12,6 +12,7 @@ import { InventoryModule } from "./modules/inventory/inventory.module";
 import { RecommendationsModule } from "./modules/recommendations/recommendations.module";
 import { MailModule } from "./modules/mail/mail.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
+import { AuditModule } from "./modules/audit/audit.module";
 import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
@@ -29,6 +30,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     RecommendationsModule,
     MailModule,
     PaymentsModule,
+    AuditModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],

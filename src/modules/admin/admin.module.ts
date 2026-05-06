@@ -13,6 +13,7 @@ import { ProductsModule } from "../products/products.module";
 import { CategoriesModule } from "../categories/categories.module";
 import { RentalsModule } from "../rentals/rentals.module";
 import { UsersModule } from "../users/users.module";
+import { AuditModule } from "../audit/audit.module";
 
 // ✅ entities để inject repository cho AdminService
 import { Product } from "../products/entities/product.entity";
@@ -29,6 +30,7 @@ import { Rental } from "../rentals/entities/rental.entity";
     CategoriesModule,
     RentalsModule,
     UsersModule,
+    AuditModule,
   ],
   controllers: [
     AdminProductsController,

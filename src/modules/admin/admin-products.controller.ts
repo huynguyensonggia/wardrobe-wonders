@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Req,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
@@ -22,6 +23,9 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../../modules/auth/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { Role } from "../../common/enums/role.enum";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction } from "../audit/entities/audit-log.entity";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
 
 function toNumberOrUndefined(v: any) {
   if (v === undefined || v === null || v === "") return undefined;
@@ -29,16 +33,9 @@ function toNumberOrUndefined(v: any) {
   return Number.isFinite(n) ? n : undefined;
 }
 
-/**
- * Khi dùng multipart/form-data, FE thường gửi variants là string JSON.
- * Hàm này sẽ parse + normalize về đúng dạng array.
- */
 function normalizeVariants(raw: any) {
   if (!raw) return undefined;
-
   if (Array.isArray(raw)) return raw;
-
-  // nếu FE gửi "variants" là JSON string
   if (typeof raw === "string") {
     try {
       const parsed = JSON.parse(raw);
@@ -47,7 +44,6 @@ function normalizeVariants(raw: any) {
       return undefined;
     }
   }
-
   return undefined;
 }
 
@@ -55,14 +51,16 @@ function normalizeVariants(raw: any) {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminProductsController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly auditService: AuditService,
+  ) {}
 
-  // ✅ POST: tạo 1 product (ảnh optional) + variants
   @Post()
   @UseInterceptors(
     FileInterceptor("image", {
       storage: memoryStorage(),
-      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+      limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.startsWith("image/")) {
           return cb(new BadRequestException("Only image files are allowed"), false);
@@ -71,11 +69,12 @@ export class AdminProductsController {
       },
     }),
   )
-  create(
+  async create(
     @Body() body: any,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @CurrentUser() admin: any,
+    @Req() req: any,
   ): Promise<Product> {
-    // normalize numbers (vì multipart/form-data => string)
     const dto: CreateProductDto = {
       ...body,
       categoryId: toNumberOrUndefined(body.categoryId) as any,
@@ -84,28 +83,35 @@ export class AdminProductsController {
       variants: normalizeVariants(body.variants) as any,
     };
 
-    // variants bắt buộc (theo DTO bạn muốn: nhiều size)
     if (!dto.variants || !Array.isArray(dto.variants) || dto.variants.length === 0) {
       throw new BadRequestException(
         "variants is required (example: [{\"size\":\"M\",\"stock\":2},{\"size\":\"L\",\"stock\":1}])",
       );
     }
 
-    return this.productService.create(dto, file);
+    const result = await this.productService.create(dto, file);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.PRODUCT_CREATE,
+      resourceType: "product",
+      resourceId: result.id,
+      newValue: { name: dto.name, categoryId: dto.categoryId },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ IMPORT EXCEL: tạo nhiều products 1 lần
   @Post("import-excel")
   @UseInterceptors(
     FileInterceptor("file", {
       storage: memoryStorage(),
-      limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+      limits: { fileSize: 20 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
         const ok =
           file.mimetype ===
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
           file.originalname.toLowerCase().endsWith(".xlsx");
-
         if (!ok) {
           return cb(new BadRequestException("Only .xlsx files are allowed"), false);
         }
@@ -113,12 +119,24 @@ export class AdminProductsController {
       },
     }),
   )
-  async importExcel(@UploadedFile() file?: Express.Multer.File) {
+  async importExcel(
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
     if (!file) throw new BadRequestException("Missing excel file (field name: file)");
-    return this.productService.importFromExcel(file);
+    const result = await this.productService.importFromExcel(file);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.PRODUCT_IMPORT,
+      resourceType: "product",
+      newValue: { fileName: file.originalname, imported: result.imported, failed: result.failed },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ PATCH: update 1 product (ảnh optional) + variants (optional)
   @Patch(":id")
   @UseInterceptors(
     FileInterceptor("image", {
@@ -132,10 +150,12 @@ export class AdminProductsController {
       },
     }),
   )
-  update(
+  async update(
     @Param("id") id: string,
     @Body() body: any,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File | undefined,
+    @CurrentUser() admin: any,
+    @Req() req: any,
   ): Promise<Product> {
     const productId = Number(id);
     if (!Number.isFinite(productId) || productId <= 0) {
@@ -147,19 +167,41 @@ export class AdminProductsController {
       categoryId: toNumberOrUndefined(body.categoryId) as any,
       rentPricePerDay: toNumberOrUndefined(body.rentPricePerDay) as any,
       deposit: toNumberOrUndefined(body.deposit) as any,
-      variants: normalizeVariants(body.variants) as any, // optional
+      variants: normalizeVariants(body.variants) as any,
     };
 
-    return this.productService.update(productId, dto, file);
+    const result = await this.productService.update(productId, dto, file);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.PRODUCT_UPDATE,
+      resourceType: "product",
+      resourceId: productId,
+      newValue: { name: dto.name, categoryId: dto.categoryId },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ DELETE
   @Delete(":id")
-  remove(@Param("id") id: string): Promise<{ message: string }> {
+  async remove(
+    @Param("id") id: string,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ): Promise<{ message: string }> {
     const productId = Number(id);
     if (!Number.isFinite(productId) || productId <= 0) {
       throw new BadRequestException("Invalid id");
     }
-    return this.productService.remove(productId);
+    const result = await this.productService.remove(productId);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.PRODUCT_DELETE,
+      resourceType: "product",
+      resourceId: productId,
+      ipAddress: req.ip,
+    });
+    return result;
   }
 }

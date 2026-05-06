@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
+  Req,
 } from "@nestjs/common";
 
 import { RentalsService } from "../rentals/rentals.service";
@@ -18,53 +19,140 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { Role } from "../../common/enums/role.enum";
 import { UpdateRentalStatusDto } from "../rentals/dto/update-rental-status.dto";
+import { AuditService } from "../audit/audit.service";
+import { AuditAction } from "../audit/entities/audit-log.entity";
+import { CurrentUser } from "../../common/decorators/current-user.decorator";
 
 @Controller("admin/rentals")
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminRentalsController {
-  constructor(private readonly rentalsService: RentalsService) {}
+  constructor(
+    private readonly rentalsService: RentalsService,
+    private readonly auditService: AuditService,
+  ) {}
 
   @Get()
   findAll(@Query("page") page?: string, @Query("pageSize") pageSize?: string) {
     return this.rentalsService.findAll(Number(page ?? 1), Number(pageSize ?? 20));
   }
 
-  // ✅ PATCH /admin/rentals/:id/status
   @Patch(":id/status")
-  updateStatus(@Param("id") id: string, @Body() dto: UpdateRentalStatusDto) {
-    return this.rentalsService.update(Number(id), dto);
+  async updateStatus(
+    @Param("id") id: string,
+    @Body() dto: UpdateRentalStatusDto,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
+    const result = await this.rentalsService.update(Number(id), dto);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_STATUS_UPDATE,
+      resourceType: "rental",
+      resourceId: Number(id),
+      newValue: { status: dto.status },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ PATCH /admin/rentals/:id/shipping
   @Patch(":id/shipping")
-  updateShipping(@Param("id") id: string, @Body() dto: UpdateShippingDto) {
-    return this.rentalsService.updateShipping(Number(id), dto);
+  async updateShipping(
+    @Param("id") id: string,
+    @Body() dto: UpdateShippingDto,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
+    const result = await this.rentalsService.updateShipping(Number(id), dto);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_SHIPPING_UPDATE,
+      resourceType: "rental",
+      resourceId: Number(id),
+      newValue: { ...dto },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string): Promise<{ deleted: boolean }> {
-    return this.rentalsService.remove(Number(id));
+  async remove(
+    @Param("id") id: string,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ): Promise<{ deleted: boolean }> {
+    const result = await this.rentalsService.remove(Number(id));
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_DELETE,
+      resourceType: "rental",
+      resourceId: Number(id),
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
   @Patch(":id/refund-deposit")
-  refundDeposit(@Param("id") id: string) {
-    return this.rentalsService.refundDeposit(Number(id));
+  async refundDeposit(
+    @Param("id") id: string,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
+    const result = await this.rentalsService.refundDeposit(Number(id));
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_REFUND_DEPOSIT,
+      resourceType: "rental",
+      resourceId: Number(id),
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ Thêm phí phát sinh
   @Post(":id/surcharges")
-  addSurcharge(@Param("id") id: string, @Body() dto: AddSurchargeDto) {
-    return this.rentalsService.addSurcharge(Number(id), dto);
+  async addSurcharge(
+    @Param("id") id: string,
+    @Body() dto: AddSurchargeDto,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
+    const result = await this.rentalsService.addSurcharge(Number(id), dto);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_SURCHARGE_ADD,
+      resourceType: "rental",
+      resourceId: Number(id),
+      newValue: { amount: dto.amount, type: dto.type, note: dto.note },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ Ghi nhận ngày trả thực tế
   @Patch(":id/actual-return")
-  setActualReturn(@Param("id") id: string, @Body("actualReturnDate") date: string) {
-    return this.rentalsService.setActualReturnDate(Number(id), date);
+  async setActualReturn(
+    @Param("id") id: string,
+    @Body("actualReturnDate") date: string,
+    @CurrentUser() admin: any,
+    @Req() req: any,
+  ) {
+    const result = await this.rentalsService.setActualReturnDate(Number(id), date);
+    await this.auditService.log({
+      adminId: admin.id,
+      adminEmail: admin.email,
+      action: AuditAction.RENTAL_ACTUAL_RETURN,
+      resourceType: "rental",
+      resourceId: Number(id),
+      newValue: { actualReturnDate: date },
+      ipAddress: req.ip,
+    });
+    return result;
   }
 
-  // ✅ Kiểm tra availability theo ngày
   @Get("check-availability")
   checkAvailability(
     @Query("variantId") variantId: string,

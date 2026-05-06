@@ -766,17 +766,20 @@ export default function AdminProducts() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {sizeItems.map((item: any) => {
                           const cs = item.conditionStatus as string;
-                          // Nếu conditionStatus = available nhưng variant stock = 0
-                          // → đang bị giữ bởi đơn PENDING chưa giao
+                          // "Đang giữ chỗ" chỉ hiện khi item đang available
+                          // nhưng stock = 0 VÀ có đơn PENDING thực sự.
+                          // Không thể biết chắc từ đây → hiển thị đúng conditionStatus thực tế.
+                          // Nếu stock = 0 mà item = available → đồ đang chờ được đổi sang returned
+                          // sau khi khách trả (admin chưa cập nhật kho vận).
                           const variant = (detailProduct as any).variants?.find(
                             (v: any) => String(v.id) === String(item.variantId) || v.size === item.variant?.size
                           );
-                          const isHeldByOrder = cs === "available" && (variant?.stock ?? 1) <= 0;
+                          const stockZeroButAvailable = cs === "available" && (variant?.stock ?? 1) <= 0;
 
-                          const statusLabel = isHeldByOrder
-                            ? t("adminInventory.status.reserved", { defaultValue: "Đang giữ chỗ" })
+                          const statusLabel = stockZeroButAvailable
+                            ? t("adminInventory.status.reserved", { defaultValue: "Chờ cập nhật kho" })
                             : t(`adminInventory.status.${cs}`, { defaultValue: cs });
-                          const statusCls = isHeldByOrder
+                          const statusCls = stockZeroButAvailable
                             ? "bg-orange-100 text-orange-800"
                             : cs === "available"  ? "bg-green-100 text-green-800" :
                               cs === "washing"    ? "bg-cyan-100 text-cyan-800" :

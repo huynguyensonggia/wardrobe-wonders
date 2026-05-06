@@ -859,7 +859,7 @@
       "washing": "洗濯中",
       "repairing": "修理中",
       "retired": "廃棄済み",
-      "reserved": "予約済み（注文待ち）"
+      "reserved": "在庫更新待ち"
     },
     "form": {
       "title": "在庫にアイテムを追加",

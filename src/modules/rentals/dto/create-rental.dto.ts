@@ -3,9 +3,11 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsPositive,
   IsString,
+  Matches,
   MaxLength,
   ValidateNested,
 } from "class-validator";
@@ -49,16 +51,20 @@ export class CreateRentalDto {
   note?: string;
 
   // =========================
-  // ✅ SHIPPING INFO (NEW)
+  // ✅ SHIPPING INFO
   // =========================
+  @IsNotEmpty({ message: "shipFullName is required" })
   @IsString()
   @MaxLength(100)
   shipFullName: string;
 
+  @IsNotEmpty({ message: "shipPhone is required" })
   @IsString()
+  @Matches(/^[0-9+\-\s]{7,20}$/, { message: "shipPhone must be a valid phone number" })
   @MaxLength(30)
   shipPhone: string;
 
+  @IsNotEmpty({ message: "shipAddress is required" })
   @IsString()
   @MaxLength(200)
   shipAddress: string;

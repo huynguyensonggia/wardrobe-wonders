@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
 import { InventoryItem, ConditionStatus } from "./entities/inventory-item.entity";
@@ -18,6 +18,8 @@ const WAS_REDUCING = (s: ConditionStatus) => STOCK_REDUCING_STATUSES.includes(s)
 
 @Injectable()
 export class InventoryService {
+  private readonly logger = new Logger(InventoryService.name);
+
   constructor(
     @InjectRepository(InventoryItem)
     private readonly repo: Repository<InventoryItem>,
@@ -163,6 +165,13 @@ export class InventoryService {
   // ========================
   // Sync từ rental status (tự động) — CHỈ đổi conditionStatus, KHÔNG đụng stock
   // Stock đã được quản lý bởi rentals.service (trừ khi PENDING, hoàn khi CANCELLED/REJECTED)
+  //
+  // Luồng chuẩn:
+  //   PENDING   → item: available (stock đã trừ, item chưa đổi status)
+  //   SHIPPING  → item: shipping
+  //   ACTIVE    → item: rented
+  //   COMPLETED → item: returned  (chờ admin đổi: returned → washing/repairing → available)
+  //   CANCELLED/REJECTED → item: available (stock đã được hoàn bởi rentals.service)
   // ========================
   async syncFromRental(rentalItemId: number, variantId: number, rentalStatus: string) {
     const statusMap: Record<string, ConditionStatus> = {
@@ -176,7 +185,9 @@ export class InventoryService {
     const newStatus = statusMap[rentalStatus];
     if (!newStatus) return;
 
-    // Tìm item phù hợp theo thứ tự ưu tiên
+    // Tìm item phù hợp theo thứ tự ưu tiên.
+    // Mở rộng danh sách tìm kiếm để xử lý trường hợp các bước trước bị miss
+    // (ví dụ: admin bỏ qua SHIPPING → ACTIVE, nhảy thẳng PENDING → COMPLETED)
     const prevStatusMap: Record<string, ConditionStatus[]> = {
       shipping:  [ConditionStatus.AVAILABLE],
       active:    [ConditionStatus.SHIPPING, ConditionStatus.AVAILABLE],
@@ -197,24 +208,27 @@ export class InventoryService {
     }
 
     if (!item) {
-      console.log(`[syncFromRental] No item found for variantId=${variantId}, statuses=${JSON.stringify(expectedPrevStatuses)}`);
+      this.logger.warn(
+        `[syncFromRental] No item found for variantId=${variantId}, rentalStatus=${rentalStatus}, tried statuses=${JSON.stringify(expectedPrevStatuses)}`
+      );
       return;
     }
 
     if (item.conditionStatus === newStatus) return;
 
-    console.log(`[syncFromRental] ${item.barcode}: ${item.conditionStatus} → ${newStatus}`);
+    this.logger.log(
+      `[syncFromRental] barcode=${item.barcode} variantId=${variantId}: ${item.conditionStatus} → ${newStatus} (rental ${rentalStatus})`
+    );
 
-    // ✅ Cập nhật conditionStatus trực tiếp — KHÔNG đụng stock
-    // Stock được quản lý hoàn toàn bởi rentals.service:
-    //   - Trừ khi tạo đơn PENDING
-    //   - Hoàn khi COMPLETED / CANCELLED / REJECTED
-    // Khi trả về (rented → returned): tăng totalRentals
-    const wasRented = item.conditionStatus === ConditionStatus.RENTED;
+    // Khi đơn hoàn tất (rented/shipping/available → returned): tăng totalRentals
+    const wasActive =
+      item.conditionStatus === ConditionStatus.RENTED ||
+      item.conditionStatus === ConditionStatus.SHIPPING ||
+      item.conditionStatus === ConditionStatus.AVAILABLE;
 
     item.conditionStatus = newStatus;
 
-    if (wasRented && newStatus === ConditionStatus.RETURNED) {
+    if (wasActive && newStatus === ConditionStatus.RETURNED) {
       item.totalRentals += 1;
     }
 
