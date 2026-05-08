@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { productsApi } from "@/lib/api";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,8 @@ import {
 type VariantLite = {
   id: number;
   size: string;
+  sizeEn?: string | null;
+  sizeJa?: string | null;
   stock: number;
   isActive?: number | boolean | string;
 };
@@ -85,7 +88,8 @@ export default function ProductDetailPage() {
   });
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const {
     data: product,
@@ -128,6 +132,8 @@ export default function ProductDetailPage() {
     return raw.map((v: any) => ({
       id: Number(v.id),
       size: String(v.size),
+      sizeEn: v.sizeEn ?? null,
+      sizeJa: v.sizeJa ?? null,
       stock: Number(v.stock ?? 0),
       isActive: v.isActive ?? 1,
     }));
@@ -240,12 +246,29 @@ export default function ProductDetailPage() {
   };
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
     if (!ensureValid()) return;
+
+    const stock = selectedVariant!.stock ?? 1;
+    const variantId = Number(selectedVariant!.id);
+
+    // Kiểm tra overlap ngày: cùng variant mà ngày thuê giao nhau thì không cho thêm
+    const doOverlap = (s1: string, e1: string, s2: string, e2: string) =>
+      s1 <= e2 && s2 <= e1;
+
+    const overlappingQty = cartItems
+      .filter((x) => x.variantId === variantId && doOverlap(x.startDate, x.endDate, startDate, endDate))
+      .reduce((s, x) => s + x.quantity, 0);
+
+    if (overlappingQty >= stock) {
+      alert(t("productDetail.alerts.outOfStock", { stock }));
+      return;
+    }
 
     addItem(
       {
         productId: Number((product as any).id),
-        variantId: Number(selectedVariant!.id),
+        variantId,
         size: selectedVariant!.size,
         name: (product as any).name ?? "",
         nameEn: (product as any).nameEn ?? null,
@@ -255,7 +278,7 @@ export default function ProductDetailPage() {
           (product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0
         ),
         deposit: Number((product as any).deposit ?? 0),
-        stock: selectedVariant!.stock ?? 1,
+        stock,
         startDate,
         endDate,
         days: rentalDays,
@@ -267,6 +290,7 @@ export default function ProductDetailPage() {
   };
 
   const handleRentNow = () => {
+    if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
     if (!ensureValid()) return;
 
     navigate("/checkout", {
@@ -409,9 +433,6 @@ export default function ProductDetailPage() {
           <div className="lg:py-4">
             <div className="flex items-start justify-between mb-4">
               <div>
-                <p className="text-sm text-muted-foreground uppercase tracking-wider mb-1">
-                  {(product as any).category?.name}
-                </p>
                 <h1 className="font-display text-3xl md:text-4xl font-semibold">
                   {getLocalizedProductName(
                     product as any,
@@ -511,6 +532,13 @@ export default function ProductDetailPage() {
                   const active = v ? isVariantActive(v.isActive) : true;
                   const disabled = !active || stock <= 0;
 
+                  const displaySize =
+                    i18n.language === "ja" && v?.sizeJa
+                      ? v.sizeJa
+                      : i18n.language === "en" && v?.sizeEn
+                      ? v.sizeEn
+                      : size;
+
                   const title = disabled
                     ? !active
                       ? t("productDetail.tooltips.variantInactive")
@@ -531,7 +559,7 @@ export default function ProductDetailPage() {
                           : "border-border hover:border-accent"
                       )}
                     >
-                      <div>{size}</div>
+                      <div>{displaySize}</div>
                       <div className="text-xs font-normal opacity-70">
                         {disabled
                           ? t("productDetail.tooltips.outOfStock")

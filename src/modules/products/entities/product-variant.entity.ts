@@ -31,6 +31,12 @@ export class ProductVariant {
   })
   size: string;
 
+  @Column({ name: "size_en", type: "varchar", length: 50, nullable: true })
+  sizeEn: string | null;
+
+  @Column({ name: "size_ja", type: "varchar", length: 50, nullable: true })
+  sizeJa: string | null;
+
   @Column({ name: "stock", type: "int", default: 0 })
   stock: number;
 

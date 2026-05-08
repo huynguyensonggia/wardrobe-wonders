@@ -395,12 +395,16 @@ export default function AdminProducts() {
   };
 
   /* ===== SEARCH ===== */
+  const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
+    const nonAccessory = products.filter(
+      (p) => !ACCESSORY_SLUGS.includes((p as any).category?.slug ?? "")
+    );
+    if (!searchQuery.trim()) return nonAccessory;
     const kw = searchQuery.toLowerCase();
-    return products.filter((p) =>
+    return nonAccessory.filter((p) =>
       String((p as any).name ?? "").toLowerCase().includes(kw) ||
       String((p as any).nameEn ?? "").toLowerCase().includes(kw) ||
       String((p as any).color ?? "").toLowerCase().includes(kw) ||

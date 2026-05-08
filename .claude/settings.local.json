@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem d:\\\\wardrobe-wonders\\\\src -Recurse | Where-Object { $_.Name -match \"variant\" } | Select-Object FullName)",
+      "PowerShell(head -50)"
+    ]
+  }
+}

@@ -91,6 +91,12 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex flex-wrap items-center gap-1 min-h-[24px]">
           {sizes.map((v: any) => {
             const s = v?.size ?? v;
+            const displaySize =
+              lang === "ja" && v?.sizeJa
+                ? v.sizeJa
+                : lang === "en" && v?.sizeEn
+                ? v.sizeEn
+                : s;
             const available = (v?.stock ?? 1) > 0;
             return (
               <span
@@ -101,7 +107,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     : "border-muted text-muted-foreground line-through"
                 }`}
               >
-                {s}
+                {displaySize}
               </span>
             );
           })}

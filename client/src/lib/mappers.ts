@@ -51,6 +51,8 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
     id: Number(v.id),
     productId: Number(v.productId ?? p.id),
     size: String(v.size ?? "M"),
+    sizeEn: v.sizeEn ?? null,
+    sizeJa: v.sizeJa ?? null,
     stock: Number(v.stock ?? 0),
     isActive: v.isActive !== undefined ? Number(v.isActive) : undefined,
     createdAt: v.createdAt ? String(v.createdAt) : undefined,

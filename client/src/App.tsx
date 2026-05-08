@@ -28,6 +28,7 @@ import AdminCategories from "@/pages/admin/AdminCategories";
 import AdminRentals from "@/pages/admin/AdminRentals";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminInventory from "@/pages/admin/AdminInventory";
+import AdminAccessories from "@/pages/admin/AdminAccessories";
 import CartPage from "@/pages/CartPage";
 import StyleAdvisorPage from "@/pages/StyleAdvisorPage";
 import HowItWorksPage from "@/pages/HowItWorksPage";
@@ -40,6 +41,7 @@ import TermsPage from "@/pages/TermsPage";
 import OrderSuccessPage from "@/pages/OrderSuccessPage";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import ContactPage from "@/pages/ContactPage";
+import CategoryPage from "@/pages/CategoryPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
@@ -75,6 +77,7 @@ const App = () => (
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/category/:slug" element={<CategoryPage />} />
                 <Route path="/privacy" element={<PrivacyPage />} />
                 <Route path="/terms" element={<TermsPage />} />
                 <Route path="/cart" element={
@@ -123,6 +126,7 @@ const App = () => (
                   <Route path="rentals" element={<AdminRentals />} />
                   <Route path="users" element={<AdminUsersPage />} />
                   <Route path="inventory" element={<AdminInventory />} />
+                  <Route path="accessories" element={<AdminAccessories />} />
                 </Route>
               </Route>
 

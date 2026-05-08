@@ -9,6 +9,7 @@ import dressesImg from "@/assets/product-dress.jpg";
 import blazerImg from "@/assets/product-blazer.jpg";
 import shirtImg from "@/assets/product-shirt.jpg";
 import pantsImg from "@/assets/product-pants.jpg";
+import aoDaiImg from "@/assets/product-aodai.jpg";
 
 import { productsApi, categoriesApi } from "@/lib/api";
 import type { Product, Category } from "@/types";
@@ -28,12 +29,18 @@ export default function HomePage() {
     outerwear: blazerImg,
     tops: shirtImg,
     pants: pantsImg,
+    "ao-dai": aoDaiImg,
+    "ao-dai-cao-cap": aoDaiImg,
   };
 
-  // ✅ featured lấy từ data thật
+  // ✅ featured lấy từ data thật, loại trừ phụ kiện
+  const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
   const featuredProducts = useMemo(() => {
-    const featured = products.filter((p: any) => p?.featured === true);
-    return (featured.length ? featured : products).slice(0, 4);
+    const nonAccessory = products.filter(
+      (p: any) => !ACCESSORY_SLUGS.includes(p?.category?.slug ?? "")
+    );
+    const featured = nonAccessory.filter((p: any) => p?.featured === true);
+    return (featured.length ? featured : nonAccessory).slice(0, 4);
   }, [products]);
 
   useEffect(() => {
@@ -181,7 +188,10 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.slice(0, 4).map((category, i) => (
+            {categories
+              .filter((c) => !["bags", "jewelry", "hats", "accessories"].includes((c as any).slug ?? ""))
+              .slice(0, 4)
+              .map((category, i) => (
               <Link
                 key={category.id}
                 to={`/products?category=${category.slug}`}

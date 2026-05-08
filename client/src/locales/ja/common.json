@@ -37,6 +37,10 @@
     "outerwear": "アウター",
     "aoDaiCaoCap": "プレミアムアオザイ",
     "aoDai": "アオザイ",
+    "accessories": "アクセサリー",
+    "bags": "バッグ",
+    "jewelry": "ジュエリー",
+    "hats": "帽子",
     "aiTryOn": "AI試着",
     "styleAdvisor": "スタイル診断",
     "cart": "カート",
@@ -115,7 +119,7 @@
     "alerts": {
       "selectSize": "サイズを選択してください",
       "variantNotFound": "サイズ/バリアントが見つかりません。選び直してください。",
-      "outOfStock": "このサイズは在庫切れです。",
+      "outOfStock": "在庫数({{stock}})の上限をカートに追加済みです。",
       "selectDates": "レンタル日程を選択してください",
       "minimumRental": "最低レンタル期間は{{days}}日です",
       "addedToCart": "カートに追加しました！"
@@ -484,7 +488,29 @@
       "products": "商品",
       "categories": "カテゴリー",
       "rentals": "レンタル",
-      "inventory": "在庫管理"
+      "inventory": "在庫管理",
+      "accessories": "アクセサリー",
+      "allAccessories": "全アクセサリー"
+    },
+    "accessories": {
+      "title": "アクセサリー",
+      "subtitle": "バッグ、ジュエリー、帽子を管理",
+      "addBtn": "+ アクセサリーを追加",
+      "searchPlaceholder": "アクセサリーを検索...",
+      "inStock": "在庫あり",
+      "outOfStock": "在庫なし",
+      "empty": "アクセサリーがありません。「+ アクセサリーを追加」をクリックしてください。",
+      "noCategoryWarning": "アクセサリーカテゴリーが見つかりません。bags/jewelry/hatsのスラッグでカテゴリーを作成してください。",
+      "loading": "読み込み中...",
+      "dialogCreate": "アクセサリーを追加",
+      "dialogEdit": "アクセサリーを編集",
+      "createBtn": "アクセサリーを作成",
+      "saveBtn": "変更を保存",
+      "deleteTitle": "アクセサリーを削除しますか？",
+      "deleteDesc": "この操作は元に戻せません。",
+      "toastCreated": "アクセサリーを作成しました",
+      "toastUpdated": "アクセサリーを更新しました",
+      "toastDeleted": "アクセサリーを削除しました"
     }
   },
   "common": {

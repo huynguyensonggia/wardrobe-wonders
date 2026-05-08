@@ -60,6 +60,16 @@ const NAV_COLLECTIONS = [
     ],
     occasions: [],
   },
+  {
+    key: "accessories",
+    items: [
+      { key: "bags", occasion: null, categorySlug: "bags" },
+      { key: "jewelry", occasion: null, categorySlug: "jewelry" },
+      { key: "hats", occasion: null, categorySlug: "hats" },
+    ],
+    occasions: [],
+    categoryPage: true,
+  },
 ];
 
 export function Navbar() {
@@ -111,16 +121,26 @@ export function Navbar() {
                   {/* Link tổng cho collection */}
                   <DropdownMenuItem asChild>
                     <Link to={
-                      col.occasions.length > 0
+                      (col as any).categoryPage
+                        ? `/category/accessories`
+                        : col.occasions.length > 0
                         ? `/products?occasion=${col.occasions[0]}`
-                        : `/products`
+                        : `/products?category=${col.items[0]?.categorySlug ?? ""}`
                     }>
                       {t("navbar.collection")} ({t(`navbar.${col.key}`)})
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {/* Với event/trend: hiện theo category + occasion */}
-                  {col.key !== "traditional"
+                  {/* Với accessories: link đến /category/:slug */}
+                  {(col as any).categoryPage
+                    ? col.items.map((item) => (
+                        <DropdownMenuItem key={item.categorySlug} asChild>
+                          <Link to={`/category/${item.categorySlug}`}>
+                            {t(`navbar.${item.key}`)}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))
+                    : col.key !== "traditional"
                     ? Array.from(new Set(col.items.map((i) => i.categorySlug))).map((slug) => (
                         <DropdownMenuItem key={slug} asChild>
                           <Link to={`/products?category=${slug}&occasion=${col.occasions.join(",")}`}>
@@ -154,8 +174,8 @@ export function Navbar() {
             {/* Language selector */}
             <LanguageSwitcher />
 
-            {/* Cart button — ẩn với admin */}
-            {user?.role !== "ADMIN" && (
+            {/* Cart button — chỉ hiện khi đã đăng nhập và không phải admin */}
+            {isAuthenticated && user?.role !== "ADMIN" && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -301,14 +321,31 @@ export function Navbar() {
               {NAV_COLLECTIONS.map((col) => (
                 <div key={col.key} className="space-y-1">
                   <Link
-                    to={col.occasions.length > 0 ? `/products?occasion=${col.occasions[0]}` : `/products`}
+                    to={
+                      (col as any).categoryPage
+                        ? `/category/accessories`
+                        : col.occasions.length > 0
+                        ? `/products?occasion=${col.occasions[0]}`
+                        : `/products?category=${col.items[0]?.categorySlug ?? ""}`
+                    }
                     className="text-sm font-medium py-2 block"
                     onClick={() => setIsOpen(false)}
                   >
                     {t(`navbar.${col.key}`)}
                   </Link>
                   <div className="pl-4 space-y-1 border-l border-border">
-                    {col.key !== "traditional"
+                    {(col as any).categoryPage
+                      ? col.items.map((item) => (
+                          <Link
+                            key={item.categorySlug}
+                            to={`/category/${item.categorySlug}`}
+                            className="text-sm text-muted-foreground py-1.5 block"
+                            onClick={() => setIsOpen(false)}
+                          >
+                            {t(`navbar.${item.key}`)}
+                          </Link>
+                        ))
+                      : col.key !== "traditional"
                       ? Array.from(new Set(col.items.map((i) => i.categorySlug))).map((slug) => (
                           <Link
                             key={slug}
@@ -343,8 +380,8 @@ export function Navbar() {
                 {t("navbar.styleAdvisor")}
               </Link>
 
-              {/* Cart in mobile menu — ẩn với admin */}
-              {user?.role !== "ADMIN" && (
+              {/* Cart in mobile menu — chỉ hiện khi đã đăng nhập và không phải admin */}
+              {isAuthenticated && user?.role !== "ADMIN" && (
                 <button
                   className="text-left text-sm font-medium py-2"
                   onClick={() => {

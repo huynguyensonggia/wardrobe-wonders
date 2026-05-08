@@ -73,6 +73,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const makeKey = (productId: number, variantId: number, startDate: string, endDate: string) =>
     `${productId}_${variantId}_${startDate}_${endDate}`;
 
+  const doOverlap = (s1: string, e1: string, s2: string, e2: string) =>
+    s1 <= e2 && s2 <= e1;
+
   const addItem: CartContextValue["addItem"] = (item, qty = 1) => {
     setItems((prev) => {
       const key = makeKey(item.productId, item.variantId, item.startDate, item.endDate);
@@ -80,12 +83,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         (x) => makeKey(x.productId, x.variantId, x.startDate, x.endDate) === key
       );
 
+      // Tính tổng số lượng các entry cùng variant có ngày trùng nhau
+      const overlappingQty = prev
+        .filter((x) => x.variantId === item.variantId && doOverlap(x.startDate, x.endDate, item.startDate, item.endDate))
+        .reduce((s, x) => s + x.quantity, 0);
+
       if (idx >= 0) {
+        const current = prev[idx];
+        if (overlappingQty + qty > item.stock) return prev;
         const copy = [...prev];
-        copy[idx] = { ...copy[idx], quantity: copy[idx].quantity + qty };
+        copy[idx] = { ...current, quantity: current.quantity + qty };
         return copy;
       }
 
+      if (overlappingQty + qty > item.stock) return prev;
       return [...prev, { ...item, quantity: qty }];
     });
   };
@@ -94,11 +105,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => {
       const key = makeKey(productId, variantId, startDate, endDate);
       return prev
-        .map((x) =>
-          makeKey(x.productId, x.variantId, x.startDate, x.endDate) === key
-            ? { ...x, quantity: qty }
-            : x
-        )
+        .map((x) => {
+          if (makeKey(x.productId, x.variantId, x.startDate, x.endDate) !== key) return x;
+          // Cap tại stock
+          const safeQty = Math.min(qty, x.stock);
+          return { ...x, quantity: safeQty };
+        })
         .filter((x) => x.quantity > 0);
     });
   };

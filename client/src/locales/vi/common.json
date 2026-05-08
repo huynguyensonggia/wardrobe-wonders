@@ -37,6 +37,10 @@
     "outerwear": "Áo khoác",
     "aoDaiCaoCap": "Áo dài cao cấp",
     "aoDai": "Áo dài",
+    "accessories": "Phụ kiện",
+    "bags": "Túi xách",
+    "jewelry": "Trang sức",
+    "hats": "Mũ",
     "aiTryOn": "AI Thử đồ",
     "styleAdvisor": "Tư vấn phong cách",
     "cart": "Giỏ hàng",
@@ -133,7 +137,7 @@
     "alerts": {
       "selectSize": "Vui lòng chọn size",
       "variantNotFound": "Không tìm thấy biến thể. Vui lòng chọn lại.",
-      "outOfStock": "Size này đã hết hàng.",
+      "outOfStock": "Bạn đã thêm đủ số lượng tồn kho ({{stock}}) vào giỏ hàng.",
       "selectDates": "Vui lòng chọn ngày thuê",
       "minimumRental": "Thời gian thuê tối thiểu {{days}} ngày",
       "addedToCart": "Đã thêm vào giỏ hàng!"
@@ -501,7 +505,29 @@
       "products": "Sản phẩm",
       "categories": "Danh mục",
       "rentals": "Đơn thuê",
-      "inventory": "Kho vận"
+      "inventory": "Kho vận",
+      "accessories": "Phụ kiện",
+      "allAccessories": "Tất cả phụ kiện"
+    },
+    "accessories": {
+      "title": "Phụ kiện",
+      "subtitle": "Quản lý túi xách, trang sức, mũ...",
+      "addBtn": "+ Thêm phụ kiện",
+      "searchPlaceholder": "Tìm phụ kiện...",
+      "inStock": "Còn hàng",
+      "outOfStock": "Hết hàng",
+      "empty": "Chưa có phụ kiện nào. Bấm \"+ Thêm phụ kiện\" để tạo.",
+      "noCategoryWarning": "Chưa có danh mục phụ kiện. Tạo danh mục với slug bags/jewelry/hats trước.",
+      "loading": "Đang tải...",
+      "dialogCreate": "Thêm phụ kiện",
+      "dialogEdit": "Chỉnh sửa phụ kiện",
+      "createBtn": "Tạo phụ kiện",
+      "saveBtn": "Lưu thay đổi",
+      "deleteTitle": "Xoá phụ kiện?",
+      "deleteDesc": "Hành động này không thể hoàn tác.",
+      "toastCreated": "Đã tạo phụ kiện",
+      "toastUpdated": "Đã cập nhật phụ kiện",
+      "toastDeleted": "Đã xoá phụ kiện"
     }
   },
   "common": {

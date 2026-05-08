@@ -182,6 +182,8 @@ export class ProductService {
         productId: saved.id,
         product: saved,
         size: v.size,
+        sizeEn: v.sizeEn ?? null,
+        sizeJa: v.sizeJa ?? null,
         stock: Number(v.stock),
         isActive: true,
       }),
@@ -317,7 +319,9 @@ export class ProductService {
           await this.variantRepo.update(vid, {
             isActive: true as any,
             stock: Number(dtoVariant.stock),
-          });
+            sizeEn: dtoVariant.sizeEn ?? null,
+            sizeJa: dtoVariant.sizeJa ?? null,
+          } as any);
           newSizes.delete(existing.size); // đã xử lý, không tạo mới
         }
       }
@@ -330,6 +334,8 @@ export class ProductService {
             productId: id,
             product,
             size: v.size,
+            sizeEn: v.sizeEn ?? null,
+            sizeJa: v.sizeJa ?? null,
             stock: Number(v.stock),
             isActive: true,
           }),

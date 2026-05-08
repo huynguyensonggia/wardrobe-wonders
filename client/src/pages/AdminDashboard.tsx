@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
@@ -9,6 +10,8 @@ import {
   ArrowLeft,
   Users,
   Warehouse,
+  Gem,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +30,9 @@ export default function AdminDashboard() {
 
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const [accessoriesOpen, setAccessoriesOpen] = useState(
+    location.pathname.startsWith("/admin/accessories")
+  );
 
   const sidebarLinks = [
     { to: "/admin", icon: LayoutDashboard, label: t("admin.sidebar.overview"), exact: true },
@@ -100,6 +106,41 @@ export default function AdminDashboard() {
                 </Link>
               );
             })}
+
+            {/* Phụ kiện dropdown */}
+            <div>
+              <button
+                onClick={() => setAccessoriesOpen((v) => !v)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  location.pathname.startsWith("/admin/accessories")
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+              >
+                <Gem className="w-5 h-5" />
+                {t("admin.sidebar.accessories")}
+                <ChevronDown
+                  className={cn("w-4 h-4 ml-auto transition-transform", accessoriesOpen && "rotate-180")}
+                />
+              </button>
+
+              {accessoriesOpen && (
+                <div className="mt-1 ml-4 pl-4 border-l border-border space-y-1">
+                  <Link
+                    to="/admin/accessories"
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                      location.pathname === "/admin/accessories"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    )}
+                  >
+                    {t("admin.sidebar.allAccessories")}
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
           <div className="min-h-[500px]">

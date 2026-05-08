@@ -37,6 +37,10 @@
     "outerwear": "Outerwear",
     "aoDaiCaoCap": "Premium Ao Dai",
     "aoDai": "Ao Dai",
+    "accessories": "Accessories",
+    "bags": "Bags",
+    "jewelry": "Jewelry",
+    "hats": "Hats",
     "aiTryOn": "AI Try-On",
     "styleAdvisor": "Style Advisor",
     "cart": "Cart",
@@ -115,7 +119,7 @@
     "alerts": {
       "selectSize": "Please select size",
       "variantNotFound": "Size/variant not found. Please re-select.",
-      "outOfStock": "This size is out of stock.",
+      "outOfStock": "You've already added the maximum available stock ({{stock}}) to your cart.",
       "selectDates": "Please select rental dates",
       "minimumRental": "Minimum rental is {{days}} days",
       "addedToCart": "Added to cart!"
@@ -483,7 +487,29 @@
       "products": "Products",
       "categories": "Categories",
       "rentals": "Rentals",
-      "inventory": "Inventory"
+      "inventory": "Inventory",
+      "accessories": "Accessories",
+      "allAccessories": "All accessories"
+    },
+    "accessories": {
+      "title": "Accessories",
+      "subtitle": "Manage bags, jewelry, hats...",
+      "addBtn": "+ Add accessory",
+      "searchPlaceholder": "Search accessories...",
+      "inStock": "In stock",
+      "outOfStock": "Out of stock",
+      "empty": "No accessories yet. Click \"+ Add accessory\" to create one.",
+      "noCategoryWarning": "No accessory categories found. Create categories with slug bags/jewelry/hats first.",
+      "loading": "Loading...",
+      "dialogCreate": "Add accessory",
+      "dialogEdit": "Edit accessory",
+      "createBtn": "Create accessory",
+      "saveBtn": "Save changes",
+      "deleteTitle": "Delete accessory?",
+      "deleteDesc": "This action cannot be undone.",
+      "toastCreated": "Accessory created",
+      "toastUpdated": "Accessory updated",
+      "toastDeleted": "Accessory deleted"
     }
   },
   "common": {

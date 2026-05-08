@@ -128,9 +128,13 @@ export default function ProductsPage() {
     enabled: filters.category ? categoryId !== undefined : true,
   });
 
-  // 3) Client-side filter chỉ còn size và color (search đã xử lý ở BE)
+  const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
+
+  // 3) Client-side filter — loại trừ phụ kiện, chỉ lọc size/color/status
   const filteredProducts = useMemo(() => {
-    const list = productsFromApi as any[];
+    const list = (productsFromApi as any[]).filter(
+      (product) => !ACCESSORY_SLUGS.includes(product?.category?.slug ?? "")
+    );
 
     return list.filter((product) => {
       if (filters.size) {
