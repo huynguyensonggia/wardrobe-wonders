@@ -815,10 +815,10 @@ export default function ProductDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-orange-900">
-                      {t("productDetail.shopee.title", { defaultValue: "Muốn sở hữu luôn?" })}
+                      {t("productDetail.shopee.title")}
                     </p>
                     <p className="text-xs text-orange-600">
-                      {t("productDetail.shopee.subtitle", { defaultValue: "Mua sản phẩm này trên Shopee" })}
+                      {t("productDetail.shopee.subtitle")}
                     </p>
                   </div>
                 </div>

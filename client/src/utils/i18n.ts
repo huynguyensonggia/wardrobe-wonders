@@ -29,16 +29,6 @@ export function getLocalizedText(
   const enField = item[`${field}En` as keyof MultilingualText] as string | null;
   const jaField = item[`${field}Ja` as keyof MultilingualText] as string | null;
 
-  // Debug log
-  console.log("getLocalizedText debug:", {
-    field,
-    language,
-    baseField,
-    enField,
-    jaField,
-    item,
-  });
-
   switch (language) {
     case "en":
       return enField || baseField || fallback;

@@ -119,29 +119,6 @@
       "title": "Muốn sở hữu luôn?",
       "subtitle": "Mua sản phẩm này trên Shopee"
     },
-    "products": {
-        "title": "Bộ sưu tập",
-        "piecesAvailable": "Có {{count}} sản phẩm",
-        "searchPlaceholder": "Tìm sản phẩm...",
-        "filters": "Bộ lọc",
-        "category": "Danh mục",
-        "allCategories": "Tất cả danh mục",
-        "size": "Size",
-        "allSizes": "Tất cả size",
-        "color": "Màu",
-        "allColors": "Tất cả màu",
-        "availability": "Tình trạng",
-        "allStatus": "Trạng thái",
-        "status": {
-            "available": "Còn hàng",
-            "rented": "Đang thuê"
-        },
-        "clear": "Xoá",
-        "loading": "Đang tải...",
-        "error": "Tải sản phẩm thất bại",
-        "noProducts": "Không tìm thấy sản phẩm",
-        "clearFilters": "Xoá bộ lọc"
-    },
     "alerts": {
       "selectSize": "Vui lòng chọn size",
       "variantNotFound": "Không tìm thấy biến thể. Vui lòng chọn lại.",
