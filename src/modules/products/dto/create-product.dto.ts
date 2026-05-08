@@ -79,6 +79,10 @@ export class CreateProductDto {
   @IsString()
   descriptionJa?: string;
 
+  @IsOptional()
+  @IsString()
+  shopeeUrl?: string;
+
   // ✅ NEW: nhiều size + stock
   @IsArray()
   @ArrayMinSize(1)

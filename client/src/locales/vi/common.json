@@ -111,6 +111,14 @@
       "stock": "Tồn kho: {{stock}}",
       "stockRemaining": "{{stock}} còn"
     },
+    "features": {
+      "freeShipping": "Miễn phí vận chuyển trên 400.000đ",
+      "damageProtection": "Bảo hiểm hư hỏng kèm theo"
+    },
+    "shopee": {
+      "title": "Muốn sở hữu luôn?",
+      "subtitle": "Mua sản phẩm này trên Shopee"
+    },
     "products": {
         "title": "Bộ sưu tập",
         "piecesAvailable": "Có {{count}} sản phẩm",

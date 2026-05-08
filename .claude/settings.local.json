@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "PowerShell(Get-ChildItem d:\\\\wardrobe-wonders\\\\src -Recurse | Where-Object { $_.Name -match \"variant\" } | Select-Object FullName)",
-      "PowerShell(head -50)"
+      "PowerShell(head -50)",
+      "PowerShell(Get-Process -Name \"mysqld\",\"mysql\",\"mariadbd\" -ErrorAction SilentlyContinue)",
+      "PowerShell(netstat -ano)",
+      "PowerShell(Get-Process -Id 11832)",
+      "Bash(powershell -Command \"\\(\\(Get-Content 'd:\\\\wardrobe-wonders\\\\src\\\\modules\\\\products\\\\products.service.ts'\\) | Measure-Object -Line\\).Lines\")",
+      "Bash(npx ts-node *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\\\\client\\\\src\" -Recurse)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }

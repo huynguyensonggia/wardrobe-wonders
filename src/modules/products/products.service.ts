@@ -171,6 +171,7 @@ export class ProductService {
       nameJa: (dto as any).nameJa ?? null,
       descriptionEn: (dto as any).descriptionEn ?? null,
       descriptionJa: (dto as any).descriptionJa ?? null,
+      shopeeUrl: (dto as any).shopeeUrl ?? null,
       status: dto.status ?? ProductStatus.AVAILABLE,
     });
 
@@ -275,6 +276,7 @@ export class ProductService {
     if ((dto as any).nameJa !== undefined) product.nameJa = (dto as any).nameJa ?? null;
     if ((dto as any).descriptionEn !== undefined) product.descriptionEn = (dto as any).descriptionEn ?? null;
     if ((dto as any).descriptionJa !== undefined) product.descriptionJa = (dto as any).descriptionJa ?? null;
+    if ((dto as any).shopeeUrl !== undefined) product.shopeeUrl = (dto as any).shopeeUrl ?? null;
     if (dto.status !== undefined) product.status = dto.status;
 
     await this.productRepo.save(product);
@@ -427,6 +429,7 @@ export class ProductService {
         const nameJa = r.nameJa ? String(r.nameJa).trim() : null;
         const descriptionEn = r.descriptionEn ? String(r.descriptionEn).trim() : null;
         const descriptionJa = r.descriptionJa ? String(r.descriptionJa).trim() : null;
+        const shopeeUrl = r.shopeeUrl ? String(r.shopeeUrl).trim() : null;
 
         // variantsJson
         let variants: any[] = [];
@@ -452,6 +455,7 @@ export class ProductService {
           nameJa,
           descriptionEn,
           descriptionJa,
+          shopeeUrl,
           status,
         });
 

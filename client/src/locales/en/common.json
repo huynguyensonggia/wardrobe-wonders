@@ -116,6 +116,10 @@
       "freeShipping": "Free shipping over 400.000đ",
       "damageProtection": "Damage protection included"
     },
+    "shopee": {
+      "title": "Want to own it?",
+      "subtitle": "Buy this product on Shopee"
+    },
     "alerts": {
       "selectSize": "Please select size",
       "variantNotFound": "Size/variant not found. Please re-select.",

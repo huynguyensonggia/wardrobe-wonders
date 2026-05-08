@@ -17,6 +17,8 @@ export const databaseConfig: DataSourceOptions = {
   database: process.env.DB_NAME || 'wardrobe-wonders',
   synchronize: isProd ? false : false,
   logging: process.env.APP_DEBUG === 'true',
+  connectTimeout: 20000,       // chờ tối đa 20s khi kết nối
+  extra: { connectionLimit: 10 },
   ssl: isProd && process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   entities: isProd
     ? [path.join(__dirname, 'src/modules/**/*.entity.js')]

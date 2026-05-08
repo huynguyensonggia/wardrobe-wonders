@@ -97,5 +97,6 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
     status: mapStatus(String(p.status)),
     featured: false,
     createdAt: String((p as any).createdAt ?? ""),
+    shopeeUrl: (p as any).shopeeUrl ?? null,
   };
 };

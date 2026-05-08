@@ -34,6 +34,7 @@ import {
   ShoppingBag,
   Bell,
   BellOff,
+  ExternalLink,
 } from "lucide-react";
 
 import { format, differenceInDays, startOfDay } from "date-fns";
@@ -799,6 +800,31 @@ export default function ProductDetailPage() {
                 <span>{t("productDetail.features.damageProtection")}</span>
               </div>
             </div>
+
+            {/* Shopee Affiliate Link */}
+            {(product as any)?.shopeeUrl && (
+              <a
+                href={(product as any).shopeeUrl}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="mt-5 flex items-center justify-between rounded-xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 px-4 py-3 transition-all hover:border-orange-300 hover:shadow-sm group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#EE4D2D] shadow-sm">
+                    <ShoppingBag className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-orange-900">
+                      {t("productDetail.shopee.title", { defaultValue: "Muốn sở hữu luôn?" })}
+                    </p>
+                    <p className="text-xs text-orange-600">
+                      {t("productDetail.shopee.subtitle", { defaultValue: "Mua sản phẩm này trên Shopee" })}
+                    </p>
+                  </div>
+                </div>
+                <ExternalLink className="h-4 w-4 text-orange-400 transition-transform group-hover:translate-x-0.5" />
+              </a>
+            )}
           </div>
         </div>
       </div>

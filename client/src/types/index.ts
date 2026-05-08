@@ -45,6 +45,8 @@ export interface ProductVariant {
   id: number;
   productId: number;
   size: string;
+  sizeEn?: string | null;
+  sizeJa?: string | null;
   stock: number;
   isActive?: number;
   createdAt?: string;
@@ -54,12 +56,17 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   name: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   slug: string;
   description: string;
+  descriptionEn?: string | null;
+  descriptionJa?: string | null;
   category: Category;
   images: ProductImage[];
   sizes: string[];
   colors: string[];
+  color?: string;
   pricePerDay: number;
   deposit: number;
   quantity: number;
@@ -67,6 +74,7 @@ export interface Product {
   featured: boolean;
   createdAt: string;
   variants?: ProductVariant[];
+  shopeeUrl?: string | null;
 }
 
 // =====================

@@ -76,6 +76,9 @@ export class Product {
   })
   imageUrl: string | null;
 
+  @Column({ name: "shopee_url", type: "varchar", length: 500, nullable: true })
+  shopeeUrl: string | null;
+
   @Column({ name: "description", type: "text", nullable: true })
   description: string | null;
 

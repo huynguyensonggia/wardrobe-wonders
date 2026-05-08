@@ -160,6 +160,7 @@ export default function AdminProducts() {
   const [nameJa, setNameJa] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
   const [descriptionJa, setDescriptionJa] = useState("");
+  const [shopeeUrl, setShopeeUrl] = useState("");
 
   const [variants, setVariants] = useState<VariantForm[]>([
     { id: makeRowId(), size: "M", stock: "1", conditionNote: "" },
@@ -176,6 +177,7 @@ export default function AdminProducts() {
     setNameJa("");
     setDescriptionEn("");
     setDescriptionJa("");
+    setShopeeUrl("");
     setVariants([{ id: makeRowId(), size: "M", stock: "1", conditionNote: "" }]);
   };
 
@@ -206,6 +208,7 @@ export default function AdminProducts() {
     setNameJa((p as any).nameJa ?? "");
     setDescriptionEn((p as any).descriptionEn ?? "");
     setDescriptionJa((p as any).descriptionJa ?? "");
+    setShopeeUrl((p as any).shopeeUrl ?? "");
 
     const vts = ((p as any).variants ?? []) as any[];
     if (Array.isArray(vts) && vts.length) {
@@ -308,6 +311,8 @@ export default function AdminProducts() {
       if (nameJa.trim()) form.append("nameJa", nameJa.trim());
       if (descriptionEn.trim()) form.append("descriptionEn", descriptionEn.trim());
       if (descriptionJa.trim()) form.append("descriptionJa", descriptionJa.trim());
+      if (shopeeUrl.trim()) form.append("shopeeUrl", shopeeUrl.trim());
+      else form.append("shopeeUrl", "");
 
       // IMPORTANT: multipart/form-data -> variants as JSON string
       form.append(
@@ -632,6 +637,24 @@ export default function AdminProducts() {
                     <Input placeholder="日本語の説明" value={descriptionJa} onChange={(e) => setDescriptionJa(e.target.value)} />
                   </div>
                 </div>
+              </div>
+
+              {/* Shopee Affiliate */}
+              <div className="border border-orange-200 rounded-lg p-4 space-y-2 bg-orange-50/50">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <span className="text-base">🛍️</span>
+                  Link Shopee Affiliate
+                  <span className="text-muted-foreground font-normal text-xs">(không bắt buộc)</span>
+                </p>
+                <Input
+                  placeholder="https://shope.ee/..."
+                  value={shopeeUrl}
+                  onChange={(e) => setShopeeUrl(e.target.value)}
+                  className="bg-white"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Nếu điền link, khách hàng sẽ thấy nút mua hàng trên trang sản phẩm.
+                </p>
               </div>
 
               <Button onClick={handleSubmit}>
