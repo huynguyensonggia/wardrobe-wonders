@@ -1,15 +1,16 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { MailerService } from "@nestjs-modules/mailer";
+import { Resend } from "resend";
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-
-  constructor(private readonly mailer: MailerService) {}
+  private readonly resend = new Resend(process.env.RESEND_API_KEY);
+  private readonly from = process.env.MAIL_FROM || "AI Closet <onboarding@resend.dev>";
 
   async sendWelcome(to: string, name: string) {
     try {
-      await this.mailer.sendMail({
+      await this.resend.emails.send({
+        from: this.from,
         to,
         subject: "Chao mung ban den voi AI Closet!",
         html: this.welcomeTemplate(name),
@@ -33,7 +34,8 @@ export class MailService {
     paymentMethod: string;
   }) {
     try {
-      await this.mailer.sendMail({
+      await this.resend.emails.send({
+        from: this.from,
         to: params.to,
         subject: `Xac nhan don thue #${params.rentalId} - AI Closet`,
         html: this.rentalConfirmTemplate(params),
@@ -51,9 +53,10 @@ export class MailService {
     items: { name: string; size: string; quantity: number }[];
   }) {
     try {
-      await this.mailer.sendMail({
+      await this.resend.emails.send({
+        from: this.from,
         to: params.to,
-        subject: `Nhac nho: Don thue #${params.rentalId} het han HOM NAY - tra truoc 23:59`,
+        subject: `Nhac nho: Don thue #${params.rentalId} het han HOM NAY - tra truoc 22:30`,
         html: this.returnReminderTemplate(params),
       });
     } catch (err: any) {
