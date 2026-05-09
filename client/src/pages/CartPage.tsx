@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getLocalizedProductName } from "@/utils/i18n";
+import { useToast } from "@/components/ui/use-toast";
 
 /** Công thức đồng bộ với ProductDetailPage: ngày đầu = basePrice, mỗi ngày thêm +10.000đ */
 function calcRentalPrice(basePrice: number, days: number): number {
@@ -12,6 +13,7 @@ function calcRentalPrice(basePrice: number, days: number): number {
 
 export default function CartPage() {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
 
   const { items, count, updateQty, removeItem, clear } = useCart();
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ export default function CartPage() {
   const handleCheckout = () => {
     const missingVariant = items.find((it) => !it.variantId);
     if (missingVariant) {
-      alert(t("cart.alert.missingVariant"));
+      toast({ title: t("cart.alert.missingVariant"), variant: "destructive" });
       return;
     }
 

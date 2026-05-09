@@ -79,7 +79,7 @@ export default function AdminAccessories() {
       const list = await productsApi.getAll();
       setProducts(list || []);
     } catch (e: any) {
-      toast({ title: "Lỗi", description: e?.message });
+      toast({ title: t("common.errors.prefix"), description: e?.message });
     } finally {
       setLoadingProducts(false);
     }
@@ -187,11 +187,11 @@ export default function AdminAccessories() {
 
   /* ===== SUBMIT ===== */
   const handleSubmit = async () => {
-    if (!name.trim()) { toast({ title: t("accessories.validation.missingName", "Thiếu tên sản phẩm") }); return; }
-    if (!categoryId) { toast({ title: t("accessories.validation.missingCategory", "Chưa chọn danh mục") }); return; }
-    if (mode === "create" && !image) { toast({ title: t("accessories.validation.missingImage", "Chưa chọn ảnh") }); return; }
-    if (!variants.length) { toast({ title: t("accessories.validation.missingVariants", "Cần ít nhất 1 màu/số lượng") }); return; }
-    if (sizesDuplicate) { toast({ title: t("accessories.validation.duplicateSize", "Màu sắc bị trùng") }); return; }
+    if (!name.trim()) { toast({ title: t("admin.accessories.validation.missingName") }); return; }
+    if (!categoryId) { toast({ title: t("admin.accessories.validation.missingCategory") }); return; }
+    if (mode === "create" && !image) { toast({ title: t("admin.accessories.validation.missingImage") }); return; }
+    if (!variants.length) { toast({ title: t("admin.accessories.validation.missingVariants") }); return; }
+    if (sizesDuplicate) { toast({ title: t("admin.accessories.validation.duplicateSize") }); return; }
 
     const form = new FormData();
     if (image) form.append("image", image);
@@ -227,7 +227,7 @@ export default function AdminAccessories() {
       resetForm();
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: "Lỗi", description: e?.message });
+      toast({ title: t("common.errors.prefix"), description: e?.message });
     }
   };
 
@@ -238,7 +238,7 @@ export default function AdminAccessories() {
       toast({ title: t("admin.accessories.toastDeleted") });
       await fetchProducts();
     } catch (e: any) {
-      toast({ title: "Lỗi", description: e?.message });
+      toast({ title: t("common.errors.prefix"), description: e?.message });
     }
   };
 
@@ -275,29 +275,29 @@ export default function AdminAccessories() {
             <div className="grid gap-4">
               {/* Ảnh */}
               <div className="grid gap-2">
-                <Label>Ảnh {mode === "edit" && <span className="text-muted-foreground font-normal">(tuỳ chọn)</span>}</Label>
+                <Label>{t("admin.accessories.form.image")} {mode === "edit" && <span className="text-muted-foreground font-normal">{t("admin.accessories.form.optional")}</span>}</Label>
                 <div className="flex gap-4 items-start">
                   <div className="w-24 h-24 border rounded-md overflow-hidden flex items-center justify-center shrink-0">
                     {imagePreview
                       ? <img src={imagePreview} className="w-full h-full object-cover" alt="preview" />
-                      : <span className="text-xs text-muted-foreground">Chưa có ảnh</span>}
+                      : <span className="text-xs text-muted-foreground">{t("admin.accessories.form.noImage")}</span>}
                   </div>
                   <Input type="file" accept="image/*" onChange={(e) => setImage(e.target.files?.[0] ?? null)} />
                 </div>
                 {mode === "edit" && (
-                  <p className="text-xs text-muted-foreground">Không chọn ảnh mới sẽ giữ ảnh cũ.</p>
+                  <p className="text-xs text-muted-foreground">{t("admin.accessories.form.keepOldImageHint")}</p>
                 )}
               </div>
 
               {/* Tên */}
               <div className="grid gap-2">
-                <Label>Tên sản phẩm (Tiếng Việt)</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Dây chuyền ngọc trai" />
+                <Label>{t("admin.accessories.form.name")}</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("admin.accessories.form.namePlaceholder")} />
               </div>
 
               {/* Đa ngôn ngữ - Tên */}
               <div className="grid gap-2 rounded-md border border-border p-3">
-                <p className="text-xs font-semibold text-muted-foreground mb-1">🌐 Tên đa ngôn ngữ</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-1">{t("admin.accessories.form.multilingual")}</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="grid gap-1.5">
                     <Label className="text-xs">Tên (English)</Label>
@@ -320,15 +320,15 @@ export default function AdminAccessories() {
 
               {/* Danh mục */}
               <div className="grid gap-2">
-                <Label>Danh mục phụ kiện</Label>
+                <Label>{t("admin.accessories.form.category")}</Label>
                 {accessoryCategories.length === 0 ? (
                   <p className="text-sm text-destructive">
-                    Chưa có danh mục phụ kiện. Vào Admin → Danh mục và tạo danh mục với slug <code>bags</code>, <code>jewelry</code> hoặc <code>hats</code>.
+                    {t("admin.accessories.noCategoryWarning")}
                   </p>
                 ) : (
                   <Select value={categoryId} onValueChange={setCategoryId}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Chọn danh mục" />
+                      <SelectValue placeholder={t("admin.accessories.form.categoryPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                       {accessoryCategories.map((c) => (
@@ -342,37 +342,37 @@ export default function AdminAccessories() {
               {/* Giá + Cọc */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
-                  <Label>Giá thuê / ngày (K)</Label>
+                  <Label>{t("admin.accessories.form.rentPerDay")}</Label>
                   <Input value={rentPricePerDay} onChange={(e) => setRentPricePerDay(e.target.value)} inputMode="numeric" />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Tiền cọc (K)</Label>
+                  <Label>{t("admin.accessories.form.deposit")}</Label>
                   <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
                 </div>
               </div>
 
               {/* Màu sắc chính */}
               <div className="grid gap-2">
-                <Label>Màu sắc chính</Label>
-                <Input value={color} onChange={(e) => setColor(e.target.value)} placeholder="VD: vàng, bạc, đen..." />
+                <Label>{t("admin.accessories.form.color")}</Label>
+                <Input value={color} onChange={(e) => setColor(e.target.value)} placeholder={t("admin.accessories.form.colorPlaceholder")} />
               </div>
 
               {/* Màu sắc & Số lượng */}
               <div className="grid gap-3">
                 <div className="flex items-center justify-between">
-                  <Label>Màu sắc & Số lượng</Label>
+                  <Label>{t("admin.accessories.form.variants")}</Label>
                   <Button
                     type="button"
                     variant="secondary"
                     size="sm"
                     onClick={() => setVariants((prev) => [...prev, { id: makeRowId(), size: "", sizeEn: "", sizeJa: "", stock: "1" }])}
                   >
-                    + Thêm màu
+                    {t("admin.accessories.form.addColor")}
                   </Button>
                 </div>
 
                 {sizesDuplicate && (
-                  <p className="text-xs text-destructive">Màu sắc bị trùng, mỗi màu chỉ được nhập một lần.</p>
+                  <p className="text-xs text-destructive">{t("admin.accessories.validation.duplicateSizeInline")}</p>
                 )}
 
                 <div className="space-y-3">
@@ -382,7 +382,7 @@ export default function AdminAccessories() {
                         <Input
                           value={v.size}
                           onChange={(e) => setVariants((prev) => prev.map((x) => x.id === v.id ? { ...x, size: e.target.value } : x))}
-                          placeholder="Màu (VI): vàng, bạc..."
+                          placeholder={t("admin.accessories.form.colorViPlaceholder")}
                         />
                         <Input
                           value={v.stock}
@@ -474,7 +474,7 @@ export default function AdminAccessories() {
                     variant="outline"
                     className="h-8 w-8"
                     onClick={() => setDetailProductId(String(product.id) === detailProductId ? null : String(product.id))}
-                    title="Xem kho"
+                    title={t("admin.accessories.buttons.viewInventory")}
                   >
                     <span className="text-xs">📦</span>
                   </Button>
@@ -484,14 +484,14 @@ export default function AdminAccessories() {
                     variant="secondary"
                     className="h-8 w-8"
                     onClick={() => openEdit(product)}
-                    title="Chỉnh sửa"
+                    title={t("admin.accessories.buttons.edit")}
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button size="icon" variant="destructive" className="h-8 w-8" title="Xoá">
+                      <Button size="icon" variant="destructive" className="h-8 w-8" title={t("admin.accessories.buttons.delete")}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
@@ -502,7 +502,7 @@ export default function AdminAccessories() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(String(product.id))}>{t("common.delete", "Xoá")}</AlertDialogAction>
+                        <AlertDialogAction onClick={() => handleDelete(String(product.id))}>{t("common.delete")}</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
@@ -526,14 +526,14 @@ export default function AdminAccessories() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-5 border-b">
-              <h3 className="font-medium">📦 Kho: {(detailProduct as any).name}</h3>
+              <h3 className="font-medium">📦 {t("admin.accessories.inventory.title")}: {(detailProduct as any).name}</h3>
               <Button variant="ghost" size="icon" onClick={() => setDetailProductId(null)}>✕</Button>
             </div>
             <div className="p-5">
               {loadingInventory ? (
-                <p className="text-sm text-muted-foreground">Đang tải...</p>
+                <p className="text-sm text-muted-foreground">{t("admin.accessories.inventory.loading")}</p>
               ) : inventoryItems.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Chưa có hàng trong kho.</p>
+                <p className="text-sm text-muted-foreground">{t("admin.accessories.inventory.empty")}</p>
               ) : (
                 <div className="space-y-2">
                   {inventoryItems.map((item: any) => (

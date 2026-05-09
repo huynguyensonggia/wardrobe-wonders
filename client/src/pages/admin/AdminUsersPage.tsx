@@ -3,6 +3,17 @@ import { adminUsersApi } from "@/lib/api";
 import type { User } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type EditForm = {
   name?: string;
@@ -12,6 +23,7 @@ type EditForm = {
 
 export default function AdminUsersPage() {
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +31,7 @@ export default function AdminUsersPage() {
 
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<EditForm>({});
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
   const load = async () => {
     try {
@@ -73,27 +86,28 @@ export default function AdminUsersPage() {
       await load();
       cancelEdit();
     } catch (e: any) {
-      alert(e?.message ?? t("adminUsers.errors.updateFailed"));
+      toast({ title: t("common.errors.prefix"), description: e?.message ?? t("adminUsers.errors.updateFailed"), variant: "destructive" });
     }
   };
 
-  const remove = async (u: User) => {
-    const idNum = Number((u as any).id);
-
-    // ✅ FE guard if user has rentals
+  const confirmDelete = (u: User) => {
     const rentalsCount = Array.isArray((u as any).rentals) ? (u as any).rentals.length : 0;
     if (rentalsCount > 0) {
-      alert(t("adminUsers.errors.cannotDeleteHasRentals"));
+      toast({ title: t("adminUsers.errors.cannotDeleteHasRentals"), variant: "destructive" });
       return;
     }
+    setDeleteTargetId(Number((u as any).id));
+  };
 
-    if (!confirm(t("adminUsers.confirm.deleteUser", { id: idNum }))) return;
-
+  const executeDelete = async () => {
+    if (deleteTargetId === null) return;
     try {
-      await adminUsersApi.delete(idNum);
+      await adminUsersApi.delete(deleteTargetId);
       await load();
     } catch (e: any) {
-      alert(e?.message ?? t("adminUsers.errors.deleteFailed"));
+      toast({ title: t("common.errors.prefix"), description: e?.message ?? t("adminUsers.errors.deleteFailed"), variant: "destructive" });
+    } finally {
+      setDeleteTargetId(null);
     }
   };
 
@@ -204,7 +218,7 @@ export default function AdminUsersPage() {
                               size="sm"
                               variant="destructive"
                               disabled={cannotDelete}
-                              onClick={() => remove(u)}
+                              onClick={() => confirmDelete(u)}
                               title={
                                 cannotDelete
                                   ? t("adminUsers.tooltips.cannotDeleteHasRentals")
@@ -238,6 +252,21 @@ export default function AdminUsersPage() {
           </table>
         </div>
       )}
+
+      <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("adminUsers.confirm.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("adminUsers.confirm.deleteUser", { id: deleteTargetId })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={executeDelete}>{t("common.delete")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

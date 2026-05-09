@@ -14,6 +14,7 @@ import aoDaiImg from "@/assets/product-aodai.jpg";
 import { productsApi, categoriesApi } from "@/lib/api";
 import type { Product, Category } from "@/types";
 import { useTranslation } from "react-i18next";
+import { LoadingState, ErrorState } from "@/components/common/PageState";
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -120,13 +121,6 @@ export default function HomePage() {
               </Button>
             </div>
 
-            {/* trạng thái load/error */}
-            {loading && (
-              <p className="mt-6 text-sm text-muted-foreground">
-                {t("home.loading")}
-              </p>
-            )}
-            {err && <p className="mt-6 text-sm text-red-500">{err}</p>}
           </div>
         </div>
       </section>
@@ -237,6 +231,10 @@ export default function HomePage() {
             </Button>
           </div>
 
+          {loading && <LoadingState text={t("home.loading")} />}
+          {err && <ErrorState message={err} onRetry={() => window.location.reload()} retryLabel={t("common.refresh")} />}
+
+          {!loading && !err && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {featuredProducts.map((product, i) => (
               <div
@@ -248,6 +246,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+          )}
 
           <div className="mt-8 text-center md:hidden">
             <Button variant="outline" asChild>

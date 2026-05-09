@@ -152,13 +152,13 @@ export default function RegisterPage() {
                 className="text-sm text-muted-foreground leading-relaxed"
               >
                 {t("auth.register.terms.prefix")}{" "}
-                <a href="#" className="text-accent hover:underline">
+                <Link to="/terms" className="text-accent hover:underline">
                   {t("auth.register.terms.tos")}
-                </a>{" "}
+                </Link>{" "}
                 {t("auth.register.terms.and")}{" "}
-                <a href="#" className="text-accent hover:underline">
+                <Link to="/privacy" className="text-accent hover:underline">
                   {t("auth.register.terms.privacy")}
-                </a>
+                </Link>
               </Label>
             </div>
 

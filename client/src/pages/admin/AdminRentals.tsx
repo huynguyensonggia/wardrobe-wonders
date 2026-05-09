@@ -5,6 +5,7 @@ import { rentalsApi } from "@/lib/api";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
 
 import type { Rental } from "@/types";
 import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
@@ -53,13 +54,17 @@ function getAdminActions(t: (k: string) => string): Record<
   };
 }
 
-async function handleRefundDeposit(rentalId: string, t: (k: string) => string) {
+async function handleRefundDeposit(
+  rentalId: string,
+  t: (k: string) => string,
+  toast: (opts: { title: string; description?: string; variant?: "default" | "destructive" }) => void
+) {
   try {
     await rentalsApi.refundDeposit(rentalId);
-    alert(t("rentals.refundDeposit.success"));
+    toast({ title: t("rentals.refundDeposit.success") });
     return true;
   } catch (e: any) {
-    alert(e?.message || t("rentals.refundDeposit.error"));
+    toast({ title: t("rentals.refundDeposit.error"), description: e?.message, variant: "destructive" });
     return false;
   }
 }
@@ -67,6 +72,7 @@ async function handleRefundDeposit(rentalId: string, t: (k: string) => string) {
 const SURCHARGE_TYPES = ["late_return", "damage", "cleaning", "express_delivery", "other"] as const;
 
 function AddSurchargeForm({ rentalId, onDone, t }: { rentalId: string; onDone: () => void; t: (k: string) => string }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string>("late_return");
   const [amount, setAmount] = useState("");
@@ -80,9 +86,9 @@ function AddSurchargeForm({ rentalId, onDone, t }: { rentalId: string; onDone: (
       await rentalsApi.addSurcharge(rentalId, { type, amount: Number(amount), note: note || undefined });
       setOpen(false); setAmount(""); setNote("");
       onDone();
-      alert(t("adminRentals.surcharge.success"));
+      toast({ title: t("adminRentals.surcharge.success") });
     } catch (e: any) {
-      alert(e?.message || t("adminRentals.surcharge.error"));
+      toast({ title: t("adminRentals.surcharge.error"), description: e?.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -113,6 +119,7 @@ function AddSurchargeForm({ rentalId, onDone, t }: { rentalId: string; onDone: (
 
 export default function AdminRentals() {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -164,7 +171,7 @@ export default function AdminRentals() {
       await updateStatusMutation.mutateAsync({ id: rentalId, status });
       setSelected((prev) => (prev ? { ...prev, status } : prev));
     } catch (e: any) {
-      alert(e?.message || t("adminRentals.errors.updateStatusFailed"));
+      toast({ title: t("adminRentals.errors.updateStatusFailed"), description: e?.message, variant: "destructive" });
     }
   };
 
@@ -179,7 +186,7 @@ export default function AdminRentals() {
       setSelected((prev) => prev ? { ...prev, shipFullName: shipFullName.trim(), shipPhone: shipPhone.trim(), shipAddress: shipAddress.trim(), shipNote: shipNote.trim() } : prev);
       setEditingShip(false);
     } catch (e: any) {
-      alert(e?.message || t("adminRentals.errors.updateShippingFailed"));
+      toast({ title: t("adminRentals.errors.updateShippingFailed"), description: e?.message, variant: "destructive" });
     }
   };
 
@@ -277,7 +284,7 @@ export default function AdminRentals() {
                     if (isRefunded) return <span className="text-xs text-green-600 font-medium px-2 py-1 bg-green-50 rounded-md">✓ {t("adminRentals.actions.depositRefunded")}</span>;
                     return (
                       <Button size="sm" variant="outline" onClick={async () => {
-                        const ok = await handleRefundDeposit(String(selected.id), t);
+                        const ok = await handleRefundDeposit(String(selected.id), t, toast);
                         if (ok) await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
                       }}>
                         {t("adminRentals.actions.refundDeposit")} ({vnd(selected.totalDeposit)})

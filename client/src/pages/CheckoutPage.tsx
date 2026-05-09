@@ -6,6 +6,7 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 import {
   DA_NANG_DISTRICTS,
@@ -185,6 +186,7 @@ export default function CheckoutPage() {
     return parts.join(", ");
   }, [street, ward, district, t]);
 
+  const { toast } = useToast();
   const [submitting, setSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH");
   const [pickupType, setPickupType] = useState<PickupType>("delivery");
@@ -204,21 +206,28 @@ export default function CheckoutPage() {
       const address = shipAddress.trim();
       const note = shipNote.trim();
 
-      if (!fullName) return alert(t("checkout.alert.fullName"));
-      if (!phone) return alert(t("checkout.alert.phone"));
+      if (!fullName) {
+        toast({ title: t("checkout.alert.fullName"), variant: "destructive" });
+        return;
+      }
+      if (!phone) {
+        toast({ title: t("checkout.alert.phone"), variant: "destructive" });
+        return;
+      }
 
       // Validate tất cả items phải có variantId hợp lệ
       const missingVariant = checkoutItems.find((it) => !it.variantId);
       if (missingVariant) {
-        return alert(t("cart.alert.missingVariant"));
+        toast({ title: t("cart.alert.missingVariant"), variant: "destructive" });
+        return;
       }
 
       // Chỉ validate địa chỉ khi chọn giao tận nơi
       if (pickupType === "delivery") {
-        if (!street.trim()) return alert(t("checkout.alert.street"));
-        if (!district) return alert(t("checkout.alert.district"));
-        if (!ward) return alert(t("checkout.alert.ward"));
-        if (!address) return alert(t("checkout.alert.address"));
+        if (!street.trim()) { toast({ title: t("checkout.alert.street"), variant: "destructive" }); return; }
+        if (!district) { toast({ title: t("checkout.alert.district"), variant: "destructive" }); return; }
+        if (!ward) { toast({ title: t("checkout.alert.ward"), variant: "destructive" }); return; }
+        if (!address) { toast({ title: t("checkout.alert.address"), variant: "destructive" }); return; }
       }
 
       setSubmitting(true);
@@ -274,7 +283,7 @@ export default function CheckoutPage() {
         },
       });
     } catch (e: any) {
-      alert(e?.message || t("checkout.alert.failed"));
+      toast({ title: t("checkout.alert.failed"), description: e?.message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }

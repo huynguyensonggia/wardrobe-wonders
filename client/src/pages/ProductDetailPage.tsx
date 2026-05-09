@@ -45,6 +45,7 @@ import {
   getLocalizedProductName,
   getLocalizedProductDescription,
 } from "@/utils/i18n";
+import { LoadingState, ErrorState } from "@/components/common/PageState";
 
 type VariantLite = {
   id: number;
@@ -338,9 +339,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-muted-foreground">
-          {t("productDetail.loading")}
-        </div>
+        <LoadingState text={t("productDetail.loading")} />
       </div>
     );
   }
@@ -348,17 +347,11 @@ export default function ProductDetailPage() {
   if (isError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-display text-2xl mb-2">
-            {t("productDetail.errorTitle")}
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            {(error as Error)?.message}
-          </p>
-          <Button asChild>
-            <Link to="/products">{t("productDetail.backToCollection")}</Link>
-          </Button>
-        </div>
+        <ErrorState
+          message={(error as Error)?.message ?? t("productDetail.errorTitle")}
+          onRetry={() => window.location.reload()}
+          retryLabel={t("common.refresh")}
+        />
       </div>
     );
   }

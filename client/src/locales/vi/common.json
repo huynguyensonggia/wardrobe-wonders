@@ -512,7 +512,43 @@
       "deleteDesc": "Hành động này không thể hoàn tác.",
       "toastCreated": "Đã tạo phụ kiện",
       "toastUpdated": "Đã cập nhật phụ kiện",
-      "toastDeleted": "Đã xoá phụ kiện"
+      "toastDeleted": "Đã xoá phụ kiện",
+      "validation": {
+        "missingName": "Thiếu tên sản phẩm",
+        "missingCategory": "Chưa chọn danh mục",
+        "missingImage": "Chưa chọn ảnh",
+        "missingVariants": "Cần ít nhất 1 màu/số lượng",
+        "duplicateSize": "Màu sắc bị trùng",
+        "duplicateSizeInline": "Màu sắc bị trùng, mỗi màu chỉ được nhập một lần."
+      },
+      "form": {
+        "image": "Ảnh",
+        "optional": "(tuỳ chọn)",
+        "noImage": "Chưa có ảnh",
+        "keepOldImageHint": "Không chọn ảnh mới sẽ giữ ảnh cũ.",
+        "name": "Tên sản phẩm (VI)",
+        "namePlaceholder": "VD: Dây chuyền ngọc trai",
+        "multilingual": "🌐 Tên đa ngôn ngữ",
+        "category": "Danh mục phụ kiện",
+        "categoryPlaceholder": "Chọn danh mục",
+        "rentPerDay": "Giá thuê / ngày (K)",
+        "deposit": "Tiền cọc (K)",
+        "color": "Màu sắc chính",
+        "colorPlaceholder": "VD: vàng, bạc, đen...",
+        "variants": "Màu sắc & Số lượng",
+        "addColor": "+ Thêm màu",
+        "colorViPlaceholder": "Màu (VI): vàng, bạc..."
+      },
+      "buttons": {
+        "viewInventory": "Xem kho",
+        "edit": "Chỉnh sửa",
+        "delete": "Xoá"
+      },
+      "inventory": {
+        "title": "Kho",
+        "loading": "Đang tải...",
+        "empty": "Chưa có hàng trong kho."
+      }
     }
   },
   "common": {
@@ -930,6 +966,7 @@
       "deleteUser": "Xoá người dùng"
     },
     "confirm": {
+      "deleteTitle": "Xác nhận xoá người dùng",
       "deleteUser": "Xoá user #{{id}}?"
     },
     "errors": {

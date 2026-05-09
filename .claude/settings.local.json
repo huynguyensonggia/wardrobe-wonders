@@ -11,7 +11,11 @@
       "Bash(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\\\\client\\\\src\" -Recurse)",
       "Bash(Select-Object FullName)",
       "Bash(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\\\\client\\\\src\" -Recurse -File -Filter \"*.tsx\")",
-      "Bash(Sort-Object FullName)"
+      "Bash(Sort-Object FullName)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\" -Recurse -Exclude node_modules -ErrorAction SilentlyContinue | Where-Object {$_.Name -match \"^\\(Dockerfile|docker-compose\\\\.yml|\\\\.dockerignore|Procfile|railway\\\\.toml|render\\\\.yaml|vercel\\\\.json|netlify\\\\.toml|fly\\\\.toml|nginx\\\\.conf|ecosystem\\\\.config\\\\.js|deploy\\)\" } | Select-Object FullName)",
+      "Bash(ls -la \"d:\\\\wardrobe-wonders\\\\\" | grep -E \"^\\\\.\" || echo \"No hidden files found\")",
+      "Read(//d//**)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\" -File | Where-Object {$_.Extension -in \".json\", \".toml\", \".yaml\", \".yml\", \".conf\", \".js\" -or $_.Name -in \"Dockerfile\", \"Procfile\", \".dockerignore\"} | Select-Object Name)"
     ]
   }
 }

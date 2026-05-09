@@ -513,7 +513,43 @@
       "deleteDesc": "This action cannot be undone.",
       "toastCreated": "Accessory created",
       "toastUpdated": "Accessory updated",
-      "toastDeleted": "Accessory deleted"
+      "toastDeleted": "Accessory deleted",
+      "validation": {
+        "missingName": "Product name is required",
+        "missingCategory": "Please select a category",
+        "missingImage": "Please select an image",
+        "missingVariants": "At least 1 color/quantity is required",
+        "duplicateSize": "Duplicate color detected",
+        "duplicateSizeInline": "Duplicate color — each color can only be entered once."
+      },
+      "form": {
+        "image": "Image",
+        "optional": "(optional)",
+        "noImage": "No image",
+        "keepOldImageHint": "Leave empty to keep the existing image.",
+        "name": "Product name (VI)",
+        "namePlaceholder": "e.g. Pearl Necklace",
+        "multilingual": "🌐 Multilingual name",
+        "category": "Accessory category",
+        "categoryPlaceholder": "Select category",
+        "rentPerDay": "Rent / day (K)",
+        "deposit": "Deposit (K)",
+        "color": "Primary color",
+        "colorPlaceholder": "e.g. gold, silver, black...",
+        "variants": "Colors & Quantity",
+        "addColor": "+ Add color",
+        "colorViPlaceholder": "Color (VI): gold, silver..."
+      },
+      "buttons": {
+        "viewInventory": "View inventory",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "inventory": {
+        "title": "Inventory",
+        "loading": "Loading...",
+        "empty": "No items in inventory."
+      }
     }
   },
   "common": {
@@ -931,6 +967,7 @@
       "deleteUser": "Delete user"
     },
     "confirm": {
+      "deleteTitle": "Confirm user deletion",
       "deleteUser": "Delete user #{{id}}?"
     },
     "errors": {
