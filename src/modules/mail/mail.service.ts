@@ -1,15 +1,22 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Resend } from "resend";
+import * as nodemailer from "nodemailer";
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private readonly resend = new Resend(process.env.RESEND_API_KEY);
-  private readonly from = process.env.MAIL_FROM || "AI Closet <onboarding@resend.dev>";
+  private readonly transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    auth: {
+      user: process.env.BREVO_SMTP_USER,
+      pass: process.env.BREVO_SMTP_KEY,
+    },
+  });
+  private readonly from = `AI Closet <${process.env.BREVO_SMTP_USER}>`;
 
   async sendWelcome(to: string, name: string) {
     try {
-      await this.resend.emails.send({
+      await this.transporter.sendMail({
         from: this.from,
         to,
         subject: "Chao mung ban den voi AI Closet!",
@@ -34,7 +41,7 @@ export class MailService {
     paymentMethod: string;
   }) {
     try {
-      await this.resend.emails.send({
+      await this.transporter.sendMail({
         from: this.from,
         to: params.to,
         subject: `Xac nhan don thue #${params.rentalId} - AI Closet`,
@@ -53,7 +60,7 @@ export class MailService {
     items: { name: string; size: string; quantity: number }[];
   }) {
     try {
-      await this.resend.emails.send({
+      await this.transporter.sendMail({
         from: this.from,
         to: params.to,
         subject: `Nhac nho: Don thue #${params.rentalId} het han HOM NAY - tra truoc 22:30`,

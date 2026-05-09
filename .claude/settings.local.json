@@ -17,7 +17,9 @@
       "Read(//d//**)",
       "PowerShell(Get-ChildItem -Path \"d:\\\\wardrobe-wonders\" -File | Where-Object {$_.Extension -in \".json\", \".toml\", \".yaml\", \".yml\", \".conf\", \".js\" -or $_.Name -in \"Dockerfile\", \"Procfile\", \".dockerignore\"} | Select-Object Name)",
       "Bash(npm list *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(git -C \"d:/wardrobe-wonders\" status)",
+      "Bash(git -C \"d:/wardrobe-wonders\" log --oneline -3)"
     ]
   }
 }
