@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from "@nestjs/common";
+import { QueryFailedError } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
@@ -29,8 +30,15 @@ export class UsersService {
       phone: dto.phone,
     });
 
-    const savedUser = await this.repo.save(user);
-    return this.excludePassword(savedUser);
+    try {
+      const savedUser = await this.repo.save(user);
+      return this.excludePassword(savedUser);
+    } catch (e) {
+      if (e instanceof QueryFailedError && (e as any).errno === 1062) {
+        throw new ConflictException("Email đã được sử dụng");
+      }
+      throw e;
+    }
   }
 
   // ✅ Admin panel: chỉ lấy USER => không bao giờ thấy ADMIN
