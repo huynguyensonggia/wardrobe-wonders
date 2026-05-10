@@ -7,6 +7,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { Role } from "../../common/enums/role.enum";
 import { User } from "./entities/user.entity";
+import { RentalStatus } from "../rentals/enums/rental-status.enum";
 
 // Type User không có password (type-safe)
 type UserWithoutPassword = Omit<User, "password">;
@@ -105,9 +106,12 @@ export class UsersService {
       throw new BadRequestException("Cannot delete admin account");
     }
 
-    // ✅ chặn delete nếu có rentals
-    if (user.rentals && user.rentals.length > 0) {
-      throw new BadRequestException("Cannot delete user who has rentals");
+    // chặn delete nếu có đơn đang diễn ra (pending/shipping/active)
+    const activeRentals = (user.rentals ?? []).filter((r) =>
+      [RentalStatus.PENDING, RentalStatus.SHIPPING, RentalStatus.ACTIVE].includes(r.status as RentalStatus)
+    );
+    if (activeRentals.length > 0) {
+      throw new BadRequestException("Cannot delete user who has active rentals");
     }
 
     await this.repo.remove(user);
