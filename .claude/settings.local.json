@@ -25,7 +25,13 @@
       "Bash(git -C \"d:/wardrobe-wonders\" show fbe18bb --name-only --format=\"%s\")",
       "Bash(git -C \"d:/wardrobe-wonders\" diff HEAD -- src/modules/mail/mail.module.ts)",
       "Bash(git -C \"d:/wardrobe-wonders\" show HEAD:src/modules/mail/mail.module.ts)",
-      "Bash(git -C \"d:/wardrobe-wonders\" show HEAD:src/modules/mail/mail.service.ts)"
+      "Bash(git -C \"d:/wardrobe-wonders\" show HEAD:src/modules/mail/mail.service.ts)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "WebFetch(domain:wardrobe-wonders.pages.dev)",
+      "WebFetch(domain:wardrobe-wonders-api.onrender.com)",
+      "Bash(git commit *)"
     ]
   }
 }
