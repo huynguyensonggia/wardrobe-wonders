@@ -91,8 +91,10 @@ export default function AdminUsersPage() {
   };
 
   const confirmDelete = (u: User) => {
-    const rentalsCount = Array.isArray((u as any).rentals) ? (u as any).rentals.length : 0;
-    if (rentalsCount > 0) {
+    const activeRentals = Array.isArray((u as any).rentals)
+      ? (u as any).rentals.filter((r: any) => ["pending", "shipping", "active"].includes(r.status))
+      : [];
+    if (activeRentals.length > 0) {
       toast({ title: t("adminUsers.errors.cannotDeleteHasRentals"), variant: "destructive" });
       return;
     }
@@ -144,7 +146,10 @@ export default function AdminUsersPage() {
                 const isEdit = editingId === idNum;
 
                 const rentalsCount = Array.isArray(u.rentals) ? u.rentals.length : 0;
-                const cannotDelete = rentalsCount > 0;
+                const activeRentals = Array.isArray(u.rentals)
+                  ? u.rentals.filter((r: any) => ["pending", "shipping", "active"].includes(r.status))
+                  : [];
+                const cannotDelete = activeRentals.length > 0;
 
                 return (
                   <tr key={u.id} className="border-t align-top">
