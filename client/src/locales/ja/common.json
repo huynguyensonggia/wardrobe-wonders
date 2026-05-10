@@ -286,6 +286,7 @@
     }
   },
   "auth": {
+    "orContinueWith": "または以下で続ける",
     "register": {
       "backHome": "ホームに戻る",
       "title": "AI Closet に参加",

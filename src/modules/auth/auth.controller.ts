@@ -24,6 +24,11 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Post("google")
+  googleLogin(@Body("credential") credential: string) {
+    return this.authService.googleLogin(credential);
+  }
+
   // ✅ FE: GET /auth/profile
   @UseGuards(JwtAuthGuard)
   @Get("profile")

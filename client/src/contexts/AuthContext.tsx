@@ -5,6 +5,7 @@ import { authApi } from '@/lib/api';
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
 }
@@ -76,6 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const googleLogin = useCallback(async (credential: string) => {
+    const res = await authApi.googleLogin(credential);
+    const { access_token, user } = res;
+    localStorage.setItem('auth_token', access_token);
+    localStorage.setItem('auth_user', JSON.stringify(user));
+    setState({ user, token: access_token, isAuthenticated: true, isLoading: false });
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
@@ -97,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ ...state, login, register, googleLogin, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

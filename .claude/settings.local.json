@@ -19,7 +19,13 @@
       "Bash(npm list *)",
       "Bash(npm install *)",
       "Bash(git -C \"d:/wardrobe-wonders\" status)",
-      "Bash(git -C \"d:/wardrobe-wonders\" log --oneline -3)"
+      "Bash(git -C \"d:/wardrobe-wonders\" log --oneline -3)",
+      "Bash(git -C \"d:/wardrobe-wonders\" diff HEAD~1 HEAD --name-only)",
+      "Bash(git -C \"d:/wardrobe-wonders\" log --oneline -5)",
+      "Bash(git -C \"d:/wardrobe-wonders\" show fbe18bb --name-only --format=\"%s\")",
+      "Bash(git -C \"d:/wardrobe-wonders\" diff HEAD -- src/modules/mail/mail.module.ts)",
+      "Bash(git -C \"d:/wardrobe-wonders\" show HEAD:src/modules/mail/mail.module.ts)",
+      "Bash(git -C \"d:/wardrobe-wonders\" show HEAD:src/modules/mail/mail.service.ts)"
     ]
   }
 }

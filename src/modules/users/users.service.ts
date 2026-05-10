@@ -18,6 +18,17 @@ export class UsersService {
     private readonly repo: Repository<User>,
   ) { }
 
+  async createGoogleUser(data: { email: string; name: string; googleId: string }): Promise<User> {
+    const user = this.repo.create({
+      email: data.email,
+      name: data.name,
+      googleId: data.googleId,
+      password: null,
+      role: Role.USER,
+    });
+    return this.repo.save(user);
+  }
+
   // ✅ Register/create user: luôn USER (không cho tự set role)
   async create(dto: CreateUserDto): Promise<UserWithoutPassword> {
     const hashedPassword = await bcrypt.hash(dto.password, 10);

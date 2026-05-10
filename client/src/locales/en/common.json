@@ -286,6 +286,7 @@
     }
   },
   "auth": {
+    "orContinueWith": "Or continue with",
     "register": {
       "backHome": "Back to home",
       "title": "Join AI Closet",

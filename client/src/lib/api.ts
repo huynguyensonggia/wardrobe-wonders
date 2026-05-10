@@ -72,6 +72,12 @@ export const authApi = {
       body: JSON.stringify(data),
     }),
 
+  googleLogin: (credential: string) =>
+    fetchApi<{ access_token: string; user: User }>("/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ credential }),
+    }),
+
   logout: () => fetchApi<ApiResponse<null>>("/auth/logout", { method: "POST" }),
 
   getProfile: () => fetchApi<ApiResponse<User>>("/auth/profile"),

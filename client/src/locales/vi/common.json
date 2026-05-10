@@ -285,6 +285,7 @@
     }
   },
   "auth": {
+    "orContinueWith": "Hoặc tiếp tục với",
     "register": {
       "backHome": "Về trang chủ",
       "title": "Tham gia AI Closet",

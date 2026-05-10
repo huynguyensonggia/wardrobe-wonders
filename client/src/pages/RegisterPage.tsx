@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ export default function RegisterPage() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -175,7 +176,32 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
+          <div className="mt-6">
+            <div className="relative flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground">{t("auth.orContinueWith")}</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={async (res) => {
+                  if (!res.credential) return;
+                  try {
+                    await googleLogin(res.credential);
+                    toast({ title: t("auth.register.toast.success.title") });
+                    navigate("/");
+                  } catch (e: any) {
+                    toast({ title: t("auth.register.toast.error.title"), description: e?.message, variant: "destructive" });
+                  }
+                }}
+                onError={() => toast({ title: t("auth.register.toast.error.title"), variant: "destructive" })}
+                width="360"
+                text="signup_with"
+              />
+            </div>
+          </div>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             {t("auth.register.haveAccount")}{" "}
             <Link to="/login" className="text-accent hover:underline font-medium">
               {t("auth.register.signIn")}
