@@ -12,7 +12,7 @@ export class MailService {
       pass: process.env.BREVO_SMTP_KEY,
     },
   });
-  private readonly from = `AI Closet <${process.env.BREVO_SMTP_USER}>`;
+  private readonly from = process.env.MAIL_FROM ?? `AI Closet <${process.env.BREVO_SMTP_USER}>`;
 
   async sendWelcome(to: string, name: string) {
     try {
