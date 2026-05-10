@@ -79,7 +79,9 @@ export default function AdminProducts() {
 
   /* ===== IMPORT EXCEL ===== */
   const importInputRef = useRef<HTMLInputElement>(null);
+  const clearFirstInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   /* ===== IMAGE + PREVIEW ===== */
   const [image, setImage] = useState<File | null>(null);
@@ -373,11 +375,11 @@ export default function AdminProducts() {
   };
 
   /* ===== IMPORT EXCEL ===== */
-  const handleImportExcel = async (file: File) => {
+  const handleImportExcel = async (file: File, clearFirst = false) => {
     try {
       setImporting(true);
 
-      const res = await productsApi.importExcel(file);
+      const res = await productsApi.importExcel(file, clearFirst);
 
       toast({
         title: t("adminProducts.toasts.importDone.title"),
@@ -427,7 +429,7 @@ export default function AdminProducts() {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* ✅ Import Excel */}
+          {/* Import thêm (giữ nguyên sản phẩm cũ) */}
           <input
             ref={importInputRef}
             type="file"
@@ -436,7 +438,7 @@ export default function AdminProducts() {
             onChange={(e) => {
               const f = e.target.files?.[0];
               if (!f) return;
-              handleImportExcel(f);
+              handleImportExcel(f, false);
             }}
           />
           <Button
@@ -447,6 +449,47 @@ export default function AdminProducts() {
             <Upload className="h-4 w-4 mr-2" />
             {importing ? t("adminProducts.buttons.importing") : t("adminProducts.buttons.importExcel")}
           </Button>
+
+          {/* Import (Xóa hết & nhập lại) */}
+          <input
+            ref={clearFirstInputRef}
+            type="file"
+            accept=".xlsx"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (!f) return;
+              handleImportExcel(f, true);
+            }}
+          />
+          <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={importing}>
+                <Upload className="h-4 w-4 mr-2" />
+                Xóa &amp; Import lại
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Xóa toàn bộ sản phẩm?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Hành động này sẽ <strong>xóa tất cả sản phẩm, variants và inventory</strong> hiện có, sau đó import lại từ file Excel. Dữ liệu đơn thuê cũ vẫn được giữ nhưng sẽ mất liên kết với sản phẩm.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={() => {
+                    setShowClearConfirm(false);
+                    clearFirstInputRef.current?.click();
+                  }}
+                >
+                  Xác nhận xóa &amp; import lại
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
           {/* ✅ Create */}
           <Button onClick={openCreate}>{t("adminProducts.buttons.create")}</Button>

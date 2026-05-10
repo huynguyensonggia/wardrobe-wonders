@@ -141,7 +141,7 @@ export const productsApi = {
     }),
 
   // ✅ IMPORT EXCEL
-  importExcel: (file: File) => {
+  importExcel: (file: File, clearFirst = false) => {
     const fd = new FormData();
     fd.append("file", file);
 
@@ -151,7 +151,7 @@ export const productsApi = {
       failedCount: number;
       failed?: any[];
       success?: any[];
-    }>("/admin/products/import-excel", {
+    }>(`/admin/products/import-excel${clearFirst ? "?clearFirst=true" : ""}`, {
       method: "POST",
       body: fd,
     });

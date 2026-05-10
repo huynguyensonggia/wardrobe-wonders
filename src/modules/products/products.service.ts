@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import * as XLSX from "xlsx";
 
 import { Product } from "./entities/product.entity";
@@ -23,6 +23,7 @@ export class ProductService {
   constructor(
     private readonly cloudinaryService: CloudinaryService,
     private readonly inventoryService: InventoryService,
+    private readonly dataSource: DataSource,
 
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
@@ -33,6 +34,16 @@ export class ProductService {
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
   ) {}
+
+  async clearAllProducts(): Promise<{ deleted: number }> {
+    const count = await this.productRepo.count();
+    await this.dataSource.query("SET FOREIGN_KEY_CHECKS = 0");
+    await this.dataSource.query("DELETE FROM inventory_items");
+    await this.dataSource.query("DELETE FROM product_variants");
+    await this.dataSource.query("DELETE FROM products");
+    await this.dataSource.query("SET FOREIGN_KEY_CHECKS = 1");
+    return { deleted: count };
+  }
 
   async findAll(query?: { categoryId?: number; status?: ProductStatus; occasion?: string; search?: string }) {
     const qb = this.productRepo
@@ -375,7 +386,11 @@ export class ProductService {
   // name, categoryId, occasion, color, rentPricePerDay, deposit, status, description, imageUrl, variantsJson
   // variantsJson: [{"size":"S","stock":2},{"size":"M","stock":1}]
   // =============================
-  async importFromExcel(file: Express.Multer.File) {
+  async importFromExcel(file: Express.Multer.File, clearFirst = false) {
+    if (clearFirst) {
+      await this.clearAllProducts();
+    }
+
     const wb = XLSX.read(file.buffer, { type: "buffer" });
     const sheetName = wb.SheetNames[0];
     if (!sheetName) throw new BadRequestException("Excel has no sheets");

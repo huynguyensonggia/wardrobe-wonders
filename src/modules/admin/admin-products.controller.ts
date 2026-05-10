@@ -5,6 +5,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -123,9 +124,10 @@ export class AdminProductsController {
     @UploadedFile() file: Express.Multer.File | undefined,
     @CurrentUser() admin: any,
     @Req() req: any,
+    @Query("clearFirst") clearFirst?: string,
   ) {
     if (!file) throw new BadRequestException("Missing excel file (field name: file)");
-    const result = await this.productService.importFromExcel(file);
+    const result = await this.productService.importFromExcel(file, clearFirst === "true");
     await this.auditService.log({
       adminId: admin.id,
       adminEmail: admin.email,
