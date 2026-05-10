@@ -29,6 +29,8 @@ import { Payment } from "../payments/entities/payment.entity";
 import { PaymentMethod } from "../payments/enums/payment-method.enum";
 import { PaymentStatus } from "../payments/enums/payment-status.enum";
 import { MailService } from "../mail/mail.service";
+import { NotificationsService } from "../notifications/notifications.service";
+import { NotificationType } from "../notifications/enums/notification-type.enum";
 
 function daysBetweenInclusive(start: Date, end: Date) {
   const s = new Date(start);
@@ -80,6 +82,7 @@ export class RentalsService {
 
     private readonly inventoryService: InventoryService,
     private readonly mailService: MailService,
+    private readonly notificationsService: NotificationsService,
   ) { }
 
   // =========================
@@ -328,6 +331,13 @@ export class RentalsService {
         shipAddress: finalRental.shipAddress,
         paymentMethod: String(dto.paymentMethod ?? "CASH"),
       }).catch(() => {});
+
+      this.notificationsService.create(
+        userId,
+        "Đặt thuê thành công! 🎉",
+        `Đơn #${finalRental.id} đã được đặt từ ${new Date(finalRental.startDate).toLocaleDateString("vi-VN")} đến ${new Date(finalRental.endDate).toLocaleDateString("vi-VN")}. Chúng tôi sẽ xác nhận sớm.`,
+        NotificationType.RENTAL_CREATED,
+      ).catch(() => {});
     }
 
     return finalRental;
@@ -472,6 +482,42 @@ export class RentalsService {
           })
         )
       );
+
+      // Gửi in-app notification cho user
+      if (result?.user?.id) {
+        const userId = result.user.id;
+        const notifMap: Partial<Record<RentalStatus, { title: string; message: string; type: NotificationType }>> = {
+          [RentalStatus.SHIPPING]: {
+            title: "Đơn hàng đang được giao 🚚",
+            message: `Đơn #${id} đang trên đường đến bạn. Vui lòng chú ý điện thoại để nhận hàng.`,
+            type: NotificationType.RENTAL_SHIPPING,
+          },
+          [RentalStatus.ACTIVE]: {
+            title: "Nhận hàng thành công! ✅",
+            message: `Đơn #${id} đã được kích hoạt. Chúc bạn mặc đẹp!`,
+            type: NotificationType.RENTAL_ACTIVE,
+          },
+          [RentalStatus.COMPLETED]: {
+            title: "Trả hàng thành công! 🙏",
+            message: `Đơn #${id} đã hoàn tất. Cảm ơn bạn đã sử dụng AI Closet!`,
+            type: NotificationType.RENTAL_COMPLETED,
+          },
+          [RentalStatus.CANCELLED]: {
+            title: "Đơn hàng đã hủy",
+            message: `Đơn #${id} đã được hủy. Nếu có thắc mắc, liên hệ hỗ trợ qua Facebook.`,
+            type: NotificationType.RENTAL_CANCELLED,
+          },
+          [RentalStatus.REJECTED]: {
+            title: "Đơn hàng bị từ chối",
+            message: `Đơn #${id} không được chấp nhận. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.`,
+            type: NotificationType.RENTAL_REJECTED,
+          },
+        };
+        const notif = notifMap[nextStatus];
+        if (notif) {
+          this.notificationsService.create(userId, notif.title, notif.message, notif.type).catch(() => {});
+        }
+      }
     }
 
     return result;

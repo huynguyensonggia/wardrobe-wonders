@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { productsApi, categoriesApi } from "@/lib/api";
 import type { ProductStatus } from "@/types";
@@ -163,6 +163,16 @@ export default function ProductsPage() {
   }, [productsFromApi]);
 
   const isSearching = searchInput !== debouncedSearch;
+
+  // Pagination
+  const PAGE_SIZE = 12;
+  const [page, setPage] = useState(1);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [filteredProducts.length]);
+
+  const totalPages = Math.ceil(filteredProducts.length / PAGE_SIZE);
+  const pagedProducts = filteredProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   if (isLoading) {
     return (
@@ -363,17 +373,65 @@ export default function ProductsPage() {
 
         {/* Product Grid */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-            {filteredProducts.map((product: any, i: number) => (
-              <div
-                key={product.id}
-                className="animate-fade-in"
-                style={{ animationDelay: `${i * 0.05}s` }}
-              >
-                <ProductCard product={product} />
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+              {pagedProducts.map((product: any, i: number) => (
+                <div
+                  key={product.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${i * 0.05}s` }}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                  .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    p === "..." ? (
+                      <span key={`e${i}`} className="px-2 text-muted-foreground">…</span>
+                    ) : (
+                      <Button
+                        key={p}
+                        variant={p === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPage(p as number)}
+                        className="min-w-9"
+                      >
+                        {p}
+                      </Button>
+                    )
+                  )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20">
             <p className="text-lg text-muted-foreground mb-4">{t("products.noProducts")}</p>

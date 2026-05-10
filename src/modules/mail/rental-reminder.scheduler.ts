@@ -5,6 +5,8 @@ import { Repository, Between } from "typeorm";
 import { Rental } from "../rentals/entities/rental.entity";
 import { RentalStatus } from "../rentals/enums/rental-status.enum";
 import { MailService } from "./mail.service";
+import { NotificationsService } from "../notifications/notifications.service";
+import { NotificationType } from "../notifications/enums/notification-type.enum";
 
 @Injectable()
 export class RentalReminderScheduler {
@@ -14,6 +16,7 @@ export class RentalReminderScheduler {
     @InjectRepository(Rental)
     private readonly rentalsRepo: Repository<Rental>,
     private readonly mailService: MailService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // Chạy mỗi ngày lúc 8:00 sáng — nhắc trả đồ trước 22:30 tối cho đơn hết hạn HÔM NAY
@@ -54,6 +57,16 @@ export class RentalReminderScheduler {
         returnDate: new Date(rental.endDate).toLocaleDateString("vi-VN"),
         items,
       });
+
+      // Tạo in-app notification nhắc trả hàng
+      if (rental.user?.id) {
+        await this.notificationsService.create(
+          rental.user.id,
+          "⏰ Nhắc trả hàng hôm nay",
+          `Đơn #${rental.id} cần được trả trước 22:30 tối nay (${new Date(rental.endDate).toLocaleDateString("vi-VN")}). Vui lòng liên hệ để sắp xếp shipper.`,
+          NotificationType.RETURN_REMINDER,
+        ).catch(() => {});
+      }
 
       this.logger.log(`Sent reminder to ${rental.user.email} for rental #${rental.id}`);
     }

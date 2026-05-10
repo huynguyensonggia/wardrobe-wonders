@@ -394,3 +394,34 @@ export const recommendationsApi = {
       body: JSON.stringify(dto),
     }),
 };
+
+// =============================
+// Notifications API
+// =============================
+export type AppNotification = {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  isRead: boolean;
+  createdAt: string;
+};
+
+export const notificationsApi = {
+  getAll: () => fetchApi<AppNotification[]>("/notifications"),
+  getUnreadCount: () => fetchApi<{ count: number }>("/notifications/unread-count"),
+  markRead: (id: number) => fetchApi<{ success: boolean }>(`/notifications/${id}/read`, { method: "PATCH" }),
+  markAllRead: () => fetchApi<{ success: boolean }>("/notifications/read-all", { method: "PATCH" }),
+  deleteOne: (id: number) => fetchApi<{ success: boolean }>(`/notifications/${id}`, { method: "DELETE" }),
+};
+
+// =============================
+// Product Watchlist API
+// =============================
+export const productWatchApi = {
+  check: (productId: number) => fetchApi<{ watching: boolean }>(`/products/${productId}/watch`),
+  watch: (productId: number) =>
+    fetchApi<{ watching: boolean }>(`/products/${productId}/watch`, { method: "POST" }),
+  unwatch: (productId: number) =>
+    fetchApi<{ watching: boolean }>(`/products/${productId}/watch`, { method: "DELETE" }),
+};

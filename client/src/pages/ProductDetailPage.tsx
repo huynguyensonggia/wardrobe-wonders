@@ -10,7 +10,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { productsApi } from "@/lib/api";
+import { productsApi, productWatchApi } from "@/lib/api";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -319,20 +319,30 @@ export default function ProductDetailPage() {
   };
 
   // ===== Notify when available =====
-  const NOTIFY_KEY = `notify_${(product as any)?.id ?? id}`;
   const [notifyRegistered, setNotifyRegistered] = useState(false);
+  const [notifyLoading, setNotifyLoading] = useState(false);
+  const productIdNum = Number((product as any)?.id ?? id);
 
   useEffect(() => {
-    setNotifyRegistered(!!localStorage.getItem(NOTIFY_KEY));
-  }, [NOTIFY_KEY]);
+    if (!isAuthenticated || !productIdNum) return;
+    productWatchApi.check(productIdNum)
+      .then(({ watching }) => setNotifyRegistered(watching))
+      .catch(() => {});
+  }, [isAuthenticated, productIdNum]);
 
-  const handleNotify = () => {
-    if (notifyRegistered) {
-      localStorage.removeItem(NOTIFY_KEY);
-      setNotifyRegistered(false);
-    } else {
-      localStorage.setItem(NOTIFY_KEY, "1");
-      setNotifyRegistered(true);
+  const handleNotify = async () => {
+    if (!isAuthenticated) { navigate("/login"); return; }
+    setNotifyLoading(true);
+    try {
+      if (notifyRegistered) {
+        await productWatchApi.unwatch(productIdNum);
+        setNotifyRegistered(false);
+      } else {
+        await productWatchApi.watch(productIdNum);
+        setNotifyRegistered(true);
+      }
+    } catch {} finally {
+      setNotifyLoading(false);
     }
   };
 
@@ -455,7 +465,7 @@ export default function ProductDetailPage() {
 
             <div className="flex items-baseline gap-3 mb-6">
               <span className="text-2xl font-medium">
-                {Number((product as any).pricePerDay).toLocaleString("vi-VN")}đ
+                {Number((product as any).rentPricePerDay ?? (product as any).pricePerDay ?? 0).toLocaleString("vi-VN")}đ
                 {t("productDetail.perDay")}
               </span>
               <span className="text-muted-foreground">
@@ -641,7 +651,7 @@ export default function ProductDetailPage() {
                       });
                     }}
                     disabled={disabledDays}
-                    numberOfMonths={2}
+                    numberOfMonths={typeof window !== "undefined" && window.innerWidth < 640 ? 1 : 2}
                   />
                 </PopoverContent>
               </Popover>
@@ -710,6 +720,7 @@ export default function ProductDetailPage() {
                     size="lg"
                     className="w-full"
                     onClick={handleNotify}
+                    disabled={notifyLoading}
                   >
                     {notifyRegistered ? (
                       <>

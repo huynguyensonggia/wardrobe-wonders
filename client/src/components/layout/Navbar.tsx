@@ -25,6 +25,7 @@ import {
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 
 // Cấu trúc danh mục
 const NAV_COLLECTIONS = [
@@ -195,6 +196,9 @@ export function Navbar() {
                 )}
               </Button>
             )}
+
+            {/* Notification bell — chỉ hiện khi đã đăng nhập */}
+            {isAuthenticated && <NotificationBell />}
 
             {isAuthenticated ? (
               <DropdownMenu>
@@ -391,6 +395,13 @@ export function Navbar() {
                 >
                   {t("navbar.cart")} {count > 0 ? `(${count})` : ""}
                 </button>
+              )}
+
+              {/* Notification bell in mobile */}
+              {isAuthenticated && (
+                <div className="py-1">
+                  <NotificationBell />
+                </div>
               )}
 
               <div className="pt-4 border-t border-border">

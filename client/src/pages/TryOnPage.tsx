@@ -605,13 +605,6 @@ export default function TryOnPage() {
                       {mixCandidates.length === 0 ? (
                         <div className="text-sm text-muted-foreground">
                           {t("tryOn.mix.noCandidates")}
-                          <div className="text-xs mt-1">
-                            {t("tryOn.mix.noCandidatesHint")}{" "}
-                            <code>/products</code>{" "}
-                            {t("tryOn.mix.noCandidatesHint2")}{" "}
-                            <code>category.vtonCategory</code>{" "}
-                            {t("tryOn.mix.noCandidatesHint3")}
-                          </div>
                         </div>
                       ) : (
                         <div className="max-h-[420px] sm:max-h-[520px] overflow-y-auto pr-1">

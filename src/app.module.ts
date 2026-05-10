@@ -13,6 +13,7 @@ import { RecommendationsModule } from "./modules/recommendations/recommendations
 import { MailModule } from "./modules/mail/mail.module";
 import { PaymentsModule } from "./modules/payments/payments.module";
 import { AuditModule } from "./modules/audit/audit.module";
+import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
@@ -31,6 +32,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     MailModule,
     PaymentsModule,
     AuditModule,
+    NotificationsModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [],
