@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { recommendationsApi, type RecommendResult } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { ErrorState } from "@/components/common";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 export default function StyleAdvisorPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const CATEGORIES = [
     { label: t("styleAdvisor.categories.dresses"),   value: "Dresses" },
@@ -278,14 +279,14 @@ export default function StyleAdvisorPage() {
                     <div className="shrink-0 w-20 h-24 rounded-lg overflow-hidden bg-muted">
                       <img
                         src={product.imageUrl || "https://placehold.co/200x240?text=No+Image"}
-                        alt={product.name}
+                        alt={getLocalizedProductName(product, i18n.language, product.name)}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{product.name}</div>
+                      <div className="font-medium truncate">{getLocalizedProductName(product, i18n.language, product.name)}</div>
                       <div className="text-xs text-muted-foreground mt-0.5">
                         {product.category} • {product.color}
                       </div>
