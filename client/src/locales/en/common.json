@@ -1658,6 +1658,20 @@
       "outerwear": "🧥 Outerwear",
       "aodai":     "🥻 Ao Dai"
     },
+    "occasions": {
+      "wedding": "💍 Wedding",
+      "party":   "🎉 Party / Event",
+      "casual":  "☀️ Casual",
+      "work":    "💼 Work",
+      "dating":  "💕 Dating"
+    },
+    "styles": {
+      "elegant":  "👑 Elegant",
+      "feminine": "🌸 Feminine",
+      "modern":   "⚡ Modern",
+      "cute":     "🐣 Cute",
+      "bold":     "🔥 Bold"
+    },
     "form": {
       "measurements": {
         "title":              "📏 Body Measurements",
@@ -1671,6 +1685,14 @@
         "waistPlaceholder":   "e.g. 64",
         "hips":               "Hips (cm)",
         "hipsPlaceholder":    "e.g. 90"
+      },
+      "occasion": {
+        "title": "🎉 Occasion",
+        "hint":  "Select multiple occasions. Leave empty to let AI decide."
+      },
+      "style": {
+        "title": "✨ Style Preference",
+        "hint":  "Select multiple styles."
       },
       "category": {
         "title": "👗 Clothing Type",

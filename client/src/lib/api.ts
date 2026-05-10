@@ -362,11 +362,16 @@ export type RecommendRequest = {
   hips?: number;
   favoriteColors?: string;
   category?: string;
+  occasion?: string;
+  stylePreference?: string;
+  language?: string;
 };
 
 export type RecommendedProduct = {
   id: number;
   name: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   imageUrl: string | null;
   rentPricePerDay: number;
   deposit: number;

@@ -1675,6 +1675,20 @@
       "outerwear": "🧥 Áo khoác",
       "aodai":     "🥻 Áo dài"
     },
+    "occasions": {
+      "wedding": "💍 Tiệc cưới",
+      "party":   "🎉 Tiệc / Sự kiện",
+      "casual":  "☀️ Hằng ngày",
+      "work":    "💼 Đi làm",
+      "dating":  "💕 Hẹn hò"
+    },
+    "styles": {
+      "elegant":  "👑 Thanh lịch",
+      "feminine": "🌸 Nữ tính",
+      "modern":   "⚡ Hiện đại",
+      "cute":     "🐣 Dễ thương",
+      "bold":     "🔥 Cá tính"
+    },
     "form": {
       "measurements": {
         "title":              "📏 Số đo cơ thể",
@@ -1688,6 +1702,14 @@
         "waistPlaceholder":   "VD: 64",
         "hips":               "Vòng hông (cm)",
         "hipsPlaceholder":    "VD: 90"
+      },
+      "occasion": {
+        "title": "🎉 Dịp mặc",
+        "hint":  "Có thể chọn nhiều dịp. Bỏ trống để AI tự chọn."
+      },
+      "style": {
+        "title": "✨ Phong cách yêu thích",
+        "hint":  "Có thể chọn nhiều phong cách."
       },
       "category": {
         "title": "👗 Loại trang phục",

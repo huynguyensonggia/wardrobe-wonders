@@ -3,29 +3,41 @@ import { IsNumber, IsOptional, IsString, Min } from "class-validator";
 export class RecommendDto {
   @IsNumber()
   @Min(1)
-  height: number; // cm
+  height: number;
 
   @IsNumber()
   @Min(1)
-  weight: number; // kg
+  weight: number;
 
   @IsOptional()
   @IsNumber()
-  bust?: number; // cm
+  bust?: number;
 
   @IsOptional()
   @IsNumber()
-  waist?: number; // cm
+  waist?: number;
 
   @IsOptional()
   @IsNumber()
-  hips?: number; // cm
+  hips?: number;
 
   @IsOptional()
   @IsString()
-  favoriteColors?: string; // "hồng, đỏ đô"
+  favoriteColors?: string;
 
   @IsOptional()
   @IsString()
-  category?: string; // "Quần, Áo, Váy, Áo khoác"
+  category?: string;
+
+  @IsOptional()
+  @IsString()
+  occasion?: string; // "wedding, party, casual"
+
+  @IsOptional()
+  @IsString()
+  stylePreference?: string; // "elegant, feminine, modern"
+
+  @IsOptional()
+  @IsString()
+  language?: string; // "vi", "en", "ja"
 }

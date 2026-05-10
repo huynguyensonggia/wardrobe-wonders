@@ -1678,6 +1678,20 @@
       "outerwear": "🧥 アウター",
       "aodai":     "🥻 アオザイ"
     },
+    "occasions": {
+      "wedding": "💍 ウエディング",
+      "party":   "🎉 パーティー / イベント",
+      "casual":  "☀️ カジュアル",
+      "work":    "💼 仕事",
+      "dating":  "💕 デート"
+    },
+    "styles": {
+      "elegant":  "👑 エレガント",
+      "feminine": "🌸 フェミニン",
+      "modern":   "⚡ モダン",
+      "cute":     "🐣 キュート",
+      "bold":     "🔥 ボールド"
+    },
     "form": {
       "measurements": {
         "title":              "📏 体のサイズ",
@@ -1691,6 +1705,14 @@
         "waistPlaceholder":   "例: 64",
         "hips":               "ヒップ (cm)",
         "hipsPlaceholder":    "例: 90"
+      },
+      "occasion": {
+        "title": "🎉 シーン",
+        "hint":  "複数選択可。空欄にするとAIが自動で選びます。"
+      },
+      "style": {
+        "title": "✨ 好みのスタイル",
+        "hint":  "複数選択可。"
       },
       "category": {
         "title": "👗 服の種類",
