@@ -1,27 +1,41 @@
 import { Injectable, Logger } from "@nestjs/common";
-import * as nodemailer from "nodemailer";
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private readonly transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    auth: {
-      user: process.env.BREVO_SMTP_USER,
-      pass: process.env.BREVO_SMTP_KEY,
-    },
-  });
-  private readonly from = process.env.MAIL_FROM ?? `AI Closet <${process.env.BREVO_SMTP_USER}>`;
+  private readonly apiKey = process.env.BREVO_API_KEY ?? "";
+  private readonly senderEmail =
+    process.env.MAIL_SENDER_EMAIL ?? "xuagiahuy@gmail.com";
+  private readonly senderName = process.env.MAIL_SENDER_NAME ?? "AI Closet";
+
+  private async send(to: string, subject: string, html: string) {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": this.apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: { name: this.senderName, email: this.senderEmail },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Brevo API error ${res.status}: ${body}`);
+    }
+  }
 
   async sendWelcome(to: string, name: string) {
     try {
-      await this.transporter.sendMail({
-        from: this.from,
+      await this.send(
         to,
-        subject: "Chao mung ban den voi AI Closet!",
-        html: this.welcomeTemplate(name),
-      });
+        "Chao mung ban den voi AI Closet!",
+        this.welcomeTemplate(name),
+      );
     } catch (err: any) {
       this.logger.error(`sendWelcome failed for ${to}: ${err?.message}`);
     }
@@ -41,14 +55,15 @@ export class MailService {
     paymentMethod: string;
   }) {
     try {
-      await this.transporter.sendMail({
-        from: this.from,
-        to: params.to,
-        subject: `Xac nhan don thue #${params.rentalId} - AI Closet`,
-        html: this.rentalConfirmTemplate(params),
-      });
+      await this.send(
+        params.to,
+        `Xac nhan don thue #${params.rentalId} - AI Closet`,
+        this.rentalConfirmTemplate(params),
+      );
     } catch (err: any) {
-      this.logger.error(`sendRentalConfirmation failed for ${params.to}: ${err?.message}`);
+      this.logger.error(
+        `sendRentalConfirmation failed for ${params.to}: ${err?.message}`,
+      );
     }
   }
 
@@ -60,14 +75,15 @@ export class MailService {
     items: { name: string; size: string; quantity: number }[];
   }) {
     try {
-      await this.transporter.sendMail({
-        from: this.from,
-        to: params.to,
-        subject: `Nhac nho: Don thue #${params.rentalId} het han HOM NAY - tra truoc 22:30`,
-        html: this.returnReminderTemplate(params),
-      });
+      await this.send(
+        params.to,
+        `Nhac nho: Don thue #${params.rentalId} het han HOM NAY - tra truoc 22:30`,
+        this.returnReminderTemplate(params),
+      );
     } catch (err: any) {
-      this.logger.error(`sendReturnReminder failed for ${params.to}: ${err?.message}`);
+      this.logger.error(
+        `sendReturnReminder failed for ${params.to}: ${err?.message}`,
+      );
     }
   }
 
