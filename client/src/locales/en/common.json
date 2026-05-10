@@ -712,6 +712,7 @@
     "buttons": {
       "importExcel": "Import Excel",
       "importing": "Importing...",
+      "clearAndImport": "Clear & Reimport",
       "create": "Create product",
       "addSize": "+ Add size",
       "remove": "Remove",
@@ -815,6 +816,11 @@
       "importFailed": {
         "title": "Import failed"
       }
+    },
+    "clearImport": {
+      "title": "Delete all products?",
+      "desc": "This will delete all existing products, variants and inventory, then reimport from the Excel file.",
+      "confirm": "Confirm delete & reimport"
     }
   },
   "adminCategories": {

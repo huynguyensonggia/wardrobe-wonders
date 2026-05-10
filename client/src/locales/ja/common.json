@@ -713,6 +713,7 @@
     "buttons": {
       "importExcel": "Excelをインポート",
       "importing": "インポート中...",
+      "clearAndImport": "クリア＆再インポート",
       "create": "商品を作成",
       "addSize": "+ サイズ追加",
       "remove": "削除",
@@ -816,6 +817,11 @@
       "importFailed": {
         "title": "インポートに失敗しました"
       }
+    },
+    "clearImport": {
+      "title": "全商品を削除しますか？",
+      "desc": "この操作により、既存の全商品・バリアント・在庫が削除され、Excelファイルから再インポートされます。",
+      "confirm": "削除して再インポートする"
     }
   },
   "adminCategories": {

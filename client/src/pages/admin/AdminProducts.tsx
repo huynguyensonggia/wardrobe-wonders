@@ -466,18 +466,18 @@ export default function AdminProducts() {
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={importing}>
                 <Upload className="h-4 w-4 mr-2" />
-                Xóa &amp; Import lại
+                {importing ? t("adminProducts.buttons.importing") : t("adminProducts.buttons.clearAndImport")}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Xóa toàn bộ sản phẩm?</AlertDialogTitle>
+                <AlertDialogTitle>{t("adminProducts.clearImport.title")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Hành động này sẽ <strong>xóa tất cả sản phẩm, variants và inventory</strong> hiện có, sau đó import lại từ file Excel. Dữ liệu đơn thuê cũ vẫn được giữ nhưng sẽ mất liên kết với sản phẩm.
+                  {t("adminProducts.clearImport.desc")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={() => {
@@ -485,7 +485,7 @@ export default function AdminProducts() {
                     clearFirstInputRef.current?.click();
                   }}
                 >
-                  Xác nhận xóa &amp; import lại
+                  {t("adminProducts.clearImport.confirm")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

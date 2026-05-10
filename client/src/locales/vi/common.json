@@ -711,6 +711,7 @@
     "buttons": {
       "importExcel": "Nhập Excel",
       "importing": "Đang nhập...",
+      "clearAndImport": "Xóa & Import lại",
       "create": "Tạo sản phẩm",
       "addSize": "+ Thêm size",
       "remove": "Xoá",
@@ -814,6 +815,11 @@
       "importFailed": {
         "title": "Nhập thất bại"
       }
+    },
+    "clearImport": {
+      "title": "Xóa toàn bộ sản phẩm?",
+      "desc": "Hành động này sẽ xóa tất cả sản phẩm, variants và inventory hiện có, sau đó import lại từ file Excel.",
+      "confirm": "Xác nhận xóa & import lại"
     }
   },
   "adminCategories": {
