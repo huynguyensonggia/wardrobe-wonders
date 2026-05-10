@@ -34,7 +34,11 @@ async function bootstrap() {
         process.env.FRONTEND_URL,
       ].filter(Boolean);
 
-      if (!origin || allowed.includes(origin)) {
+      const isAllowedSubdomain =
+        origin?.endsWith(".wardrobe-wonders.pages.dev") ||
+        origin?.endsWith(".wardrobe-wonders-client.pages.dev");
+
+      if (!origin || allowed.includes(origin) || isAllowedSubdomain) {
         callback(null, true);
       } else {
         callback(new Error(`CORS blocked: ${origin}`));
