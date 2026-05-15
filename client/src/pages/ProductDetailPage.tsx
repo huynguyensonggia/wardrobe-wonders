@@ -302,13 +302,16 @@ export default function ProductDetailPage() {
           productId: Number((product as any).id),
           variantId: Number(selectedVariant!.id),
           size: selectedVariant!.size,
-          name: displayName,
+          name: (product as any).name ?? "",
+          nameEn: (product as any).nameEn ?? null,
+          nameJa: (product as any).nameJa ?? null,
           imageUrl,
           rentPricePerDay: Number(
             (product as any).rentPricePerDay ??
               (product as any).pricePerDay ??
               0
           ),
+          deposit: Number((product as any).deposit ?? 0),
           startDate,
           endDate,
           days: rentalDays,

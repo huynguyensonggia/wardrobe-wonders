@@ -366,11 +366,12 @@ export class RentalsService {
   // =========================
   // ADMIN: LIST ALL
   // =========================
-  async findAll(page = 1, pageSize = 20) {
+  async findAll(page = 1, pageSize = 20, status?: RentalStatus) {
     const take = Math.min(Math.max(pageSize, 1), 100);
     const skip = (Math.max(page, 1) - 1) * take;
 
     const [data, total] = await this.rentalsRepo.findAndCount({
+      where: status ? { status } : undefined,
       relations: ["user", "items", "items.product", "items.variant", "payments"],
       order: { createdAt: "DESC" as any },
       take,
@@ -449,10 +450,12 @@ export class RentalsService {
           //    đổi inventory: washing/repairing → available (hàng đã giặt/sửa xong)
           const shouldReturn =
             (nextStatus === RentalStatus.CANCELLED ||
-             nextStatus === RentalStatus.REJECTED) &&
+             nextStatus === RentalStatus.REJECTED ||
+             nextStatus === RentalStatus.RETURNED) &&
             prevStatus !== RentalStatus.COMPLETED &&
             prevStatus !== RentalStatus.CANCELLED &&
-            prevStatus !== RentalStatus.REJECTED;
+            prevStatus !== RentalStatus.REJECTED &&
+            prevStatus !== RentalStatus.RETURNED;
 
           if (shouldReturn) {
             for (const it of items) {
@@ -511,6 +514,11 @@ export class RentalsService {
             title: "Đơn hàng bị từ chối",
             message: `Đơn #${id} không được chấp nhận. Vui lòng liên hệ hỗ trợ để biết thêm chi tiết.`,
             type: NotificationType.RENTAL_REJECTED,
+          },
+          [RentalStatus.RETURNED]: {
+            title: "Đơn hàng bị trả về",
+            message: `Đơn #${id} đã bị trả về khi giao hàng. Vui lòng liên hệ hỗ trợ qua Facebook để biết thêm chi tiết.`,
+            type: NotificationType.RENTAL_CANCELLED,
           },
         };
         const notif = notifMap[nextStatus];

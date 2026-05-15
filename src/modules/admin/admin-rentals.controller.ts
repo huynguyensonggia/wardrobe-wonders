@@ -19,6 +19,7 @@ import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../../common/decorators/roles.decorator";
 import { Role } from "../../common/enums/role.enum";
 import { UpdateRentalStatusDto } from "../rentals/dto/update-rental-status.dto";
+import { RentalStatus } from "../rentals/enums/rental-status.enum";
 import { AuditService } from "../audit/audit.service";
 import { AuditAction } from "../audit/entities/audit-log.entity";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
@@ -33,8 +34,15 @@ export class AdminRentalsController {
   ) {}
 
   @Get()
-  findAll(@Query("page") page?: string, @Query("pageSize") pageSize?: string) {
-    return this.rentalsService.findAll(Number(page ?? 1), Number(pageSize ?? 20));
+  findAll(
+    @Query("page") page?: string,
+    @Query("pageSize") pageSize?: string,
+    @Query("status") status?: string,
+  ) {
+    const statusEnum = Object.values(RentalStatus).includes(status as RentalStatus)
+      ? (status as RentalStatus)
+      : undefined;
+    return this.rentalsService.findAll(Number(page ?? 1), Number(pageSize ?? 20), statusEnum);
   }
 
   @Patch(":id/status")

@@ -491,6 +491,8 @@
       "rentals": "Rentals",
       "inventory": "Inventory",
       "accessories": "Accessories",
+      "allRentals": "All rentals",
+      "returnedRentals": "Returned at delivery",
       "allAccessories": "All accessories"
     },
     "accessories": {
@@ -606,6 +608,15 @@
       "noItems": "No items in this rental."
     }
   },
+  "rentalStatus": {
+    "pending": "Pending",
+    "shipping": "Shipping",
+    "active": "Active",
+    "completed": "Completed",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
+    "returned": "Returned at delivery"
+  },
   "pagination": {
     "prev": "Prev",
     "next": "Next",
@@ -638,9 +649,18 @@
       "startShipping": "Start shipping",
       "reject": "Reject",
       "customerReceived": "Customer received",
+      "markReturned": "Returned at delivery",
       "complete": "Complete",
       "refundDeposit": "Refund Deposit",
       "depositRefunded": "Deposit Refunded"
+    },
+    "returnModal": {
+      "title": "Mark as returned at delivery",
+      "label": "Return reason",
+      "placeholder": "E.g. Customer not home, refused delivery, wrong size...",
+      "confirm": "Confirm return",
+      "cancel": "Cancel",
+      "required": "Please enter a return reason"
     },
     "detail": {
       "rental": "Rental",
@@ -654,7 +674,8 @@
     "payment": {
       "rent": "Rental fee",
       "deposit": "Deposit",
-      "extension": "Extension fee"
+      "extension": "Extension fee",
+      "refunded": "refunded"
     },
     "shipping": {
       "edit": "Edit shipping",
@@ -693,7 +714,15 @@
         "express_delivery": "Express delivery",
         "other": "Other"
       }
+    },
+    "filter": {
+      "allStatuses": "All statuses"
     }
+  },
+  "adminReturnedRentals": {
+    "title": "Returned at delivery",
+    "empty": "No returned orders found.",
+    "reason": "Return reason"
   },
   "adminProducts": {
     "status": {
@@ -1756,6 +1785,7 @@
     "payment": "Payment",
     "rentalTotal": "Rental total",
     "deposit": "Deposit (refundable)",
+    "noDeposit": "Not required",
     "grandTotal": "Total due today",
     "paymentMethod": {
       "CASH": "Cash on delivery",

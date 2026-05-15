@@ -25,6 +25,8 @@ type CheckoutItem = {
   size?: string;
 
   name: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   imageUrl?: string;
   rentPricePerDay: number;
   deposit: number;
@@ -44,6 +46,8 @@ type CheckoutState =
         size?: string;
 
         name: string;
+        nameEn?: string | null;
+        nameJa?: string | null;
         imageUrl?: string;
         rentPricePerDay: number;
         deposit: number;
@@ -89,6 +93,8 @@ export default function CheckoutPage() {
           variantId: p.variantId,
           size: p.size,
           name: p.name,
+          nameEn: p.nameEn ?? null,
+          nameJa: p.nameJa ?? null,
           imageUrl: p.imageUrl,
           rentPricePerDay: p.rentPricePerDay,
           deposit: p.deposit ?? 0,
@@ -106,6 +112,8 @@ export default function CheckoutPage() {
       variantId: it.variantId,
       size: it.size,
       name: it.name,
+      nameEn: it.nameEn ?? null,
+      nameJa: it.nameJa ?? null,
       imageUrl: it.imageUrl,
       rentPricePerDay: it.rentPricePerDay,
       deposit: (it as any).deposit ?? 0,
@@ -244,7 +252,7 @@ export default function CheckoutPage() {
             variantId: x.variantId,
             quantity: x.quantity,
           })),
-          note: t("checkout.order.note"),
+          note: "system:checkout",
           shipFullName: fullName,
           shipPhone: phone,
           shipAddress: finalAddress,
@@ -273,6 +281,8 @@ export default function CheckoutPage() {
             endDate: g.endDate,
             items: g.list.map((it) => ({
               name: it.name,
+              nameEn: it.nameEn ?? null,
+              nameJa: it.nameJa ?? null,
               size: it.size,
               imageUrl: it.imageUrl,
               quantity: it.quantity,
@@ -332,12 +342,10 @@ export default function CheckoutPage() {
 
                     <div className="flex-1">
                       <div className="font-medium">
-                        {getLocalizedProductName(
-                          it as any,
-                          i18n.language,
-                          it.name
-                        )}{" "}
-                        {it.size ? `(${it.size})` : ""}
+                        {(() => {
+                          const n = getLocalizedProductName(it as any, i18n.language, it.name);
+                          return it.size && !n.endsWith(`(${it.size})`) ? `${n} (${it.size})` : n;
+                        })()}
                       </div>
 
                       <div className="text-sm text-muted-foreground">

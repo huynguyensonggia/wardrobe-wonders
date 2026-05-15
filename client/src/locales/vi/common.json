@@ -488,6 +488,8 @@
       "products": "Sản phẩm",
       "categories": "Danh mục",
       "rentals": "Đơn thuê",
+      "allRentals": "Tất cả đơn thuê",
+      "returnedRentals": "Hàng trả về",
       "inventory": "Kho vận",
       "accessories": "Phụ kiện",
       "allAccessories": "Tất cả phụ kiện"
@@ -605,6 +607,15 @@
       "noItems": "Đơn thuê này không có sản phẩm."
     }
   },
+  "rentalStatus": {
+    "pending": "Chờ xác nhận",
+    "shipping": "Đang giao",
+    "active": "Đang thuê",
+    "completed": "Hoàn thành",
+    "rejected": "Đã từ chối",
+    "cancelled": "Đã hủy",
+    "returned": "Trả về khi giao"
+  },
   "pagination": {
     "prev": "Trước",
     "next": "Sau",
@@ -637,9 +648,18 @@
       "startShipping": "Bắt đầu giao",
       "reject": "Từ chối",
       "customerReceived": "Khách đã nhận",
+      "markReturned": "Hàng bị trả về",
       "complete": "Hoàn tất",
       "refundDeposit": "Hoàn cọc",
       "depositRefunded": "Đã hoàn cọc"
+    },
+    "returnModal": {
+      "title": "Đánh dấu hàng bị trả về",
+      "label": "Lý do trả hàng",
+      "placeholder": "VD: Khách không có nhà, từ chối nhận, sai size...",
+      "confirm": "Xác nhận trả về",
+      "cancel": "Hủy",
+      "required": "Vui lòng nhập lý do trả hàng"
     },
     "detail": {
       "rental": "Đơn thuê",
@@ -653,7 +673,8 @@
     "payment": {
       "rent": "Tiền thuê",
       "deposit": "Tiền cọc",
-      "extension": "Phí gia hạn"
+      "extension": "Phí gia hạn",
+      "refunded": "đã hoàn"
     },
     "shipping": {
       "edit": "Sửa giao hàng",
@@ -692,7 +713,15 @@
         "express_delivery": "Giao nhanh",
         "other": "Khác"
       }
+    },
+    "filter": {
+      "allStatuses": "Tất cả trạng thái"
     }
+  },
+  "adminReturnedRentals": {
+    "title": "Hàng trả về khi giao",
+    "empty": "Không có đơn nào bị trả về.",
+    "reason": "Lý do trả hàng"
   },
   "adminProducts": {
     "status": {
@@ -1773,6 +1802,7 @@
     "payment": "Thanh toán",
     "rentalTotal": "Tiền thuê",
     "deposit": "Tiền cọc (hoàn lại)",
+    "noDeposit": "Không yêu cầu",
     "grandTotal": "Tổng thanh toán",
     "paymentMethod": {
       "CASH": "Tiền mặt khi nhận hàng",

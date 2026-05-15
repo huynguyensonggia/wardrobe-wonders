@@ -214,16 +214,17 @@ export const rentalsApi = {
     }),
 
   // Admin endpoints
-  getAll: (page = 1, pageSize = 20) =>
-    fetchApi<PaginatedResponse<Rental>>(
-      `/admin/rentals?page=${page}&pageSize=${pageSize}`
-    ),
+  getAll: (page = 1, pageSize = 20, status?: string) => {
+    const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+    if (status) params.set("status", status);
+    return fetchApi<PaginatedResponse<Rental>>(`/admin/rentals?${params.toString()}`);
+  },
 
   // ✅ FIX: status dùng RentalStatus (khớp BE)
-  updateStatus: (id: string, status: RentalStatus) =>
+  updateStatus: (id: string, status: RentalStatus, note?: string) =>
     fetchApi<ApiResponse<Rental>>(`/admin/rentals/${id}/status`, {
       method: "PATCH",
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, ...(note !== undefined ? { note } : {}) }),
     }),
 
   // ✅ update shipping

@@ -33,13 +33,15 @@ export default function AdminDashboard() {
   const [accessoriesOpen, setAccessoriesOpen] = useState(
     location.pathname.startsWith("/admin/accessories")
   );
+  const [rentalsOpen, setRentalsOpen] = useState(
+    location.pathname.startsWith("/admin/rentals")
+  );
 
   const sidebarLinks = [
     { to: "/admin", icon: LayoutDashboard, label: t("admin.sidebar.overview"), exact: true },
     { to: "/admin/users", icon: Users, label: t("admin.sidebar.users") },
     { to: "/admin/products", icon: Package, label: t("admin.sidebar.products") },
     { to: "/admin/categories", icon: FolderOpen, label: t("admin.sidebar.categories") },
-    { to: "/admin/rentals", icon: ShoppingBag, label: t("admin.sidebar.rentals") },
     { to: "/admin/inventory", icon: Warehouse, label: t("admin.sidebar.inventory") },
   ];
 
@@ -106,6 +108,52 @@ export default function AdminDashboard() {
                 </Link>
               );
             })}
+
+            {/* Đơn thuê dropdown */}
+            <div>
+              <button
+                onClick={() => setRentalsOpen((v) => !v)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  location.pathname.startsWith("/admin/rentals")
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                )}
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {t("admin.sidebar.rentals")}
+                <ChevronDown
+                  className={cn("w-4 h-4 ml-auto transition-transform", rentalsOpen && "rotate-180")}
+                />
+              </button>
+
+              {rentalsOpen && (
+                <div className="mt-1 ml-4 pl-4 border-l border-border space-y-1">
+                  <Link
+                    to="/admin/rentals"
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                      location.pathname === "/admin/rentals"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    )}
+                  >
+                    {t("admin.sidebar.allRentals")}
+                  </Link>
+                  <Link
+                    to="/admin/rentals/returned"
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                      location.pathname === "/admin/rentals/returned"
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    )}
+                  >
+                    {t("admin.sidebar.returnedRentals")}
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {/* Phụ kiện dropdown */}
             <div>

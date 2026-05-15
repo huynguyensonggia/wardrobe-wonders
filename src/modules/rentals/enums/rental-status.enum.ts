@@ -5,4 +5,5 @@ export enum RentalStatus {
   COMPLETED = "completed",    // trả xong
   REJECTED = "rejected",      // admin từ chối
   CANCELLED = "cancelled",    // user hủy
+  RETURNED = "returned",      // khách từ chối nhận khi giao, hàng trả về kho
 }

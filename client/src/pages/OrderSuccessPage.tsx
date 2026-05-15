@@ -2,6 +2,7 @@ import { useLocation, Link, Navigate } from "react-router-dom";
 import { CheckCircle, CalendarDays, MapPin, CreditCard, Package } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 type OrderSuccessState = {
   rentalCodes: string[];
@@ -17,6 +18,8 @@ type OrderSuccessState = {
     endDate: string;
     items: {
       name: string;
+      nameEn?: string | null;
+      nameJa?: string | null;
       size?: string;
       imageUrl?: string;
       quantity: number;
@@ -27,7 +30,7 @@ type OrderSuccessState = {
 };
 
 export default function OrderSuccessPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const state = location.state as OrderSuccessState | null;
 
@@ -95,7 +98,10 @@ export default function OrderSuccessPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">
-                        {it.name}{it.size ? ` (${it.size})` : ""}
+                        {(() => {
+                          const n = getLocalizedProductName(it, i18n.language, it.name);
+                          return it.size && !n.endsWith(`(${it.size})`) ? `${n} (${it.size})` : n;
+                        })()}
                       </p>
                       <p className="text-sm text-muted-foreground mt-0.5">
                         {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/{t("orderSuccess.perDay")}
@@ -139,12 +145,14 @@ export default function OrderSuccessPage() {
                 <span>{t("orderSuccess.rentalTotal")}</span>
                 <span>{state.total.toLocaleString("vi-VN")}đ</span>
               </div>
-              {state.totalDeposit > 0 && (
-                <div className="flex justify-between text-muted-foreground">
-                  <span>{t("orderSuccess.deposit")}</span>
-                  <span>{state.totalDeposit.toLocaleString("vi-VN")}đ</span>
-                </div>
-              )}
+              <div className="flex justify-between text-muted-foreground">
+                <span>{t("orderSuccess.deposit")}</span>
+                <span>
+                  {state.totalDeposit > 0
+                    ? `${state.totalDeposit.toLocaleString("vi-VN")}đ`
+                    : t("orderSuccess.noDeposit")}
+                </span>
+              </div>
               <div className="flex justify-between font-semibold border-t border-border pt-2">
                 <span>{t("orderSuccess.grandTotal")}</span>
                 <span>{grandTotal.toLocaleString("vi-VN")}đ</span>

@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 
 import type { Rental } from "@/types";
-import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
+import { RentalStatus, getRentalStatusKey, RENTAL_STATUS_OPTIONS } from "@/types/rental-status";
 
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 // Format VND
 const vnd = (amount: number) => `${Number(amount).toLocaleString("vi-VN")}đ`;
@@ -118,21 +119,25 @@ function AddSurchargeForm({ rentalId, onDone, t }: { rentalId: string; onDone: (
 }
 
 export default function AdminRentals() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
+  const [statusFilter, setStatusFilter] = useState<RentalStatus | "">("");
   const [selected, setSelected] = useState<Rental | null>(null);
   const [editingShip, setEditingShip] = useState(false);
   const [shipFullName, setShipFullName] = useState("");
   const [shipPhone, setShipPhone] = useState("");
   const [shipAddress, setShipAddress] = useState("");
   const [shipNote, setShipNote] = useState("");
+  const [returnModalOpen, setReturnModalOpen] = useState(false);
+  const [returnReason, setReturnReason] = useState("");
+  const [returnReasonError, setReturnReasonError] = useState(false);
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["admin-rentals", page, pageSize],
-    queryFn: () => rentalsApi.getAll(page, pageSize),
+    queryKey: ["admin-rentals", page, pageSize, statusFilter],
+    queryFn: () => rentalsApi.getAll(page, pageSize, statusFilter || undefined),
     staleTime: 30_000,
   });
 
@@ -190,12 +195,29 @@ export default function AdminRentals() {
     }
   };
 
+  const handleConfirmReturn = async () => {
+    if (!selected) return;
+    if (!returnReason.trim()) { setReturnReasonError(true); return; }
+    try {
+      await rentalsApi.updateStatus(String(selected.id), RentalStatus.RETURNED, returnReason.trim());
+      setSelected((prev) => prev ? { ...prev, status: RentalStatus.RETURNED, note: returnReason.trim() } : prev);
+      await qc.invalidateQueries({ queryKey: ["admin-rentals"] });
+      setReturnModalOpen(false);
+      setReturnReason("");
+      setReturnReasonError(false);
+      toast({ title: t("adminRentals.actions.markReturned") });
+    } catch (e: any) {
+      toast({ title: t("adminRentals.errors.updateStatusFailed"), description: e?.message, variant: "destructive" });
+    }
+  };
+
   const ADMIN_ACTIONS = useMemo(() => getAdminActions(t), [t]);
 
   if (isLoading) return <div className="container mx-auto px-4 py-10 text-muted-foreground">{t("adminRentals.loading")}</div>;
   if (isError) return <div className="container mx-auto px-4 py-10 text-destructive">{(error as Error)?.message}</div>;
 
   return (
+    <>
     <div className="container mx-auto px-4 py-10 grid lg:grid-cols-3 gap-6">
       {/* LEFT: List */}
       <div className="lg:col-span-2 space-y-4">
@@ -209,6 +231,24 @@ export default function AdminRentals() {
             <div className="text-sm text-muted-foreground">{t("pagination.page")} <span className="font-medium">{page}</span> / {totalPages}</div>
             <Button variant="outline" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>{t("pagination.next")}</Button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <select
+            className="border rounded-md px-3 py-1.5 text-sm bg-background"
+            value={statusFilter}
+            onChange={(e) => { setStatusFilter(e.target.value as RentalStatus | ""); setPage(1); }}
+          >
+            <option value="">{t("adminRentals.filter.allStatuses")}</option>
+            {RENTAL_STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>{t(getRentalStatusKey(s))}</option>
+            ))}
+          </select>
+          {statusFilter && (
+            <Button variant="ghost" size="sm" onClick={() => { setStatusFilter(""); setPage(1); }}>
+              ✕
+            </Button>
+          )}
         </div>
 
         {rentals.length === 0 ? (
@@ -230,7 +270,7 @@ export default function AdminRentals() {
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <Badge variant={statusBadgeVariant(r.status)}>{formatRentalStatus(r.status)}</Badge>
+                    <Badge variant={statusBadgeVariant(r.status)}>{t(getRentalStatusKey(r.status))}</Badge>
                     <div className="text-sm mt-1 font-medium">{vnd(r.totalPrice)}</div>
                     <div className="text-xs text-muted-foreground">{t("adminRentals.deposit")}: {vnd(r.totalDeposit)}</div>
                   </div>
@@ -257,8 +297,8 @@ export default function AdminRentals() {
                 {String(selected.startDate).slice(0,10)} → {String(selected.endDate).slice(0,10)} • {selected.totalDays} {t("adminRentals.days")}
               </div>
               <div className="flex gap-4 text-sm mt-1">
-                <span><span className="text-muted-foreground">Thuê: </span><span className="font-medium">{vnd(selected.totalPrice)}</span></span>
-                <span><span className="text-muted-foreground">Cọc: </span><span className="font-medium">{vnd(selected.totalDeposit)}</span></span>
+                <span><span className="text-muted-foreground">{t("adminRentals.payment.rent")}: </span><span className="font-medium">{vnd(selected.totalPrice)}</span></span>
+                <span><span className="text-muted-foreground">{t("adminRentals.payment.deposit")}: </span><span className="font-medium">{vnd(selected.totalDeposit)}</span></span>
               </div>
             </div>
 
@@ -266,14 +306,22 @@ export default function AdminRentals() {
             <div className="border-t pt-4 space-y-2">
               <div className="text-xs text-muted-foreground uppercase tracking-wide">{t("adminRentals.detail.status")}</div>
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <Badge variant={statusBadgeVariant(selected.status)}>{formatRentalStatus(selected.status)}</Badge>
+                <Badge variant={statusBadgeVariant(selected.status)}>{t(getRentalStatusKey(selected.status))}</Badge>
                 <div className="flex flex-wrap gap-2">
                   {(ADMIN_ACTIONS[selected.status] ?? []).map((a) => (
                     <Button key={a.to} size="sm" variant={a.variant ?? "outline"} disabled={updateStatusMutation.isPending} onClick={() => handleStatusChange(String(selected.id), a.to)}>
                       {a.label}
                     </Button>
                   ))}
-                  {(ADMIN_ACTIONS[selected.status] ?? []).length === 0 && (
+                  {selected.status === RentalStatus.SHIPPING && (
+                    <Button size="sm" variant="destructive" onClick={() => { setReturnReason(""); setReturnReasonError(false); setReturnModalOpen(true); }}>
+                      {t("adminRentals.actions.markReturned")}
+                    </Button>
+                  )}
+                  {(ADMIN_ACTIONS[selected.status] ?? []).length === 0 && selected.status !== RentalStatus.RETURNED && (
+                    <span className="text-xs text-muted-foreground">{t("adminRentals.noActions")}</span>
+                  )}
+                  {selected.status === RentalStatus.RETURNED && (
                     <span className="text-xs text-muted-foreground">{t("adminRentals.noActions")}</span>
                   )}
                   {/* Hoàn cọc */}
@@ -311,7 +359,7 @@ export default function AdminRentals() {
                       <div key={p.id} className="flex justify-between items-center text-sm">
                         <span className="text-muted-foreground">{label}</span>
                         <span className={`font-medium ${isRefunded ? "line-through text-muted-foreground" : ""}`}>
-                          {vnd(p.amount)}{isRefunded ? " (đã hoàn)" : ""}
+                          {vnd(p.amount)}{isRefunded ? ` (${t("adminRentals.payment.refunded")})` : ""}
                         </span>
                       </div>
                     );
@@ -365,12 +413,16 @@ export default function AdminRentals() {
                 <div className="space-y-2">
                   {selected.items.map((it) => (
                     <div key={String(it.id)} className="border rounded-md p-3 space-y-1">
-                      <div className="font-medium">{(it as any).product?.name || `Product#${(it as any).product?.id}`}</div>
+                      <div className="font-medium">
+                        {(it as any).product
+                          ? getLocalizedProductName((it as any).product, i18n.language, (it as any).product.name)
+                          : `Product#${(it as any).product?.id ?? "?"}`}
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        Size: <span className="font-medium">{(it as any).variant?.size ?? (it as any).variantId}</span>
+                        {t("adminRentals.item.size")}: <span className="font-medium">{(it as any).variant?.size ?? (it as any).variantId}</span>
                         {" • "}{vnd(it.rentPricePerDay)}/{t("adminRentals.perDay")}
                         {" • "}{it.days} {t("adminRentals.days")}
-                        {" • "}SL: {it.quantity}
+                        {" • "}{t("adminRentals.item.qty")}: {it.quantity}
                       </div>
                       <div className="text-sm flex justify-between">
                         <span className="text-muted-foreground">{t("adminRentals.item.subtotal")}</span>
@@ -388,7 +440,11 @@ export default function AdminRentals() {
             {selected.note && (
               <div className="border-t pt-4 space-y-1">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide">{t("adminRentals.detail.note")}</div>
-                <div className="text-sm">{selected.note}</div>
+                <div className="text-sm">
+                  {["system:checkout", "Tạo từ checkout", "Created from checkout", "チェックアウトから作成"].includes(selected.note)
+                    ? t("checkout.order.note")
+                    : selected.note}
+                </div>
               </div>
             )}
 
@@ -413,5 +469,37 @@ export default function AdminRentals() {
         )}
       </div>
     </div>
+
+    {/* RETURN MODAL */}
+
+    {returnModalOpen && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-background rounded-xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4">
+          <h3 className="text-lg font-semibold">{t("adminRentals.returnModal.title")}</h3>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium">{t("adminRentals.returnModal.label")}</label>
+            <textarea
+              className={`w-full border rounded-md px-3 py-2 text-sm resize-none ${returnReasonError ? "border-destructive" : ""}`}
+              rows={3}
+              placeholder={t("adminRentals.returnModal.placeholder")}
+              value={returnReason}
+              onChange={(e) => { setReturnReason(e.target.value); if (e.target.value.trim()) setReturnReasonError(false); }}
+            />
+            {returnReasonError && (
+              <p className="text-xs text-destructive">{t("adminRentals.returnModal.required")}</p>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => { setReturnModalOpen(false); setReturnReasonError(false); }}>
+              {t("adminRentals.returnModal.cancel")}
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmReturn}>
+              {t("adminRentals.returnModal.confirm")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

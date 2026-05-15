@@ -492,6 +492,8 @@
       "rentals": "レンタル",
       "inventory": "在庫管理",
       "accessories": "アクセサリー",
+      "allRentals": "すべての注文",
+      "returnedRentals": "配送時返品",
       "allAccessories": "全アクセサリー"
     },
     "accessories": {
@@ -607,6 +609,15 @@
       "noItems": "このレンタルには商品がありません。"
     }
   },
+  "rentalStatus": {
+    "pending": "確認待ち",
+    "shipping": "配送中",
+    "active": "レンタル中",
+    "completed": "完了",
+    "rejected": "却下",
+    "cancelled": "キャンセル",
+    "returned": "配送時返品"
+  },
   "pagination": {
     "prev": "前へ",
     "next": "次へ",
@@ -639,9 +650,18 @@
       "startShipping": "発送開始",
       "reject": "却下",
       "customerReceived": "受け取り完了",
+      "markReturned": "配送時返品",
       "complete": "完了",
       "refundDeposit": "デポジット返金",
       "depositRefunded": "返金済み"
+    },
+    "returnModal": {
+      "title": "配送時返品としてマーク",
+      "label": "返品理由",
+      "placeholder": "例：不在、受け取り拒否、サイズ違い...",
+      "confirm": "返品を確定",
+      "cancel": "キャンセル",
+      "required": "返品理由を入力してください"
     },
     "detail": {
       "rental": "レンタル",
@@ -655,7 +675,8 @@
     "payment": {
       "rent": "レンタル料",
       "deposit": "デポジット",
-      "extension": "延長料金"
+      "extension": "延長料金",
+      "refunded": "返金済み"
     },
     "shipping": {
       "edit": "配送を編集",
@@ -694,7 +715,15 @@
         "express_delivery": "速達配送",
         "other": "その他"
       }
+    },
+    "filter": {
+      "allStatuses": "すべてのステータス"
     }
+  },
+  "adminReturnedRentals": {
+    "title": "配送時返品一覧",
+    "empty": "返品された注文はありません。",
+    "reason": "返品理由"
   },
   "adminProducts": {
     "status": {
@@ -1776,6 +1805,7 @@
     "payment": "お支払い",
     "rentalTotal": "レンタル料金",
     "deposit": "デポジット（返金可）",
+    "noDeposit": "不要",
     "grandTotal": "本日支払い合計",
     "paymentMethod": {
       "CASH": "代金引換",
