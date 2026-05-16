@@ -155,7 +155,7 @@
       },
       "delivery": {
         "title": "Giao hàng miễn phí",
-        "desc": "Miễn phí ship cho đơn hàng từ 400.000đ"
+        "desc": "Miễn phí ship trong khu vực Đà Nẵng"
       },
       "insured": {
         "title": "Bảo hiểm đầy đủ",
@@ -569,7 +569,31 @@
     },
     "retry": "Thử lại",
     "browseCollection": "Xem sản phẩm",
-    "product": "Sản phẩm"
+    "product": "Sản phẩm",
+    "profile2": {
+      "title": "Hồ sơ cá nhân",
+      "form": {
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại"
+      },
+      "button": {
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu..."
+      },
+      "toast": {
+        "success": {
+          "title": "Cập nhật thành công",
+          "desc": "Hồ sơ của bạn đã được cập nhật."
+        },
+        "error": {
+          "title": "Cập nhật thất bại",
+          "desc": "Đã có lỗi xảy ra. Vui lòng thử lại."
+        }
+      }
+    }
   },
   "rentals": {
     "current": {

@@ -31,7 +31,14 @@
       "Bash(git push *)",
       "WebFetch(domain:wardrobe-wonders.pages.dev)",
       "WebFetch(domain:wardrobe-wonders-api.onrender.com)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebSearch",
+      "Bash(cd /d d:\\\\wardrobe-wonders)",
+      "Bash(npx tsc *)",
+      "Skill(schedule)",
+      "Skill(schedule:*)",
+      "Bash(python3)",
+      "Bash(node)"
     ]
   }
 }

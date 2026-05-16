@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class AddGoogleIdToUsers1746893400000 implements MigrationInterface {
+export class AddGoogleIdToUsers1770080356904 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       ALTER TABLE users

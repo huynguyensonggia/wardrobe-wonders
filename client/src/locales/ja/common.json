@@ -156,7 +156,7 @@
       },
       "delivery": {
         "title": "送料無料",
-        "desc": "400.000đ以上の注文で送料無料"
+        "desc": "ダナンエリア内は送料無料"
       },
       "insured": {
         "title": "補償付き",
@@ -571,7 +571,31 @@
     },
     "retry": "再試行",
     "browseCollection": "コレクションを見る",
-    "product": "商品"
+    "product": "商品",
+    "profile2": {
+      "title": "マイプロフィール",
+      "form": {
+        "fullName": "氏名",
+        "fullNamePlaceholder": "氏名を入力してください",
+        "email": "メールアドレス",
+        "phone": "電話番号",
+        "phonePlaceholder": "電話番号を入力してください"
+      },
+      "button": {
+        "save": "変更を保存",
+        "saving": "保存中..."
+      },
+      "toast": {
+        "success": {
+          "title": "更新しました",
+          "desc": "プロフィールが更新されました。"
+        },
+        "error": {
+          "title": "更新に失敗しました",
+          "desc": "エラーが発生しました。もう一度お試しください。"
+        }
+      }
+    }
   },
   "rentals": {
     "current": {

@@ -156,7 +156,7 @@
       },
       "delivery": {
         "title": "Free Delivery",
-        "desc": "Complimentary shipping on orders over 400.000đ"
+        "desc": "Free shipping within Da Nang area"
       },
       "insured": {
         "title": "Fully Insured",
@@ -570,7 +570,31 @@
     },
     "retry": "Retry",
     "browseCollection": "Browse Collection",
-    "product": "Product"
+    "product": "Product",
+    "profile2": {
+      "title": "My Profile",
+      "form": {
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Enter your full name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "phonePlaceholder": "Enter your phone number"
+      },
+      "button": {
+        "save": "Save Changes",
+        "saving": "Saving..."
+      },
+      "toast": {
+        "success": {
+          "title": "Updated successfully",
+          "desc": "Your profile has been updated."
+        },
+        "error": {
+          "title": "Update failed",
+          "desc": "An error occurred. Please try again."
+        }
+      }
+    }
   },
   "rentals": {
     "current": {
