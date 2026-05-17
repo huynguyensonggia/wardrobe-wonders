@@ -1189,7 +1189,7 @@
           "Browse diverse collection on website",
           "Select outfit and rental period",
           "Pay 30-50% deposit of order value",
-          "Receive order confirmation via SMS/Email"
+          "Receive order confirmation via Email"
         ]
       },
       "sizing": {
@@ -1307,7 +1307,7 @@
       "steps": {
         "confirm": {
           "title": "Order Confirmation",
-          "desc": "Receive confirmation via SMS/Email"
+          "desc": "Receive confirmation via Email"
         },
         "prepare": {
           "title": "Prepare Items",

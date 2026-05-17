@@ -1206,7 +1206,7 @@
           "Duyệt bộ sưu tập đa dạng trên website",
           "Chọn trang phục và thời gian thuê",
           "Đặt cọc 30-50% giá trị đơn hàng",
-          "Nhận xác nhận đơn hàng qua SMS/Email"
+          "Nhận xác nhận đơn hàng qua Email"
         ]
       },
       "sizing": {
@@ -1324,7 +1324,7 @@
       "steps": {
         "confirm": {
           "title": "Xác nhận đơn",
-          "desc": "Nhận xác nhận qua SMS/Email"
+          "desc": "Nhận xác nhận qua Email"
         },
         "prepare": {
           "title": "Chuẩn bị hàng",
