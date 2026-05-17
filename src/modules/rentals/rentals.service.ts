@@ -31,6 +31,7 @@ import { PaymentStatus } from "../payments/enums/payment-status.enum";
 import { MailService } from "../mail/mail.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { NotificationType } from "../notifications/enums/notification-type.enum";
+import { Role } from "../../common/enums/role.enum";
 
 function daysBetweenInclusive(start: Date, end: Date) {
   const s = new Date(start);
@@ -346,6 +347,18 @@ export class RentalsService {
         `Đơn #${finalRental.id} đã được đặt từ ${new Date(finalRental.startDate).toLocaleDateString("vi-VN")} đến ${new Date(finalRental.endDate).toLocaleDateString("vi-VN")}. Chúng tôi sẽ xác nhận sớm.`,
         NotificationType.RENTAL_CREATED,
       ).catch(() => {});
+
+      // Gửi thông báo cho tất cả admin
+      this.usersRepo.find({ where: { role: Role.ADMIN } }).then((admins) => {
+        for (const admin of admins) {
+          this.notificationsService.create(
+            admin.id,
+            `Đơn thuê mới #${finalRental.id}`,
+            `${user.name || user.email} vừa đặt thuê từ ${new Date(finalRental.startDate).toLocaleDateString("vi-VN")} đến ${new Date(finalRental.endDate).toLocaleDateString("vi-VN")}. Tổng: ${finalRental.totalPrice.toLocaleString("vi-VN")}đ`,
+            NotificationType.RENTAL_CREATED,
+          ).catch(() => {});
+        }
+      }).catch(() => {});
     }
 
     return finalRental;
