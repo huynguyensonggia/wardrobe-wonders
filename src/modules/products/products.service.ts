@@ -341,6 +341,14 @@ export class ProductService {
       product.costPrice = Number((dto as any).costPrice);
       product.rentPricePerDay = prices.rentPricePerDay;
       product.deposit = prices.deposit;
+    } else {
+      // phụ kiện: admin nhập thẳng rentPricePerDay / deposit
+      if ((dto as any).rentPricePerDay !== undefined) {
+        product.rentPricePerDay = Number((dto as any).rentPricePerDay) || 0;
+      }
+      if ((dto as any).deposit !== undefined) {
+        product.deposit = Number((dto as any).deposit) || 0;
+      }
     }
     if (dto.color !== undefined) product.color = nextColor;
     if (dto.colorEn !== undefined) product.colorEn = dto.colorEn?.trim() ?? null;

@@ -229,7 +229,6 @@ export default function AdminAccessories() {
     form.append("categoryId", categoryId);
     form.append("occasion", "casual");
     form.append("rentPricePerDay", rentPricePerDay);
-    form.append("deposit", deposit);
     form.append("color", color || "unknown");
     if (colorEn.trim()) form.append("colorEn", colorEn.trim());
     if (colorJa.trim()) form.append("colorJa", colorJa.trim());
@@ -367,8 +366,8 @@ export default function AdminAccessories() {
                 )}
               </div>
 
-              {/* Giá + Cọc */}
-              <div className="grid gap-3">
+              {/* Giá thuê */}
+              <div className="grid gap-2">
                 {(() => {
                   const defaults = getDefaultPrices(categoryId);
                   return defaults ? (
@@ -378,16 +377,8 @@ export default function AdminAccessories() {
                     </p>
                   ) : null;
                 })()}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="grid gap-2">
-                    <Label>Giá thuê / lần</Label>
-                    <Input value={rentPricePerDay} onChange={(e) => setRentPricePerDay(e.target.value)} inputMode="numeric" />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>{t("admin.accessories.form.deposit")}</Label>
-                    <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
-                  </div>
-                </div>
+                <Label>Giá thuê / lần (VNĐ)</Label>
+                <Input value={rentPricePerDay} onChange={(e) => setRentPricePerDay(e.target.value)} inputMode="numeric" />
               </div>
 
               {/* Màu sắc chính */}
