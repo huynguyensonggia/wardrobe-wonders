@@ -1,32 +1,33 @@
 import { Injectable, Logger } from "@nestjs/common";
+import * as nodemailer from "nodemailer";
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
-  private readonly apiKey = process.env.BREVO_API_KEY ?? "";
   private readonly senderEmail =
     process.env.MAIL_SENDER_EMAIL ?? "xuagiahuy@gmail.com";
   private readonly senderName = process.env.MAIL_SENDER_NAME ?? "AI Closet";
 
-  private async send(to: string, subject: string, html: string) {
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": this.apiKey,
-        "Content-Type": "application/json",
+  private getTransporter() {
+    return nodemailer.createTransport({
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.BREVO_SMTP_USER ?? "",
+        pass: process.env.BREVO_SMTP_PASS ?? "",
       },
-      body: JSON.stringify({
-        sender: { name: this.senderName, email: this.senderEmail },
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-      }),
     });
+  }
 
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(`Brevo API error ${res.status}: ${body}`);
-    }
+  private async send(to: string, subject: string, html: string) {
+    const transporter = this.getTransporter();
+    await transporter.sendMail({
+      from: `"${this.senderName}" <${this.senderEmail}>`,
+      to,
+      subject,
+      html,
+    });
   }
 
   async sendWelcome(to: string, name: string) {
