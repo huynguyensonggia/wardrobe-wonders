@@ -104,7 +104,8 @@
     "galleryImage": "ギャラリー画像 {{index}}",
     "actions": {
       "favorite": "お気に入りに追加",
-      "share": "共有"
+      "share": "共有",
+      "linkCopied": "リンクをコピーしました"
     },
     "tooltips": {
       "variantInactive": "バリアント無効",

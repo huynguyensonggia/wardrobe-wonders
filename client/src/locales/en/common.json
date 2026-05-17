@@ -104,7 +104,8 @@
     "galleryImage": "Gallery image {{index}}",
     "actions": {
       "favorite": "Add to favorites",
-      "share": "Share"
+      "share": "Share",
+      "linkCopied": "Product link copied"
     },
     "tooltips": {
       "variantInactive": "Variant inactive",

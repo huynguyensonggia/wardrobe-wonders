@@ -104,7 +104,8 @@
     "galleryImage": "Ảnh thư viện {{index}}",
     "actions": {
       "favorite": "Thêm vào yêu thích",
-      "share": "Chia sẻ"
+      "share": "Chia sẻ",
+      "linkCopied": "Đã copy link sản phẩm"
     },
     "tooltips": {
       "variantInactive": "Biến thể đang tắt",

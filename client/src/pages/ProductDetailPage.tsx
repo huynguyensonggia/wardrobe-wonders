@@ -69,9 +69,11 @@ function isVariantActive(x: any): boolean {
 }
 
 import { calcItemRentalPrice, isAccessorySlug } from "@/utils/pricing";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const MIN_RENTAL_DAYS = 1;
 
   const { id } = useParams<{ id: string }>();
@@ -353,6 +355,21 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    const productName = (product as any)?.name ?? "";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: productName, url });
+      } catch {
+        // user cancelled — do nothing
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: t("productDetail.actions.linkCopied") });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -466,6 +483,7 @@ export default function ProductDetailPage() {
                   variant="icon"
                   size="icon"
                   aria-label={t("productDetail.actions.share")}
+                  onClick={handleShare}
                 >
                   <Share2 className="w-5 h-5" />
                 </Button>
