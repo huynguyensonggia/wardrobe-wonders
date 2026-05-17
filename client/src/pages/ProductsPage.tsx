@@ -155,15 +155,20 @@ export default function ProductsPage() {
     });
   }, [productsFromApi, filters.size, filters.color, filters.status]);
 
-  // derive sizes/colors
+  // chỉ lấy sizes/colors từ sản phẩm không phải phụ kiện
+  const nonAccessoryProducts = useMemo(
+    () => (productsFromApi as any[]).filter((p) => !ACCESSORY_SLUGS.includes(p?.category?.slug ?? "")),
+    [productsFromApi]
+  );
+
   const allSizes = useMemo(() => {
-    return [...new Set((productsFromApi as any[]).flatMap((p) => p.sizes ?? []))].sort();
-  }, [productsFromApi]);
+    return [...new Set(nonAccessoryProducts.flatMap((p) => p.sizes ?? []))].sort();
+  }, [nonAccessoryProducts]);
 
   // Map Vietnamese color → localized display name
   const allColors = useMemo(() => {
     const map = new Map<string, string>();
-    (productsFromApi as any[]).forEach((p) => {
+    nonAccessoryProducts.forEach((p) => {
       const viColor = p.color ?? "";
       if (viColor && !map.has(viColor)) {
         const label = getLocalizedColor(p, i18n.language);
@@ -171,7 +176,7 @@ export default function ProductsPage() {
       }
     });
     return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
-  }, [productsFromApi, i18n.language]);
+  }, [nonAccessoryProducts, i18n.language]);
 
   const isSearching = searchInput !== debouncedSearch;
 
