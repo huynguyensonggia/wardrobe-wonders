@@ -67,11 +67,7 @@ function normalizePhone(s: string) {
     .replace(/[^\d+]/g, "");
 }
 
-/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
-function calcRentalPrice(basePrice: number, days: number): number {
-  if (days <= 0) return 0;
-  return basePrice + (days - 1) * 10_000;
-}
+import { calcItemRentalPrice } from "@/utils/pricing";
 
 export default function CheckoutPage() {
   const { t, i18n } = useTranslation();
@@ -158,7 +154,7 @@ export default function CheckoutPage() {
   const total = useMemo(() => {
     return checkoutItems.reduce(
       (sum, it) =>
-        sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
+        sum + it.quantity * calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug),
       0
     );
   }, [checkoutItems]);
@@ -310,7 +306,7 @@ export default function CheckoutPage() {
         {groups.map((g) => {
           const groupTotal = g.list.reduce(
             (sum, it) =>
-              sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
+              sum + it.quantity * calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug),
             0
           );
 
@@ -322,7 +318,7 @@ export default function CheckoutPage() {
               </div>
 
               {g.list.map((it) => {
-                const lineTotal = it.quantity * calcRentalPrice(it.rentPricePerDay, it.days);
+                const lineTotal = it.quantity * calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug);
 
                 return (
                   <div
@@ -359,7 +355,7 @@ export default function CheckoutPage() {
                         {t("checkout.summary.line")}:{" "}
                         {(
                           it.quantity *
-                          calcRentalPrice(it.rentPricePerDay, it.days)
+                          calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug)
                         ).toLocaleString("vi-VN")}
                         đ
                       </div>

@@ -392,6 +392,7 @@
     "size": "サイズ:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "日",
+    "perRental": "回",
     "lineTotal": "小計",
     "remove": "削除",
     "qty": {

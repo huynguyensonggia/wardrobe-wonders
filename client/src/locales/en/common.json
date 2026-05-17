@@ -391,6 +391,7 @@
     "size": "Size:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "day",
+    "perRental": "rental",
     "lineTotal": "Line total",
     "remove": "Remove",
     "qty": {

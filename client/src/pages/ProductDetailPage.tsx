@@ -68,11 +68,7 @@ function isVariantActive(x: any): boolean {
   return true;
 }
 
-/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
-function calcRentalPrice(basePrice: number, days: number): number {
-  if (days <= 0) return 0;
-  return basePrice + (days - 1) * 10_000;
-}
+import { calcItemRentalPrice, isAccessorySlug } from "@/utils/pricing";
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
@@ -193,12 +189,14 @@ export default function ProductDetailPage() {
     return `${base} (${selectedSize}${selectedColor ? `, ${selectedColor}` : ""})`;
   }, [product, selectedSize, selectedColor]);
 
+  const categorySlug: string = (product as any)?.category?.slug ?? "";
+
   const totalPrice = useMemo(() => {
     const pricePerDay = Number(
       (product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0
     );
-    return calcRentalPrice(pricePerDay, rentalDays);
-  }, [product, rentalDays]);
+    return calcItemRentalPrice(pricePerDay, rentalDays, categorySlug);
+  }, [product, rentalDays, categorySlug]);
 
   const mainImage = useMemo(() => {
     return (
@@ -287,6 +285,7 @@ export default function ProductDetailPage() {
         startDate,
         endDate,
         days: rentalDays,
+        categorySlug,
       },
       1
     );

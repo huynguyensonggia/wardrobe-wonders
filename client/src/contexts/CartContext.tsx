@@ -17,6 +17,7 @@ export type CartItem = {
   startDate: string;
   endDate: string;
   days: number;
+  categorySlug?: string;
 };
 
 type CartContextValue = {

@@ -390,6 +390,7 @@
     "size": "Size:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "ngày",
+    "perRental": "lần thuê",
     "lineTotal": "Tổng dòng",
     "remove": "Xoá",
     "qty": {

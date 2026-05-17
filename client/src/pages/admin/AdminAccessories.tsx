@@ -37,6 +37,13 @@ import { ProductCard } from "@/components/products/ProductCard";
 // Slugs được coi là phụ kiện
 const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
 
+// Giá mặc định theo loại phụ kiện (VND / lần thuê)
+const ACCESSORY_DEFAULT_PRICES: Record<string, { rent: number; deposit: number }> = {
+  jewelry: { rent: 10000, deposit: 0 },
+  hats:    { rent: 15000, deposit: 0 },
+  bags:    { rent: 20000, deposit: 0 },
+};
+
 const makeRowId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? (crypto as any).randomUUID() as string
@@ -132,18 +139,39 @@ export default function AdminAccessories() {
     }
   }, [accessoryCategories]); // eslint-disable-line
 
+  // Helper: lấy default price theo categoryId
+  const getDefaultPrices = (catId: string) => {
+    const cat = accessoryCategories.find((c) => String(c.id) === catId);
+    const slug = (cat as any)?.slug ?? "";
+    return ACCESSORY_DEFAULT_PRICES[slug] ?? null;
+  };
+
+  // Auto-fill giá khi chọn danh mục (chỉ khi tạo mới)
+  useEffect(() => {
+    if (mode !== "create" || !categoryId) return;
+    const defaults = getDefaultPrices(categoryId);
+    if (defaults) {
+      setRentPricePerDay(String(defaults.rent));
+      setDeposit(String(defaults.deposit));
+    }
+  }, [categoryId, mode]); // eslint-disable-line
+
   const resetForm = () => {
     setImage(null);
     setName("");
     setNameEn("");
     setNameJa("");
-    setRentPricePerDay("50");
-    setDeposit("100");
     setColor("");
     setColorEn("");
     setColorJa("");
     setVariants([{ id: makeRowId(), size: "", sizeEn: "", sizeJa: "", stock: "1" }]);
-    if (accessoryCategories.length) setCategoryId(String(accessoryCategories[0].id));
+    if (accessoryCategories.length) {
+      const firstCatId = String(accessoryCategories[0].id);
+      setCategoryId(firstCatId);
+      const defaults = getDefaultPrices(firstCatId);
+      setRentPricePerDay(String(defaults?.rent ?? 10000));
+      setDeposit(String(defaults?.deposit ?? 0));
+    }
   };
 
   const openCreate = () => {
@@ -340,14 +368,25 @@ export default function AdminAccessories() {
               </div>
 
               {/* Giá + Cọc */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="grid gap-2">
-                  <Label>{t("admin.accessories.form.rentPerDay")}</Label>
-                  <Input value={rentPricePerDay} onChange={(e) => setRentPricePerDay(e.target.value)} inputMode="numeric" />
-                </div>
-                <div className="grid gap-2">
-                  <Label>{t("admin.accessories.form.deposit")}</Label>
-                  <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
+              <div className="grid gap-3">
+                {(() => {
+                  const defaults = getDefaultPrices(categoryId);
+                  return defaults ? (
+                    <p className="text-xs text-muted-foreground bg-muted rounded px-2 py-1">
+                      Giá mặc định: <span className="font-medium">{defaults.rent.toLocaleString("vi-VN")}đ / lần thuê</span>
+                      {" "}(có thể chỉnh bên dưới)
+                    </p>
+                  ) : null;
+                })()}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label>Giá thuê / lần</Label>
+                    <Input value={rentPricePerDay} onChange={(e) => setRentPricePerDay(e.target.value)} inputMode="numeric" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>{t("admin.accessories.form.deposit")}</Label>
+                    <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
+                  </div>
                 </div>
               </div>
 
