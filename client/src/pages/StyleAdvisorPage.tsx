@@ -245,9 +245,6 @@ export default function StyleAdvisorPage() {
                       <div className="font-medium truncate">
                         {getLocalizedProductName(product, i18n.language, product.name)}
                       </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        {product.category} • {product.color}
-                      </div>
                       {product.sizes.length > 0 && (
                         <div className="text-xs text-muted-foreground mt-0.5">
                           {t("styleAdvisor.results.size")}: {product.sizes.join(", ")}
