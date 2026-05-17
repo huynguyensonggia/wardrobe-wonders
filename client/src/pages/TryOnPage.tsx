@@ -202,10 +202,11 @@ export default function TryOnPage() {
       .map((p: any) => {
         const id = String(p?.id ?? "");
         const name = String(p?.name ?? `Product #${id}`);
+        const nameEn = p?.nameEn ?? null;
+        const nameJa = p?.nameJa ?? null;
         const img = pickProductImage(p);
-        const catName = p?.category?.name ? String(p.category.name) : undefined;
         const vton = getProductVton(p);
-        return { id, name, img, catName, vton };
+        return { id, name, nameEn, nameJa, img, vton };
       });
 
     return list;
@@ -633,13 +634,7 @@ export default function TryOnPage() {
 
                                   <div className="p-2">
                                     <div className="text-sm font-medium line-clamp-1">
-                                      {p.name}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground line-clamp-1">
-                                      {p.catName ||
-                                        (p.vton
-                                          ? p.vton
-                                          : t("tryOn.mix.category"))}
+                                      {getLocalizedProductName(p, i18n.language, p.name)}
                                     </div>
                                     {active && (
                                       <div className="mt-1 text-xs font-medium text-primary">
