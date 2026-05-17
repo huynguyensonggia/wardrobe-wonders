@@ -1338,7 +1338,7 @@
         "Shipper will call 15-30 minutes before delivery",
         "Customers can check items before payment",
         "Payment by cash or bank transfer",
-        "Free shipping for orders over 400,000đ (Da Nang area)",
+        "Free shipping within Da Nang area",
         "Delivery 7 days/week, including weekends and holidays"
       ]
     },
@@ -1639,7 +1639,7 @@
         "note1": "Shipper will call 15-30 minutes before delivery",
         "note2": "Customers can inspect items before payment",
         "note3": "Payment by cash or bank transfer",
-        "note4": "Free shipping for orders from 400,000đ (Da Nang area)"
+        "note4": "Free shipping within Da Nang area"
       }
     },
     "returns": {

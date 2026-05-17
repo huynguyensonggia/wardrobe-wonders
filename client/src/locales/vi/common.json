@@ -1355,7 +1355,7 @@
         "Shipper sẽ gọi điện trước khi giao hàng 15-30 phút",
         "Khách hàng có thể kiểm tra hàng trước khi thanh toán",
         "Thanh toán bằng tiền mặt hoặc chuyển khoản",
-        "Miễn phí giao hàng cho đơn từ 400.000đ (khu vực Đà Nẵng)",
+        "Miễn phí giao hàng trong khu vực Đà Nẵng",
         "Giao hàng 7 ngày/tuần, kể cả cuối tuần và lễ tết"
       ]
     },
@@ -1656,7 +1656,7 @@
         "note1": "Shipper sẽ gọi điện trước khi giao hàng 15-30 phút",
         "note2": "Khách hàng có thể kiểm tra hàng trước khi thanh toán",
         "note3": "Thanh toán bằng tiền mặt hoặc chuyển khoản",
-        "note4": "Miễn phí giao hàng cho đơn từ 400.000đ (khu vực Đà Nẵng)"
+        "note4": "Miễn phí giao hàng trong khu vực Đà Nẵng"
       }
     },
     "returns": {
