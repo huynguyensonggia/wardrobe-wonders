@@ -198,16 +198,28 @@ export class ProductService {
       color,
     });
 
-    const { rentPricePerDay, deposit } = this.calcPrices(dto.costPrice);
+    const directRentPrice = (dto as any).rentPricePerDay !== undefined
+      ? Number((dto as any).rentPricePerDay)
+      : null;
+    const directDeposit = (dto as any).deposit !== undefined
+      ? Number((dto as any).deposit)
+      : null;
+    const calcedPrices = this.calcPrices(dto.costPrice);
+    const finalRentPrice = directRentPrice !== null && !dto.costPrice
+      ? directRentPrice
+      : calcedPrices.rentPricePerDay;
+    const finalDeposit = directDeposit !== null && !dto.costPrice
+      ? directDeposit
+      : calcedPrices.deposit;
 
     const product = this.productRepo.create({
       name,
       category,
       categoryId: category.id,
       occasion: occasion as ProductOccasion,
-      costPrice: dto.costPrice,
-      rentPricePerDay,
-      deposit,
+      costPrice: dto.costPrice ?? 0,
+      rentPricePerDay: finalRentPrice,
+      deposit: finalDeposit,
       color,
       colorEn: dto.colorEn?.trim() ?? null,
       colorJa: dto.colorJa?.trim() ?? null,
