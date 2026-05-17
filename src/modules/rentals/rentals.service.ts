@@ -380,7 +380,7 @@ export class RentalsService {
 
     const [data, total] = await this.rentalsRepo.findAndCount({
       where: status ? { status } : undefined,
-      relations: ["user", "items", "items.product", "items.variant", "payments"],
+      relations: ["user", "items", "items.product", "items.variant", "payments", "surcharges"],
       order: { createdAt: "DESC" as any },
       take,
       skip,
