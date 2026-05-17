@@ -115,6 +115,15 @@ export class ProductService {
     return Number.isFinite(n) ? n : null;
   }
 
+  // Giá thuê = 40% giá nhập, làm tròn 1.000đ
+  // Giá cọc  = 120% giá nhập, làm tròn 1.000đ
+  private calcPrices(costPrice: number): { rentPricePerDay: number; deposit: number } {
+    return {
+      rentPricePerDay: Math.round((costPrice * 0.4) / 1000) * 1000,
+      deposit: Math.round((costPrice * 1.2) / 1000) * 1000,
+    };
+  }
+
   /** name + category + occasion + color (KHÔNG size) */
   private async assertNoDuplicate(params: {
     name: string;
@@ -188,14 +197,19 @@ export class ProductService {
       color,
     });
 
+    const { rentPricePerDay, deposit } = this.calcPrices(dto.costPrice);
+
     const product = this.productRepo.create({
       name,
       category,
       categoryId: category.id,
       occasion: occasion as ProductOccasion,
-      rentPricePerDay: dto.rentPricePerDay,
-      deposit: dto.deposit,
+      costPrice: dto.costPrice,
+      rentPricePerDay,
+      deposit,
       color,
+      colorEn: dto.colorEn?.trim() ?? null,
+      colorJa: dto.colorJa?.trim() ?? null,
       imageUrl: null,
       description: dto.description ?? null,
       nameEn: (dto as any).nameEn ?? null,
@@ -321,10 +335,15 @@ export class ProductService {
 
     if (dto.name !== undefined) product.name = nextName;
     if (dto.occasion !== undefined) product.occasion = nextOccasion as any;
-    if (dto.rentPricePerDay !== undefined)
-      product.rentPricePerDay = dto.rentPricePerDay;
-    if (dto.deposit !== undefined) product.deposit = dto.deposit;
+    if ((dto as any).costPrice !== undefined) {
+      const prices = this.calcPrices(Number((dto as any).costPrice));
+      product.costPrice = Number((dto as any).costPrice);
+      product.rentPricePerDay = prices.rentPricePerDay;
+      product.deposit = prices.deposit;
+    }
     if (dto.color !== undefined) product.color = nextColor;
+    if (dto.colorEn !== undefined) product.colorEn = dto.colorEn?.trim() ?? null;
+    if (dto.colorJa !== undefined) product.colorJa = dto.colorJa?.trim() ?? null;
     if (dto.description !== undefined) product.description = dto.description;
     if ((dto as any).nameEn !== undefined)
       product.nameEn = (dto as any).nameEn ?? null;
@@ -490,14 +509,14 @@ export class ProductService {
         if (!occasion) throw new BadRequestException("occasion is required");
 
         const color = this.normalizeColor(r.color);
+        const colorEn = r.colorEn ? String(r.colorEn).trim() : null;
+        const colorJa = r.colorJa ? String(r.colorJa).trim() : null;
 
-        const rentPricePerDay = this.toNumber(r.rentPricePerDay);
-        if (rentPricePerDay === null)
-          throw new BadRequestException("rentPricePerDay is required");
+        const costPrice = this.toNumber(r.costPrice ?? r.cost_price);
+        if (costPrice === null)
+          throw new BadRequestException("costPrice is required");
 
-        const deposit = this.toNumber(r.deposit);
-        if (deposit === null)
-          throw new BadRequestException("deposit is required");
+        const { rentPricePerDay, deposit } = this.calcPrices(costPrice);
 
         const statusRaw = (r.status ?? "").toString().trim();
         const status = !statusRaw
@@ -538,9 +557,12 @@ export class ProductService {
           category,
           categoryId,
           occasion: occasion as any,
+          costPrice,
           rentPricePerDay,
           deposit,
           color,
+          colorEn,
+          colorJa,
           imageUrl: null,
           description,
           nameEn,

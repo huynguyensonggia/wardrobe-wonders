@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { productsApi, productWatchApi } from "@/lib/api";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -91,7 +92,8 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const { addItem, items: cartItems } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { refresh: refreshFavorites } = useFavorites();
 
   const {
     data: product,
@@ -249,6 +251,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
+    if (user?.role === "ADMIN") return;
     if (!ensureValid()) return;
 
     const stock = selectedVariant!.stock ?? 1;
@@ -293,6 +296,7 @@ export default function ProductDetailPage() {
 
   const handleRentNow = () => {
     if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
+    if (user?.role === "ADMIN") return;
     if (!ensureValid()) return;
 
     navigate("/checkout", {
@@ -344,6 +348,7 @@ export default function ProductDetailPage() {
         await productWatchApi.watch(productIdNum);
         setNotifyRegistered(true);
       }
+      refreshFavorites();
     } catch {} finally {
       setNotifyLoading(false);
     }
@@ -453,8 +458,10 @@ export default function ProductDetailPage() {
                   variant="icon"
                   size="icon"
                   aria-label={t("productDetail.actions.favorite")}
+                  onClick={handleNotify}
+                  disabled={notifyLoading}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className={`w-5 h-5 transition-colors ${notifyRegistered ? "fill-red-500 text-red-500" : ""}`} />
                 </Button>
                 <Button
                   variant="icon"

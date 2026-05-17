@@ -32,7 +32,7 @@ export class CreateProductDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  rentPricePerDay: number;
+  costPrice: number;
 
   @Type(() => Number)
   @IsInt()
@@ -46,14 +46,17 @@ export class CreateProductDto {
   @IsEnum(ProductStatus)
   status?: ProductStatus;
 
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  deposit: number;
-
   @IsOptional()
   @IsString()
   color?: string;
+
+  @IsOptional()
+  @IsString()
+  colorEn?: string;
+
+  @IsOptional()
+  @IsString()
+  colorJa?: string;
 
   @IsOptional()
   @IsString()

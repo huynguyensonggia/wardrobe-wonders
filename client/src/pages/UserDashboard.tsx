@@ -1,12 +1,13 @@
 import { Outlet, Link, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingBag, User, Clock, Settings, ChevronRight } from "lucide-react";
+import { ShoppingBag, User, Clock, Settings, ChevronRight, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 const sidebarLinks = [
   { to: "/dashboard", icon: ShoppingBag, labelKey: "dashboard.sidebar.myRentals", exact: true, adminHide: true },
   { to: "/dashboard/history", icon: Clock, labelKey: "dashboard.sidebar.rentalHistory", adminHide: true },
+  { to: "/dashboard/favorites", icon: Heart, labelKey: "dashboard.sidebar.favorites", adminHide: true },
   { to: "/dashboard/profile", icon: User, labelKey: "dashboard.sidebar.profile" },
   { to: "/dashboard/settings", icon: Settings, labelKey: "dashboard.sidebar.settings" },
 ];

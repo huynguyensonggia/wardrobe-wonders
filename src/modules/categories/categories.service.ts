@@ -38,6 +38,8 @@ export class CategoriesService {
 
     const cat = this.repo.create({
       name: dto.name.trim(),
+      nameEn: dto.nameEn?.trim() ?? null,
+      nameJa: dto.nameJa?.trim() ?? null,
       slug,
       description: dto.description ?? null,
       vtonCategory: dto.vtonCategory ?? VtonCategory.DRESSES,
@@ -62,6 +64,8 @@ export class CategoriesService {
     // Update chỉ những field được gửi (partial)
     Object.assign(cat, {
       name: dto.name ? dto.name.trim() : cat.name,
+      nameEn: dto.nameEn !== undefined ? (dto.nameEn?.trim() ?? null) : cat.nameEn,
+      nameJa: dto.nameJa !== undefined ? (dto.nameJa?.trim() ?? null) : cat.nameJa,
       slug: dto.slug ? dto.slug.trim() : cat.slug,
       description:
         dto.description !== undefined ? dto.description : cat.description,

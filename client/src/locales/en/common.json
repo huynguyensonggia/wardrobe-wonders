@@ -43,6 +43,7 @@
     "hats": "Hats",
     "aiTryOn": "AI Try-On",
     "styleAdvisor": "Style Advisor",
+    "favorites": "Favorites",
     "cart": "Cart",
     "myRentals": "My Rentals",
     "adminDashboard": "Admin Dashboard",
@@ -784,12 +785,15 @@
       "selectCategory": "Select category",
       "occasion": "Occasion",
       "selectOccasion": "Select occasion",
+      "costPrice": "Cost Price",
       "rentPerDay": "Rent / Day",
       "deposit": "Deposit",
       "variants": "Variants (Size + Stock)",
       "size": "Size",
       "stock": "Stock",
-      "color": "Color"
+      "color": "Color (Vietnamese)",
+      "colorEn": "Color (English)",
+      "colorJa": "Color (日本語)"
     },
     "occasions": {
       "party": "Party",
@@ -893,7 +897,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "Name",
+      "name": "Name (Vietnamese)",
+      "nameEn": "Name (English)",
+      "nameJa": "Name (日本語)",
       "slug": "Slug",
       "slugPlaceholder": "e.g. dresses",
       "slugHint": "Backend DTO requires slug, so it cannot be empty.",
@@ -1088,12 +1094,19 @@
       "aria": "Dashboard navigation",
       "myRentals": "My Rentals",
       "rentalHistory": "Rental History",
+      "favorites": "Favorites",
       "profile": "Profile",
       "settings": "Settings"
     },
     "fallback": {
       "firstName": "there"
     }
+  },
+  "favorites": {
+    "title": "Favorite Products",
+    "empty": "You have no favorite products yet",
+    "browse": "Browse Products",
+    "remove": "Remove from favorites"
   },
   "tryOnSuggest": {
     "header": {

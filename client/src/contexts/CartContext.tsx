@@ -1,5 +1,6 @@
 // CartContext.tsx
 import { createContext, useContext, useMemo, useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export type CartItem = {
   productId: number;
@@ -45,11 +46,13 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const CART_KEY = "ww_cart";
+function getCartKey(userId?: string) {
+  return `ww_cart_${userId ?? "guest"}`;
+}
 
-function loadCart(): CartItem[] {
+function loadCartForUser(userId?: string): CartItem[] {
   try {
-    const raw = localStorage.getItem(CART_KEY);
+    const raw = localStorage.getItem(getCartKey(userId));
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -57,12 +60,20 @@ function loadCart(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(loadCart);
+  const { user } = useAuth();
+  const userId = user?.id;
+
+  const [items, setItems] = useState<CartItem[]>(() => loadCartForUser(userId));
+
+  // Reload cart when user changes (login / logout / account switch)
+  useEffect(() => {
+    setItems(loadCartForUser(userId));
+  }, [userId]);
 
   // Sync to localStorage on every change
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
-  }, [items]);
+    localStorage.setItem(getCartKey(userId), JSON.stringify(items));
+  }, [items, userId]);
 
   const count = useMemo(
     () => items.reduce((s, i) => s + i.quantity, 0),

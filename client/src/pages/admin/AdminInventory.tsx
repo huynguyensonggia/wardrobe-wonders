@@ -5,6 +5,7 @@ import { productsApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 type ConditionStatus =
   | "available" | "shipping" | "rented"
@@ -17,7 +18,7 @@ type InventoryItem = {
   totalRentals: number;
   maxRentals: number;
   conditionNote?: string;
-  variant?: { id: number; size: string; product?: { name: string } };
+  variant?: { id: number; size: string; product?: { name: string; nameEn?: string | null; nameJa?: string | null } };
 };
 
 const STATUS_COLORS: Record<ConditionStatus, string> = {
@@ -131,7 +132,7 @@ function ConditionNoteButton({ item, onSave }: { item: InventoryItem; onSave: (n
 }
 
 export default function AdminInventory() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const [filterStatus, setFilterStatus] = useState<ConditionStatus | "">("");
   const [barcodeSearch, setBarcodeSearch] = useState("");
@@ -210,7 +211,7 @@ export default function AdminInventory() {
               >
                 <option value="">-- {t("adminInventory.form.selectProduct")} --</option>
                 {(products as any[]).map((p) => (
-                  <option key={p.id} value={String(p.id)}>{p.name}</option>
+                  <option key={p.id} value={String(p.id)}>{getLocalizedProductName(p, i18n.language, p.name)}</option>
                 ))}
               </select>
             </div>
@@ -324,7 +325,7 @@ export default function AdminInventory() {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  {item.variant?.product?.name} • Size {item.variant?.size} •{" "}
+                  {item.variant?.product ? getLocalizedProductName(item.variant.product, i18n.language, item.variant.product.name) : ""} • Size {item.variant?.size} •{" "}
                   {t("adminInventory.rentedCount", { count: item.totalRentals, max: item.maxRentals })}
                   {item.conditionNote && ` • ${item.conditionNote}`}
                 </div>

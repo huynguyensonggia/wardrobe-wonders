@@ -17,6 +17,12 @@ export class Category {
   @Column({ name: "name", length: 100 })
   name: string;
 
+  @Column({ name: "name_en", type: "varchar", length: 100, nullable: true })
+  nameEn: string | null;
+
+  @Column({ name: "name_ja", type: "varchar", length: 100, nullable: true })
+  nameJa: string | null;
+
   @Column({ name: "slug", length: 100, unique: true })
   slug: string;
 

@@ -43,6 +43,7 @@
     "hats": "Mũ",
     "aiTryOn": "AI Thử đồ",
     "styleAdvisor": "Tư vấn phong cách",
+    "favorites": "Yêu thích",
     "cart": "Giỏ hàng",
     "myRentals": "Đơn thuê của tôi",
     "adminDashboard": "Bảng điều khiển Admin",
@@ -783,12 +784,15 @@
       "selectCategory": "Chọn danh mục",
       "occasion": "Dịp sử dụng",
       "selectOccasion": "Chọn dịp",
+      "costPrice": "Giá nhập",
       "rentPerDay": "Giá thuê / ngày",
       "deposit": "Tiền cọc",
       "variants": "Biến thể (Size + Tồn kho)",
       "size": "Size",
       "stock": "Tồn kho",
-      "color": "Màu"
+      "color": "Màu (Tiếng Việt)",
+      "colorEn": "Màu (English)",
+      "colorJa": "Màu (日本語)"
     },
     "occasions": {
       "party": "Tiệc",
@@ -892,7 +896,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "Tên",
+      "name": "Tên (Tiếng Việt)",
+      "nameEn": "Tên (English)",
+      "nameJa": "Tên (日本語)",
       "slug": "Slug",
       "slugPlaceholder": "vd: dresses",
       "slugHint": "DTO backend đang require slug, nên không được để trống.",
@@ -1105,12 +1111,19 @@
       "aria": "Điều hướng bảng điều khiển",
       "myRentals": "Đơn thuê của tôi",
       "rentalHistory": "Lịch sử thuê",
+      "favorites": "Yêu thích",
       "profile": "Hồ sơ",
       "settings": "Cài đặt"
     },
     "fallback": {
       "firstName": "bạn"
     }
+  },
+  "favorites": {
+    "title": "Sản phẩm yêu thích",
+    "empty": "Bạn chưa có sản phẩm yêu thích nào",
+    "browse": "Khám phá sản phẩm",
+    "remove": "Bỏ yêu thích"
   },
   "tryOnSuggest": {
     "header": {

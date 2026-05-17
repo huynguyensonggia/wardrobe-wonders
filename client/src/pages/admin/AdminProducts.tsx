@@ -35,6 +35,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Pencil, Trash2, Upload } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 /* ===== ENUM MIRROR FROM BE ===== */
 type ProductOccasion = "party" | "wedding" | "casual";
@@ -61,7 +62,7 @@ const makeRowId = () => {
 
 export default function AdminProducts() {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // occasions with translation
   const OCCASIONS: { value: ProductOccasion; label: string }[] = useMemo(
@@ -155,9 +156,10 @@ export default function AdminProducts() {
   /* ===== FORM STATE ===== */
   const [name, setName] = useState("");
   const [occasion, setOccasion] = useState<ProductOccasion>("party");
-  const [rentPricePerDay, setRentPricePerDay] = useState("150");
-  const [deposit, setDeposit] = useState("200");
+  const [costPrice, setCostPrice] = useState("0");
   const [color, setColor] = useState("unknown");
+  const [colorEn, setColorEn] = useState("");
+  const [colorJa, setColorJa] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [nameJa, setNameJa] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
@@ -172,9 +174,10 @@ export default function AdminProducts() {
     setImage(null);
     setName("");
     setOccasion("party");
-    setRentPricePerDay("150");
-    setDeposit("200");
+    setCostPrice("0");
     setColor("unknown");
+    setColorEn("");
+    setColorJa("");
     setNameEn("");
     setNameJa("");
     setDescriptionEn("");
@@ -198,14 +201,14 @@ export default function AdminProducts() {
     setName((p as any).name ?? "");
     setOccasion(((p as any).occasion ?? "party") as ProductOccasion);
 
-    // ✅ keep only rentPricePerDay (avoid confusion)
-    setRentPricePerDay(String((p as any).rentPricePerDay ?? 150));
-    setDeposit(String((p as any).deposit ?? 200));
+    setCostPrice(String(p.costPrice ?? 0));
 
     const catId = String((p as any).category?.id ?? (p as any).categoryId ?? "");
     if (catId) setCategoryId(catId);
 
     setColor((p as any).color ?? "unknown");
+    setColorEn((p as any).colorEn ?? "");
+    setColorJa((p as any).colorJa ?? "");
     setNameEn((p as any).nameEn ?? "");
     setNameJa((p as any).nameJa ?? "");
     setDescriptionEn((p as any).descriptionEn ?? "");
@@ -306,9 +309,10 @@ export default function AdminProducts() {
       form.append("name", name.trim());
       form.append("categoryId", categoryId);
       form.append("occasion", occasion);
-      form.append("rentPricePerDay", rentPricePerDay);
-      form.append("deposit", deposit);
+      form.append("costPrice", costPrice);
       form.append("color", color);
+      if (colorEn.trim()) form.append("colorEn", colorEn.trim());
+      if (colorJa.trim()) form.append("colorJa", colorJa.trim());
       if (nameEn.trim()) form.append("nameEn", nameEn.trim());
       if (nameJa.trim()) form.append("nameJa", nameJa.trim());
       if (descriptionEn.trim()) form.append("descriptionEn", descriptionEn.trim());
@@ -574,19 +578,28 @@ export default function AdminProducts() {
               </div>
 
               {/* PRICE */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3">
                 <div className="grid gap-2">
-                  <Label>{t("adminProducts.form.rentPerDay")}</Label>
+                  <Label>{t("adminProducts.form.costPrice")}</Label>
                   <Input
-                    value={rentPricePerDay}
-                    onChange={(e) => setRentPricePerDay(e.target.value)}
+                    value={costPrice}
+                    onChange={(e) => setCostPrice(e.target.value)}
                     inputMode="numeric"
+                    placeholder="VD: 350000"
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label>{t("adminProducts.form.deposit")}</Label>
-                  <Input value={deposit} onChange={(e) => setDeposit(e.target.value)} inputMode="numeric" />
-                </div>
+                {Number(costPrice) > 0 && (
+                  <div className="grid grid-cols-2 gap-3 rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
+                    <div>
+                      <span className="font-medium">{t("adminProducts.form.rentPerDay")}:</span>{" "}
+                      {(Math.round((Number(costPrice) * 0.4) / 1000) * 1000).toLocaleString("vi-VN")}đ
+                    </div>
+                    <div>
+                      <span className="font-medium">{t("adminProducts.form.deposit")}:</span>{" "}
+                      {(Math.round((Number(costPrice) * 1.2) / 1000) * 1000).toLocaleString("vi-VN")}đ
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* VARIANTS + COLOR */}
@@ -656,6 +669,17 @@ export default function AdminProducts() {
                 <div className="grid gap-2 max-w-[260px]">
                   <Label>{t("adminProducts.form.color")}</Label>
                   <Input value={color} onChange={(e) => setColor(e.target.value)} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label>{t("adminProducts.form.colorEn")}</Label>
+                    <Input value={colorEn} onChange={(e) => setColorEn(e.target.value)} placeholder="e.g. pink" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>{t("adminProducts.form.colorJa")}</Label>
+                    <Input value={colorJa} onChange={(e) => setColorJa(e.target.value)} placeholder="例：ピンク" />
+                  </div>
                 </div>
               </div>
 
@@ -816,7 +840,7 @@ export default function AdminProducts() {
           <div className="bg-background rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b">
               <div>
-                <h3 className="font-medium text-lg">📦 {t("adminInventory.title")}: {(detailProduct as any).name}</h3>
+                <h3 className="font-medium text-lg">📦 {t("adminInventory.title")}: {getLocalizedProductName(detailProduct as any, i18n.language, (detailProduct as any).name)}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">{inventoryItems.length} {t("adminInventory.itemCount")}</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setDetailProductId(null)}>✕</Button>

@@ -43,6 +43,7 @@
     "hats": "帽子",
     "aiTryOn": "AI試着",
     "styleAdvisor": "スタイル診断",
+    "favorites": "お気に入り",
     "cart": "カート",
     "myRentals": "レンタル履歴",
     "adminDashboard": "管理ダッシュボード",
@@ -785,12 +786,15 @@
       "selectCategory": "カテゴリを選択",
       "occasion": "シーン",
       "selectOccasion": "シーンを選択",
+      "costPrice": "仕入れ価格",
       "rentPerDay": "日額レンタル",
       "deposit": "デポジット",
       "variants": "バリアント（サイズ + 在庫）",
       "size": "サイズ",
       "stock": "在庫",
-      "color": "色"
+      "color": "色（ベトナム語）",
+      "colorEn": "色（英語）",
+      "colorJa": "色（日本語）"
     },
     "occasions": {
       "party": "パーティー",
@@ -894,7 +898,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "名前",
+      "name": "名前（ベトナム語）",
+      "nameEn": "名前（英語）",
+      "nameJa": "名前（日本語）",
       "slug": "スラッグ",
       "slugPlaceholder": "例: dresses",
       "slugHint": "バックエンドDTOではslugが必須のため、空にできません。",
@@ -1107,12 +1113,19 @@
       "aria": "ダッシュボードのナビゲーション",
       "myRentals": "現在のレンタル",
       "rentalHistory": "レンタル履歴",
+      "favorites": "お気に入り",
       "profile": "プロフィール",
       "settings": "設定"
     },
     "fallback": {
       "firstName": "こちら"
     }
+  },
+  "favorites": {
+    "title": "お気に入り商品",
+    "empty": "お気に入り商品はまだありません",
+    "browse": "商品を探す",
+    "remove": "お気に入りから削除"
   },
   "tryOnSuggest": {
     "header": {

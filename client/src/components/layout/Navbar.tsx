@@ -13,6 +13,7 @@ import {
   Settings,
   LayoutDashboard,
   ChevronDown,
+  Heart,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -26,6 +27,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 // Cấu trúc danh mục
 const NAV_COLLECTIONS = [
@@ -77,6 +79,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { count } = useCart();
+  const { count: favCount } = useFavorites();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -174,6 +177,24 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-2">
             {/* Language selector */}
             <LanguageSwitcher />
+
+            {/* Favorites button — chỉ hiện khi đã đăng nhập và không phải admin */}
+            {isAuthenticated && user?.role !== "ADMIN" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
+                onClick={() => navigate("/dashboard/favorites")}
+                aria-label={t("navbar.favorites")}
+              >
+                <Heart className="w-5 h-5" />
+                {favCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
+                    {favCount}
+                  </span>
+                )}
+              </Button>
+            )}
 
             {/* Cart button — chỉ hiện khi đã đăng nhập và không phải admin */}
             {isAuthenticated && user?.role !== "ADMIN" && (
@@ -383,6 +404,19 @@ export function Navbar() {
                 <Sparkles className="w-4 h-4" />
                 {t("navbar.styleAdvisor")}
               </Link>
+
+              {/* Favorites in mobile menu — chỉ hiện khi đã đăng nhập và không phải admin */}
+              {isAuthenticated && user?.role !== "ADMIN" && (
+                <button
+                  className="text-left text-sm font-medium py-2"
+                  onClick={() => {
+                    navigate("/dashboard/favorites");
+                    setIsOpen(false);
+                  }}
+                >
+                  {t("navbar.favorites")}
+                </button>
+              )}
 
               {/* Cart in mobile menu — chỉ hiện khi đã đăng nhập và không phải admin */}
               {isAuthenticated && user?.role !== "ADMIN" && (
