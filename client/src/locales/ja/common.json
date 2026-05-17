@@ -114,8 +114,7 @@
     },
     "selectedVariant": "• 在庫: {{stock}}",
     "features": {
-      "freeShipping": "400.000đ以上で送料無料",
-      "damageProtection": "破損補償込み"
+      "freeShipping": "ダナンエリア内送料無料"
     },
     "shopee": {
       "title": "購入したいですか？",
