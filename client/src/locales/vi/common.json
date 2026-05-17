@@ -1345,7 +1345,7 @@
       "danang": {
         "zone": "Khu vực Đà Nẵng",
         "time": "2-4 giờ",
-        "fee": "Miễn phí (< 5km) / 30.000đ (> 5km)",
+        "fee": "Miễn phí",
         "areas": "Tất cả các quận huyện trong thành phố Đà Nẵng"
       }
     },
@@ -1476,7 +1476,7 @@
         "questions": {
           "deliveryArea": {
             "question": "Khu vực nào được giao hàng?",
-            "answer": "Chúng tôi giao hàng trong khu vực Đà Nẵng. Miễn phí ship cho khoảng cách dưới 5km, 30.000đ cho khoảng cách trên 5km. Miễn phí ship cho đơn từ 400.000đ."
+            "answer": "Chúng tôi giao hàng miễn phí trong toàn bộ khu vực Đà Nẵng."
           },
           "deliveryTime": {
             "question": "Thời gian giao hàng là bao lâu?",
@@ -1647,7 +1647,7 @@
         "danang": {
           "name": "Khu vực Đà Nẵng",
           "time": "2-4 giờ",
-          "fee": "Miễn phí (< 5km) / 30.000đ (> 5km)",
+          "fee": "Miễn phí",
           "areas": "Tất cả các quận huyện trong thành phố Đà Nẵng"
         }
       },

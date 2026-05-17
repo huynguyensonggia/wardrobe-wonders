@@ -1328,7 +1328,7 @@
       "danang": {
         "zone": "Da Nang Area",
         "time": "2-4 hours",
-        "fee": "Free (< 5km) / 30,000đ (> 5km)",
+        "fee": "Free",
         "areas": "All districts in Da Nang city"
       }
     },
@@ -1459,7 +1459,7 @@
         "questions": {
           "deliveryArea": {
             "question": "Which areas do you deliver to?",
-            "answer": "We deliver within Da Nang area. Free shipping for distances under 5km, 30,000đ for distances over 5km. Free shipping for orders over 400,000đ."
+            "answer": "We offer free shipping across the entire Da Nang area."
           },
           "deliveryTime": {
             "question": "How long is delivery time?",
@@ -1630,7 +1630,7 @@
         "danang": {
           "name": "Da Nang Area",
           "time": "2-4 hours",
-          "fee": "Free (< 5km) / 30,000đ (> 5km)",
+          "fee": "Free",
           "areas": "All districts in Da Nang city"
         }
       },
