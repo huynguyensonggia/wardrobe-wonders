@@ -51,15 +51,6 @@ export default function FAQPage() {
         { question: t("faq.categories.returnsPolicy.questions.insurance.question"),     answer: t("faq.categories.returnsPolicy.questions.insurance.answer") },
       ],
     },
-    {
-      title: t("faq.categories.promotionsMembership.title"),
-      questions: [
-        { question: t("faq.categories.promotionsMembership.questions.promotions.question"),        answer: t("faq.categories.promotionsMembership.questions.promotions.answer") },
-        { question: t("faq.categories.promotionsMembership.questions.vipMembership.question"),     answer: t("faq.categories.promotionsMembership.questions.vipMembership.answer") },
-        { question: t("faq.categories.promotionsMembership.questions.referral.question"),          answer: t("faq.categories.promotionsMembership.questions.referral.answer") },
-        { question: t("faq.categories.promotionsMembership.questions.styleConsultation.question"), answer: t("faq.categories.promotionsMembership.questions.styleConsultation.answer") },
-      ],
-    },
   ];
 
   return (
