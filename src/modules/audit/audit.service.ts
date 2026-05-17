@@ -5,7 +5,7 @@ import { AuditLog, AuditAction } from "./entities/audit-log.entity";
 
 export interface CreateAuditLogDto {
   adminId: number;
-  adminEmail: string;
+  adminEmail?: string | null;
   action: AuditAction;
   resourceType: string;
   resourceId?: number;

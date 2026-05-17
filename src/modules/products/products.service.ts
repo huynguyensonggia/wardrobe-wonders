@@ -118,9 +118,10 @@ export class ProductService {
   // Giá thuê = 40% giá nhập, làm tròn 1.000đ
   // Giá cọc  = 120% giá nhập, làm tròn 1.000đ
   private calcPrices(costPrice: number): { rentPricePerDay: number; deposit: number } {
+    const price = Number(costPrice) || 0;
     return {
-      rentPricePerDay: Math.round((costPrice * 0.4) / 1000) * 1000,
-      deposit: Math.round((costPrice * 1.2) / 1000) * 1000,
+      rentPricePerDay: Math.round((price * 0.4) / 1000) * 1000,
+      deposit: Math.round((price * 1.2) / 1000) * 1000,
     };
   }
 
