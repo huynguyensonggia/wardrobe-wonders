@@ -856,7 +856,7 @@ export default function AdminProducts() {
                   const sizeItems = inventoryItems.filter((i: any) => i.variant?.size === size);
                   return (
                     <div key={size} className="border rounded-md p-3 space-y-2">
-                      <div className="text-sm font-medium">Size {size} — {sizeItems.length} {t("adminInventory.itemCount")}</div>
+                      <div className="text-sm font-medium">{t("adminInventory.form.size")} {size} — {sizeItems.length} {t("adminInventory.itemCount")}</div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {sizeItems.map((item: any) => {
                           const cs = item.conditionStatus as string;

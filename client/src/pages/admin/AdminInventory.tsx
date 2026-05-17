@@ -226,7 +226,7 @@ export default function AdminInventory() {
                 <option value="">-- {t("adminInventory.form.selectSize")} --</option>
                 {variants.map((v: any) => (
                   <option key={v.id} value={String(v.id)}>
-                    Size {v.size} ({t("adminInventory.form.stock")}: {v.stock})
+                    {t("adminInventory.form.size")} {v.size} ({t("adminInventory.form.stock")}: {v.stock})
                   </option>
                 ))}
               </select>
@@ -325,7 +325,7 @@ export default function AdminInventory() {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  {item.variant?.product ? getLocalizedProductName(item.variant.product, i18n.language, item.variant.product.name) : ""} • Size {item.variant?.size} •{" "}
+                  {item.variant?.product ? getLocalizedProductName(item.variant.product, i18n.language, item.variant.product.name) : ""} • {t("adminInventory.form.size")} {item.variant?.size} •{" "}
                   {t("adminInventory.rentedCount", { count: item.totalRentals, max: item.maxRentals })}
                   {item.conditionNote && ` • ${item.conditionNote}`}
                 </div>
