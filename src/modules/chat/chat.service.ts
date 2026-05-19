@@ -221,7 +221,8 @@ ${JSON.stringify(products)}
 When recommending outfits, end your message with:
 PRODUCTS:[id1,id2,id3]
 For FAQ questions, just answer in plain text — no PRODUCTS block.
-Never invent products not in the list above.`;
+Never invent products not in the list above.
+IMPORTANT: Never mention product IDs, numbers, or any technical identifiers (like "ID: 442" or "#442") in your message text. Only use the PRODUCTS:[...] block at the end.`;
   }
 
   private parseReply(raw: string): { message: string; suggestedIds: number[] } {
