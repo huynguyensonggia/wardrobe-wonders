@@ -35,16 +35,17 @@ const FAQ: Record<string, string> = {
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
+  // Override via GEMINI_MODEL env var on Render if needed
+  private readonly model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-lite";
 
   constructor(
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
   ) {
-    // Log at startup so Render logs show key status immediately
     if (!process.env.GEMINI_API_KEY) {
       this.logger.warn("⚠️  GEMINI_API_KEY is NOT set — all chat requests will return fallback");
     } else {
-      this.logger.log("✅ GEMINI_API_KEY is configured");
+      this.logger.log(`✅ GEMINI_API_KEY configured, model=${this.model}`);
     }
   }
 
@@ -134,7 +135,7 @@ Never invent products not in the list above.`;
     lang: string,
     attempt = 0,
   ): Promise<string> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${apiKey}`;
 
     const contents = messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
