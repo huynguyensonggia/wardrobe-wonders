@@ -492,7 +492,7 @@ export class ProductService {
     }
 
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(file.buffer);
+    await wb.xlsx.load(file.buffer as unknown as Buffer);
     const ws = wb.worksheets[0];
     if (!ws) throw new BadRequestException("Excel has no sheets");
 

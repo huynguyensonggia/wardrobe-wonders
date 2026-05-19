@@ -5,7 +5,6 @@ import { OAuth2Client } from "google-auth-library";
 import { UsersService } from "../users/users.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
-import { Role } from "../../common/enums/role.enum";
 import { MailService } from "../mail/mail.service";
 
 @Injectable()
@@ -19,10 +18,7 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    const user = await this.usersService.create({
-      ...dto,
-      role: Role.USER,
-    });
+    const user = await this.usersService.create(dto);
 
     // Gửi email chào mừng (không block response nếu lỗi)
     this.mailService.sendWelcome(user.email, user.name).catch(() => {});
