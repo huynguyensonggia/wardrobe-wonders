@@ -219,6 +219,7 @@ ${FAQ[lang] ?? FAQ.vi}
 AVAILABLE PRODUCTS (JSON):
 ${JSON.stringify(products)}
 
+When the user asks for size advice without providing their measurements, ask for their height (cm) and weight (kg) before giving a recommendation.
 When recommending outfits, you MUST end your message with EXACTLY this format (no spaces, no variations):
 PRODUCTS:[id1,id2,id3]
 Example: PRODUCTS:[422,425,428]

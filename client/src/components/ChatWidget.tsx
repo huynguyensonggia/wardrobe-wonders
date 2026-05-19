@@ -21,19 +21,19 @@ const WELCOME: Record<string, string> = {
 const SUGGESTIONS: Record<string, { label: string; prompt: string }[]> = {
   vi: [
     { label: "👗 Tìm váy đi đám cưới", prompt: "Tôi cần tìm váy đi đám cưới, bạn có thể gợi ý không?" },
-    { label: "📏 Tư vấn size", prompt: "Tôi cao 160cm, nặng 52kg, nên mặc size nào?" },
+    { label: "📏 Tư vấn size", prompt: "Tôi muốn được tư vấn size phù hợp." },
     { label: "💰 Chính sách đặt cọc", prompt: "Chính sách đặt cọc của Wardrobe Wonders như thế nào?" },
     { label: "🚚 Phí ship & giao hàng", prompt: "Phí giao hàng và thời gian giao hàng là bao lâu?" },
   ],
   en: [
     { label: "👗 Find a wedding dress", prompt: "I need to find a dress for a wedding, can you suggest some?" },
-    { label: "📏 Size advice", prompt: "I'm 160cm tall and 52kg, what size should I wear?" },
+    { label: "📏 Size advice", prompt: "I'd like some size advice." },
     { label: "💰 Deposit policy", prompt: "What is the deposit policy at Wardrobe Wonders?" },
     { label: "🚚 Shipping & delivery", prompt: "What are the shipping fees and delivery times?" },
   ],
   ja: [
     { label: "👗 結婚式用ドレスを探す", prompt: "結婚式に着るドレスを探しています。おすすめはありますか？" },
-    { label: "📏 サイズアドバイス", prompt: "身長160cm、体重52kgです。何サイズが合いますか？" },
+    { label: "📏 サイズアドバイス", prompt: "サイズの相談をしたいです。" },
     { label: "💰 デポジットポリシー", prompt: "Wardrobe Wondersのデポジットポリシーを教えてください。" },
     { label: "🚚 配送について", prompt: "送料と配達時間はどれくらいですか？" },
   ],
