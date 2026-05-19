@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Put, Request, UseGuards } from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
 import { AuthService } from "./auth.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -14,16 +15,19 @@ export class AuthController {
     private readonly usersService: UsersService
   ) {}
 
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
   @Post("register")
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post("login")
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post("google")
   googleLogin(@Body("credential") credential: string) {
     return this.authService.googleLogin(credential);

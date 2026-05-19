@@ -1,44 +1,51 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { ValidationPipe } from "@nestjs/common";
+import helmet from "helmet";
 
 async function bootstrap() {
+  if (!['production', 'development', 'test'].includes(process.env.NODE_ENV ?? '')) {
+    console.warn('WARNING: NODE_ENV is not set or invalid! Defaulting to insecure dev behavior.');
+  }
+
   const app = await NestFactory.create(AppModule);
 
-  // Global validation pipe (rất tốt)
+  // Security headers
+  app.use(helmet());
+
+  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
-      forbidNonWhitelisted: true, // chặn field thừa trong DTO
+      forbidNonWhitelisted: true,
     }),
   );
 
-  // Global prefix cho toàn bộ API (bao gồm cả admin vì bạn đã thêm 'admin/' trong controller)
   app.setGlobalPrefix("api");
 
-  // CORS cho frontend React/Vite
+  // CORS — fail-safe: chặn mặc định, chỉ whitelist rõ ràng
+  const DEV_ORIGINS = ["http://localhost:8080", "http://localhost:5173"];
+  const PROD_ORIGINS = [
+    "https://wardrobe-wonders.pages.dev",
+    "https://wardrobe-wonders-client.pages.dev",
+    process.env.CORS_ORIGIN,
+    process.env.FRONTEND_URL,
+  ].filter(Boolean) as string[];
+
   app.enableCors({
     origin: (origin, callback) => {
-      // Local dev: cho phép tất cả
-      if (process.env.NODE_ENV !== 'production') {
-        return callback(null, true);
-      }
+      // Requests không có origin (curl, Postman, server-to-server) — cho phép
+      if (!origin) return callback(null, true);
 
-      const allowed = [
-        "http://localhost:8080",
-        "http://localhost:5173",
-        "https://wardrobe-wonders.pages.dev",
-        "https://wardrobe-wonders-client.pages.dev",
-        process.env.CORS_ORIGIN,
-        process.env.FRONTEND_URL,
-      ].filter(Boolean);
+      const isProd = process.env.NODE_ENV === 'production';
+      const allowedOrigins = isProd ? PROD_ORIGINS : [...DEV_ORIGINS, ...PROD_ORIGINS];
 
       const isAllowedSubdomain =
-        origin?.endsWith(".wardrobe-wonders.pages.dev") ||
-        origin?.endsWith(".wardrobe-wonders-client.pages.dev");
+        origin.endsWith(".wardrobe-wonders.pages.dev") ||
+        origin.endsWith(".wardrobe-wonders-client.pages.dev");
 
-      if (!origin || allowed.includes(origin) || isAllowedSubdomain) {
+      if (allowedOrigins.includes(origin) || isAllowedSubdomain) {
         callback(null, true);
       } else {
         callback(new Error(`CORS blocked: ${origin}`));

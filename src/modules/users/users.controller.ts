@@ -29,10 +29,19 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  // USER: xem profile theo id (nếu muốn chặt hơn: chỉ cho xem chính mình)
+  // USER: chỉ xem chính mình; ADMIN xem ai cũng được
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.usersService.findOne(Number(id));
+  findOne(@Param("id") id: string, @Request() req: any) {
+    const targetId = Number(id);
+    const meId = Number(req.user?.id);
+    const role = req.user?.role;
+
+    const isAdmin = String(role).toUpperCase() === Role.ADMIN;
+    if (!isAdmin && targetId !== meId) {
+      throw new ForbiddenException("You can only view your own profile");
+    }
+
+    return this.usersService.findOne(targetId);
   }
 
   // ✅ USER: update profile (chỉ update chính mình), ADMIN update ai cũng được

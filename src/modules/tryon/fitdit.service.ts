@@ -76,11 +76,14 @@ export class FitditService {
     if (!runRes.ok) {
       const body = await runRes.text();
       console.error("[FASHN] run error:", body);
-      throw new BadRequestException(`FASHN API error: ${body}`);
+      throw new BadRequestException("Try-on service temporarily unavailable");
     }
 
     const { id, error: runError } = (await runRes.json()) as { id: string; error: string | null };
-    if (runError) throw new BadRequestException(`FASHN error: ${runError}`);
+    if (runError) {
+      console.error("[FASHN] job error:", runError);
+      throw new BadRequestException("Try-on job failed, please try again");
+    }
 
     console.log(`[FASHN] Job started: ${id}`);
 

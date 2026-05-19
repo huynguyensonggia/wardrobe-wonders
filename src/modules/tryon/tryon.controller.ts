@@ -4,6 +4,7 @@ import {
   Controller,
   Post,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
@@ -13,6 +14,7 @@ import { Repository } from "typeorm";
 import { FitditService } from "./fitdit.service";
 import { FitditDto } from "./dto/fitdit.dto";
 import { Product } from "../../modules/products/entities/product.entity";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 function normalizeOffsets(body: FitditDto) {
   let raw: any = body.offsets ?? null;
@@ -37,6 +39,7 @@ function normalizeOffsets(body: FitditDto) {
   };
 }
 
+@UseGuards(JwtAuthGuard)
 @Controller("tryon")
 export class TryonController {
   constructor(

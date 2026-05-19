@@ -11,7 +11,10 @@ import { MailModule } from "../mail/mail.module";
     UsersModule,
     MailModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "secret123",
+      secret: (() => {
+        if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET env var is required");
+        return process.env.JWT_SECRET;
+      })(),
       signOptions: { expiresIn: "7d" },
     }),
   ],
