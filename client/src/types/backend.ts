@@ -9,13 +9,13 @@ export type BEProductOccasion = "party" | "wedding" | "casual";
 export interface BECategory {
   id: number;
   name: string;
+  nameEn: string | null;
+  nameJa: string | null;
   slug: string;
   description: string | null;
   vtonCategory: string;
   isActive: boolean;
   createdAt: string;
-  // nếu BE có updatedAt thì thêm:
-  // updatedAt?: string;
 }
 
 export interface BEProduct {
@@ -30,8 +30,11 @@ export interface BEProduct {
   // ✅ occasion theo chuẩn mới, vẫn cho fallback string nếu DB còn "dress/top" cũ
   occasion: BEProductOccasion | string;
 
+  costPrice: number;
   rentPricePerDay: number;
   deposit: number;
+  colorEn: string | null;
+  colorJa: string | null;
 
   size: BEProductSize | string;
   color: string;

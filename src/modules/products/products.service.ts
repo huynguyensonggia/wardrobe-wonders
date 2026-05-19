@@ -45,15 +45,22 @@ export class ProductService {
     return { deleted: count };
   }
 
-  async findAll(query?: { categoryId?: number; status?: ProductStatus; occasion?: string; search?: string }) {
+  async findAll(query?: {
+    categoryId?: number;
+    status?: ProductStatus;
+    occasion?: string;
+    search?: string;
+  }) {
     const qb = this.productRepo
       .createQueryBuilder("p")
       .leftJoinAndSelect("p.category", "c")
       .leftJoinAndSelect("p.variants", "v")
       .orderBy("p.id", "DESC");
 
-    if (query?.categoryId) qb.andWhere("c.id = :categoryId", { categoryId: query.categoryId });
-    if (query?.status) qb.andWhere("p.status = :status", { status: query.status });
+    if (query?.categoryId)
+      qb.andWhere("c.id = :categoryId", { categoryId: query.categoryId });
+    if (query?.status)
+      qb.andWhere("p.status = :status", { status: query.status });
     if (query?.search) {
       const keyword = `%${query.search.trim()}%`;
       qb.andWhere(
@@ -62,7 +69,10 @@ export class ProductService {
       );
     }
     if (query?.occasion) {
-      const occasions = query.occasion.split(",").map((o) => o.trim()).filter(Boolean);
+      const occasions = query.occasion
+        .split(",")
+        .map((o) => o.trim())
+        .filter(Boolean);
       if (occasions.length === 1) {
         qb.andWhere("p.occasion = :occasion", { occasion: occasions[0] });
       } else if (occasions.length > 1) {
@@ -79,7 +89,8 @@ export class ProductService {
       relations: { category: true, variants: true },
     });
 
-    if (!product) throw new NotFoundException(`Product with ID ${id} not found`);
+    if (!product)
+      throw new NotFoundException(`Product with ID ${id} not found`);
     return product;
   }
 
@@ -98,10 +109,20 @@ export class ProductService {
     // Xử lý format số kiểu VN: "100.000" hoặc "100,000" → 100000
     const cleaned = String(v)
       .trim()
-      .replace(/\./g, "")   // bỏ dấu chấm phân cách hàng nghìn kiểu VN
-      .replace(/,/g, "");   // bỏ dấu phẩy phân cách hàng nghìn kiểu EN
+      .replace(/\./g, "") // bỏ dấu chấm phân cách hàng nghìn kiểu VN
+      .replace(/,/g, ""); // bỏ dấu phẩy phân cách hàng nghìn kiểu EN
     const n = Number(cleaned);
     return Number.isFinite(n) ? n : null;
+  }
+
+  // Giá thuê = 40% giá nhập, làm tròn 1.000đ
+  // Giá cọc  = 120% giá nhập, làm tròn 1.000đ
+  private calcPrices(costPrice: number): { rentPricePerDay: number; deposit: number } {
+    const price = Number(costPrice) || 0;
+    return {
+      rentPricePerDay: Math.round((price * 0.4) / 1000) * 1000,
+      deposit: Math.round((price * 1.2) / 1000) * 1000,
+    };
   }
 
   /** name + category + occasion + color (KHÔNG size) */
@@ -119,7 +140,8 @@ export class ProductService {
       .andWhere("p.occasion = :occasion", { occasion: params.occasion })
       .andWhere("p.color = :color", { color: params.color });
 
-    if (params.excludeId) qb.andWhere("p.id != :excludeId", { excludeId: params.excludeId });
+    if (params.excludeId)
+      qb.andWhere("p.id != :excludeId", { excludeId: params.excludeId });
 
     const dup = await qb.getOne();
     if (dup) {
@@ -132,7 +154,7 @@ export class ProductService {
   private validateVariants(variants: any) {
     if (!Array.isArray(variants) || variants.length === 0) {
       throw new BadRequestException(
-        "variants is required. Example: [{\"size\":\"M\",\"stock\":2},{\"size\":\"L\",\"stock\":1}]",
+        'variants is required. Example: [{"size":"M","stock":2},{"size":"L","stock":1}]',
       );
     }
 
@@ -153,8 +175,11 @@ export class ProductService {
 
   // ================= CREATE =================
   async create(dto: CreateProductDto, file?: Express.Multer.File) {
-    const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-    if (!category) throw new BadRequestException("Invalid categoryId - Category not found");
+    const category = await this.categoryRepo.findOne({
+      where: { id: dto.categoryId },
+    });
+    if (!category)
+      throw new BadRequestException("Invalid categoryId - Category not found");
 
     const name = this.normalizeName(dto.name);
     if (!name) throw new BadRequestException("name is required");
@@ -166,16 +191,38 @@ export class ProductService {
 
     this.validateVariants((dto as any).variants);
 
-    await this.assertNoDuplicate({ name, categoryId: dto.categoryId, occasion, color });
+    await this.assertNoDuplicate({
+      name,
+      categoryId: dto.categoryId,
+      occasion,
+      color,
+    });
+
+    const directRentPrice = (dto as any).rentPricePerDay !== undefined
+      ? Number((dto as any).rentPricePerDay)
+      : null;
+    const directDeposit = (dto as any).deposit !== undefined
+      ? Number((dto as any).deposit)
+      : null;
+    const calcedPrices = this.calcPrices(dto.costPrice);
+    const finalRentPrice = directRentPrice !== null && !dto.costPrice
+      ? directRentPrice
+      : calcedPrices.rentPricePerDay;
+    const finalDeposit = directDeposit !== null && !dto.costPrice
+      ? directDeposit
+      : calcedPrices.deposit;
 
     const product = this.productRepo.create({
       name,
       category,
       categoryId: category.id,
       occasion: occasion as ProductOccasion,
-      rentPricePerDay: dto.rentPricePerDay,
-      deposit: dto.deposit,
+      costPrice: dto.costPrice ?? 0,
+      rentPricePerDay: finalRentPrice,
+      deposit: finalDeposit,
       color,
+      colorEn: dto.colorEn?.trim() ?? null,
+      colorJa: dto.colorJa?.trim() ?? null,
       imageUrl: null,
       description: dto.description ?? null,
       nameEn: (dto as any).nameEn ?? null,
@@ -204,7 +251,9 @@ export class ProductService {
 
     // Tự động tạo inventory items cho từng variant theo stock
     for (const sv of savedVariants) {
-      const variantDto = (dto as any).variants.find((v: any) => v.size === sv.size);
+      const variantDto = (dto as any).variants.find(
+        (v: any) => v.size === sv.size,
+      );
       const stock = Number(variantDto?.stock ?? 0);
       const conditionNote = variantDto?.conditionNote ?? undefined;
       for (let i = 1; i <= stock; i++) {
@@ -217,29 +266,39 @@ export class ProductService {
             conditionNote,
             skipStockUpdate: true, // stock đã set đúng khi tạo variant
           });
-        } catch { /* barcode trùng → bỏ qua */ }
+        } catch {
+          /* barcode trùng → bỏ qua */
+        }
       }
     }
 
     // image
     try {
       if (file) {
-        const uploaded = await this.cloudinaryService.uploadBuffer(file.buffer, {
-          folder: `products/${saved.id}`,
-          publicId: "main",
-        });
+        const uploaded = await this.cloudinaryService.uploadBuffer(
+          file.buffer,
+          {
+            folder: `products/${saved.id}`,
+            publicId: "main",
+          },
+        );
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       } else if (dto.imageUrl) {
-        const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
-          folder: `products/${saved.id}`,
-          publicId: "main",
-        });
+        const uploaded = await this.cloudinaryService.uploadFromUrl(
+          dto.imageUrl,
+          {
+            folder: `products/${saved.id}`,
+            publicId: "main",
+          },
+        );
         await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
       }
       return this.findOne(saved.id);
     } catch (e: any) {
       await this.productRepo.delete(saved.id);
-      throw new BadRequestException(`Failed to create product: ${e?.message ?? e}`);
+      throw new BadRequestException(
+        `Failed to create product: ${e?.message ?? e}`,
+      );
     }
   }
 
@@ -248,18 +307,28 @@ export class ProductService {
     const product = await this.findOne(id);
 
     if (dto.categoryId !== undefined) {
-      const category = await this.categoryRepo.findOne({ where: { id: dto.categoryId } });
-      if (!category) throw new BadRequestException("Invalid categoryId - Category not found");
+      const category = await this.categoryRepo.findOne({
+        where: { id: dto.categoryId },
+      });
+      if (!category)
+        throw new BadRequestException(
+          "Invalid categoryId - Category not found",
+        );
       product.category = category;
       product.categoryId = category.id;
     }
 
-    const nextName = dto.name !== undefined ? this.normalizeName(dto.name) : product.name;
+    const nextName =
+      dto.name !== undefined ? this.normalizeName(dto.name) : product.name;
     const nextOccasion =
-      dto.occasion !== undefined ? this.normalizeOccasion(dto.occasion) : product.occasion;
-    const nextColor = dto.color !== undefined ? this.normalizeColor(dto.color) : product.color;
+      dto.occasion !== undefined
+        ? this.normalizeOccasion(dto.occasion)
+        : product.occasion;
+    const nextColor =
+      dto.color !== undefined ? this.normalizeColor(dto.color) : product.color;
 
-    const categoryIdForDup = dto.categoryId !== undefined ? dto.categoryId : product.categoryId;
+    const categoryIdForDup =
+      dto.categoryId !== undefined ? dto.categoryId : product.categoryId;
 
     const isKeyChanged =
       nextName !== product.name ||
@@ -279,15 +348,34 @@ export class ProductService {
 
     if (dto.name !== undefined) product.name = nextName;
     if (dto.occasion !== undefined) product.occasion = nextOccasion as any;
-    if (dto.rentPricePerDay !== undefined) product.rentPricePerDay = dto.rentPricePerDay;
-    if (dto.deposit !== undefined) product.deposit = dto.deposit;
+    if ((dto as any).costPrice !== undefined) {
+      const prices = this.calcPrices(Number((dto as any).costPrice));
+      product.costPrice = Number((dto as any).costPrice);
+      product.rentPricePerDay = prices.rentPricePerDay;
+      product.deposit = prices.deposit;
+    } else {
+      // phụ kiện: admin nhập thẳng rentPricePerDay / deposit
+      if ((dto as any).rentPricePerDay !== undefined) {
+        product.rentPricePerDay = Number((dto as any).rentPricePerDay) || 0;
+      }
+      if ((dto as any).deposit !== undefined) {
+        product.deposit = Number((dto as any).deposit) || 0;
+      }
+    }
     if (dto.color !== undefined) product.color = nextColor;
+    if (dto.colorEn !== undefined) product.colorEn = dto.colorEn?.trim() ?? null;
+    if (dto.colorJa !== undefined) product.colorJa = dto.colorJa?.trim() ?? null;
     if (dto.description !== undefined) product.description = dto.description;
-    if ((dto as any).nameEn !== undefined) product.nameEn = (dto as any).nameEn ?? null;
-    if ((dto as any).nameJa !== undefined) product.nameJa = (dto as any).nameJa ?? null;
-    if ((dto as any).descriptionEn !== undefined) product.descriptionEn = (dto as any).descriptionEn ?? null;
-    if ((dto as any).descriptionJa !== undefined) product.descriptionJa = (dto as any).descriptionJa ?? null;
-    if ((dto as any).shopeeUrl !== undefined) product.shopeeUrl = (dto as any).shopeeUrl ?? null;
+    if ((dto as any).nameEn !== undefined)
+      product.nameEn = (dto as any).nameEn ?? null;
+    if ((dto as any).nameJa !== undefined)
+      product.nameJa = (dto as any).nameJa ?? null;
+    if ((dto as any).descriptionEn !== undefined)
+      product.descriptionEn = (dto as any).descriptionEn ?? null;
+    if ((dto as any).descriptionJa !== undefined)
+      product.descriptionJa = (dto as any).descriptionJa ?? null;
+    if ((dto as any).shopeeUrl !== undefined)
+      product.shopeeUrl = (dto as any).shopeeUrl ?? null;
     if (dto.status !== undefined) product.status = dto.status;
 
     await this.productRepo.save(product);
@@ -297,7 +385,9 @@ export class ProductService {
       this.validateVariants((dto as any).variants);
 
       // Lấy variants hiện tại
-      const existingVariants = await this.variantRepo.find({ where: { productId: id } });
+      const existingVariants = await this.variantRepo.find({
+        where: { productId: id },
+      });
 
       // Tìm variant nào đang được tham chiếu bởi rental_items → không được xóa cứng
       const referencedIds = new Set<number>();
@@ -318,17 +408,24 @@ export class ProductService {
 
       // Variant đang được tham chiếu → set inactive + stock = 0
       for (const vid of referencedIds) {
-        await this.variantRepo.update(vid, { isActive: false as any, stock: 0 });
+        await this.variantRepo.update(vid, {
+          isActive: false as any,
+          stock: 0,
+        });
       }
 
       // Tạo variants mới từ dto
-      const newSizes = new Set((dto as any).variants.map((v: any) => String(v.size)));
+      const newSizes = new Set(
+        (dto as any).variants.map((v: any) => String(v.size)),
+      );
 
       // Nếu size mới trùng với variant đang bị referenced → reactivate thay vì tạo mới
       for (const vid of referencedIds) {
         const existing = existingVariants.find((v) => v.id === vid);
         if (existing && newSizes.has(existing.size)) {
-          const dtoVariant = (dto as any).variants.find((v: any) => String(v.size) === existing.size);
+          const dtoVariant = (dto as any).variants.find(
+            (v: any) => String(v.size) === existing.size,
+          );
           await this.variantRepo.update(vid, {
             isActive: true as any,
             stock: Number(dtoVariant.stock),
@@ -364,10 +461,13 @@ export class ProductService {
       });
       await this.productRepo.update(id, { imageUrl: uploaded.url });
     } else if (dto.imageUrl !== undefined && dto.imageUrl) {
-      const uploaded = await this.cloudinaryService.uploadFromUrl(dto.imageUrl, {
-        folder: `products/${id}`,
-        publicId: "main",
-      });
+      const uploaded = await this.cloudinaryService.uploadFromUrl(
+        dto.imageUrl,
+        {
+          folder: `products/${id}`,
+          publicId: "main",
+        },
+      );
       await this.productRepo.update(id, { imageUrl: uploaded.url });
     }
 
@@ -396,12 +496,16 @@ export class ProductService {
     if (!sheetName) throw new BadRequestException("Excel has no sheets");
 
     const ws = wb.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, { defval: null });
+    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, {
+      defval: null,
+    });
     if (!rows.length) throw new BadRequestException("Excel is empty");
 
     // preload categories
     const categories = await this.categoryRepo.find();
-    const categoryMap = new Map<number, Category>(categories.map((c) => [c.id, c]));
+    const categoryMap = new Map<number, Category>(
+      categories.map((c) => [c.id, c]),
+    );
 
     const success: any[] = [];
     const failed: any[] = [];
@@ -415,41 +519,54 @@ export class ProductService {
         if (!name) throw new BadRequestException("name is required");
 
         const categoryId = this.toNumber(r.categoryId);
-        if (!categoryId) throw new BadRequestException("categoryId is required");
+        if (!categoryId)
+          throw new BadRequestException("categoryId is required");
 
         const category = categoryMap.get(categoryId);
-        if (!category) throw new BadRequestException(`Category ${categoryId} not found`);
+        if (!category)
+          throw new BadRequestException(`Category ${categoryId} not found`);
 
         const occasion = this.normalizeOccasion(r.occasion);
         if (!occasion) throw new BadRequestException("occasion is required");
 
         const color = this.normalizeColor(r.color);
+        const colorEn = r.colorEn ? String(r.colorEn).trim() : null;
+        const colorJa = r.colorJa ? String(r.colorJa).trim() : null;
 
-        const rentPricePerDay = this.toNumber(r.rentPricePerDay);
-        if (rentPricePerDay === null) throw new BadRequestException("rentPricePerDay is required");
+        const costPrice = this.toNumber(r.costPrice ?? r.cost_price);
+        if (costPrice === null)
+          throw new BadRequestException("costPrice is required");
 
-        const deposit = this.toNumber(r.deposit);
-        if (deposit === null) throw new BadRequestException("deposit is required");
+        const { rentPricePerDay, deposit } = this.calcPrices(costPrice);
 
         const statusRaw = (r.status ?? "").toString().trim();
-        const status =
-          !statusRaw ? ProductStatus.AVAILABLE
-          : (Object.values(ProductStatus).includes(statusRaw as any)
-              ? (statusRaw as any)
-              : (() => { throw new BadRequestException(`status invalid: ${statusRaw}`); })());
+        const status = !statusRaw
+          ? ProductStatus.AVAILABLE
+          : Object.values(ProductStatus).includes(statusRaw as any)
+            ? (statusRaw as any)
+            : (() => {
+                throw new BadRequestException(`status invalid: ${statusRaw}`);
+              })();
 
         const description = r.description ?? null;
         const imageUrl = r.imageUrl ?? null;
         const nameEn = r.nameEn ? String(r.nameEn).trim() : null;
         const nameJa = r.nameJa ? String(r.nameJa).trim() : null;
-        const descriptionEn = r.descriptionEn ? String(r.descriptionEn).trim() : null;
-        const descriptionJa = r.descriptionJa ? String(r.descriptionJa).trim() : null;
+        const descriptionEn = r.descriptionEn
+          ? String(r.descriptionEn).trim()
+          : null;
+        const descriptionJa = r.descriptionJa
+          ? String(r.descriptionJa).trim()
+          : null;
         const shopeeUrl = r.shopeeUrl ? String(r.shopeeUrl).trim() : null;
 
         // variantsJson
         let variants: any[] = [];
         if (r.variantsJson) {
-          variants = typeof r.variantsJson === "string" ? JSON.parse(r.variantsJson) : r.variantsJson;
+          variants =
+            typeof r.variantsJson === "string"
+              ? JSON.parse(r.variantsJson)
+              : r.variantsJson;
         }
         this.validateVariants(variants);
 
@@ -461,9 +578,12 @@ export class ProductService {
           category,
           categoryId,
           occasion: occasion as any,
+          costPrice,
           rentPricePerDay,
           deposit,
           color,
+          colorEn,
+          colorJa,
           imageUrl: null,
           description,
           nameEn,
@@ -506,10 +626,13 @@ export class ProductService {
         // image (optional)
         if (imageUrl) {
           try {
-            const uploaded = await this.cloudinaryService.uploadFromUrl(imageUrl, {
-              folder: `products/${saved.id}`,
-              publicId: "main",
-            });
+            const uploaded = await this.cloudinaryService.uploadFromUrl(
+              imageUrl,
+              {
+                folder: `products/${saved.id}`,
+                publicId: "main",
+              },
+            );
             await this.productRepo.update(saved.id, { imageUrl: uploaded.url });
           } catch (e) {
             console.log(`Row ${rowIndex}: image upload failed`, e);
@@ -518,7 +641,11 @@ export class ProductService {
 
         success.push({ row: rowIndex, id: saved.id, name });
       } catch (e: any) {
-        failed.push({ row: rowIndex, reason: e?.message ?? String(e), data: r });
+        failed.push({
+          row: rowIndex,
+          reason: e?.message ?? String(e),
+          data: r,
+        });
       }
     }
 

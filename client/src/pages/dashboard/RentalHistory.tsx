@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { History } from "lucide-react";
 import { rentalsApi } from "@/lib/api";
-import { RentalStatus, formatRentalStatus } from "@/types/rental-status";
+import { RentalStatus, getRentalStatusKey } from "@/types/rental-status";
 import { useTranslation } from "react-i18next";
 
 type RentalItem = {
@@ -16,12 +16,21 @@ type RentalItem = {
   product?: {
     id: number;
     name: string;
+    nameEn?: string | null;
+    nameJa?: string | null;
     category?: { name: string };
     imageUrl?: string;
     image_url?: string;
     images?: { url: string }[];
   };
 };
+
+function localizedName(p: { name: string; nameEn?: string | null; nameJa?: string | null } | undefined, lang: string): string {
+  if (!p) return "";
+  if (lang === "ja" && p.nameJa) return p.nameJa;
+  if (lang === "en" && p.nameEn) return p.nameEn;
+  return p.name;
+}
 
 type Rental = {
   id: number | string;
@@ -48,7 +57,7 @@ function normalizeStatus(s: Rental["status"]): RentalStatus | string {
 }
 
 export default function RentalHistory() {
-  const { t } = useTranslation(); // ✅ giống MyRentals
+  const { t, i18n } = useTranslation();
 
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,7 +146,7 @@ export default function RentalHistory() {
                   </div>
 
                   <Badge variant="secondary">
-                    {formatRentalStatus(st as RentalStatus)}
+                    {t(getRentalStatusKey(st as RentalStatus))}
                   </Badge>
                 </div>
 
@@ -164,7 +173,7 @@ export default function RentalHistory() {
                           <div className="w-24 h-24 shrink-0 overflow-hidden rounded-md bg-muted">
                             <img
                               src={img}
-                              alt={p?.name || t("common.product")}
+                              alt={localizedName(p, i18n.language) || t("common.product")}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -173,7 +182,7 @@ export default function RentalHistory() {
                             <div className="flex items-start justify-between gap-3">
                               <div>
                                 <div className="font-medium">
-                                  {p?.name || t("common.product")}
+                                  {localizedName(p, i18n.language) || t("common.product")}
                                 </div>
 
                                 {p?.category?.name ? (

@@ -18,11 +18,12 @@ import { productsApi, categoriesApi } from "@/lib/api";
 import type { ProductStatus } from "@/types";
 import { useTranslation } from "react-i18next";
 import { LoadingState, ErrorState } from "@/components/common";
+import { getLocalizedCategoryName, getLocalizedColor } from "@/lib/mappers";
 
 const ALL_VALUE = "all";
 
 export default function ProductsPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
@@ -129,6 +130,7 @@ export default function ProductsPage() {
   });
 
   const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
+  const HIDDEN_CATEGORY_SLUGS = [...ACCESSORY_SLUGS];
 
   // 3) Client-side filter — loại trừ phụ kiện, chỉ lọc size/color/status
   const filteredProducts = useMemo(() => {
@@ -153,14 +155,28 @@ export default function ProductsPage() {
     });
   }, [productsFromApi, filters.size, filters.color, filters.status]);
 
-  // derive sizes/colors
-  const allSizes = useMemo(() => {
-    return [...new Set((productsFromApi as any[]).flatMap((p) => p.sizes ?? []))].sort();
-  }, [productsFromApi]);
+  // chỉ lấy sizes/colors từ sản phẩm không phải phụ kiện
+  const nonAccessoryProducts = useMemo(
+    () => (productsFromApi as any[]).filter((p) => !ACCESSORY_SLUGS.includes(p?.category?.slug ?? "")),
+    [productsFromApi]
+  );
 
+  const allSizes = useMemo(() => {
+    return [...new Set(nonAccessoryProducts.flatMap((p) => p.sizes ?? []))].sort();
+  }, [nonAccessoryProducts]);
+
+  // Map Vietnamese color → localized display name
   const allColors = useMemo(() => {
-    return [...new Set((productsFromApi as any[]).flatMap((p) => p.colors ?? []))].sort();
-  }, [productsFromApi]);
+    const map = new Map<string, string>();
+    nonAccessoryProducts.forEach((p) => {
+      const viColor = p.color ?? "";
+      if (viColor && !map.has(viColor)) {
+        const label = getLocalizedColor(p, i18n.language);
+        map.set(viColor, label ? label.charAt(0).toUpperCase() + label.slice(1) : label);
+      }
+    });
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  }, [nonAccessoryProducts, i18n.language]);
 
   const isSearching = searchInput !== debouncedSearch;
 
@@ -245,9 +261,9 @@ export default function ProductsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL_VALUE}>{t("products.allCategories")}</SelectItem>
-                  {(categories as any[]).map((cat) => (
+                  {(categories as any[]).filter((cat) => !HIDDEN_CATEGORY_SLUGS.includes(cat.slug)).map((cat) => (
                     <SelectItem key={cat.id} value={cat.slug}>
-                      {cat.name}
+                      {getLocalizedCategoryName(cat, i18n.language)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,9 +289,9 @@ export default function ProductsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL_VALUE}>{t("products.allColors")}</SelectItem>
-                  {allColors.map((color) => (
-                    <SelectItem key={color} value={color}>
-                      {color}
+                  {allColors.map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -318,9 +334,9 @@ export default function ProductsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL_VALUE}>{t("products.allCategories")}</SelectItem>
-                  {(categories as any[]).map((cat) => (
+                  {(categories as any[]).filter((cat) => !HIDDEN_CATEGORY_SLUGS.includes(cat.slug)).map((cat) => (
                     <SelectItem key={cat.id} value={cat.slug}>
-                      {cat.name}
+                      {getLocalizedCategoryName(cat, i18n.language)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -346,9 +362,9 @@ export default function ProductsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={ALL_VALUE}>{t("products.allColors")}</SelectItem>
-                  {allColors.map((color) => (
-                    <SelectItem key={color} value={color}>
-                      {color}
+                  {allColors.map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
                     </SelectItem>
                   ))}
                 </SelectContent>

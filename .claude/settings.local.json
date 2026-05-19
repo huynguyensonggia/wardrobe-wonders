@@ -31,7 +31,17 @@
       "Bash(git push *)",
       "WebFetch(domain:wardrobe-wonders.pages.dev)",
       "WebFetch(domain:wardrobe-wonders-api.onrender.com)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "WebSearch",
+      "Bash(cd /d d:\\\\wardrobe-wonders)",
+      "Bash(npx tsc *)",
+      "Skill(schedule)",
+      "Skill(schedule:*)",
+      "Bash(python3)",
+      "Bash(node)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const x = require\\('./node_modules/xlsx'\\); console.log\\('xlsx ok, version:', x.version\\)\")",
+      "Bash(dir \"d:\\\\wardrobe-wonders\\\\database\\\\migrations\" /b)"
     ]
   }
 }

@@ -7,14 +7,14 @@ export enum VtonCategory {
 export const VTON_CATEGORY_OPTIONS = [
   {
     value: VtonCategory.UPPER_BODY,
-    label: "Upper body (Áo / thân trên)",
+    label: "Upper body (Áo / thân trên / トップス)",
   },
   {
     value: VtonCategory.LOWER_BODY,
-    label: "Lower body (Quần / thân dưới)",
+    label: "Lower body (Quần / thân dưới / ボトムス)",
   },
   {
     value: VtonCategory.DRESSES,
-    label: "Dresses (Váy liền / toàn thân)",
+    label: "Dresses (Váy liền / toàn thân / ワンピース)",
   },
 ];

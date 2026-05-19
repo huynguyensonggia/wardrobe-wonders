@@ -27,6 +27,8 @@ export type ProductStatus = 'AVAILABLE' | 'RENTED' | 'MAINTENANCE';
 export interface Category {
   id: string;
   name: string;
+  nameEn?: string | null;
+  nameJa?: string | null;
   slug: string;
   description?: string;
   image?: string;
@@ -67,6 +69,9 @@ export interface Product {
   sizes: string[];
   colors: string[];
   color?: string;
+  colorEn?: string | null;
+  colorJa?: string | null;
+  costPrice?: number;
   pricePerDay: number;
   deposit: number;
   quantity: number;

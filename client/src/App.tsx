@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { CartProvider } from "@/contexts/CartContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { FloatingSupportButton } from "@/components/FloatingSupportButton";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
@@ -46,6 +47,7 @@ import CategoryPage from "@/pages/CategoryPage";
 
 // ✅ NEW: Checkout page
 import CheckoutPage from "@/pages/CheckoutPage";
+import Favorites from "@/pages/dashboard/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +55,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
+        <FavoritesProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -109,6 +112,7 @@ const App = () => (
                 >
                   <Route index element={<MyRentals />} />
                   <Route path="history" element={<RentalHistory />} />
+                  <Route path="favorites" element={<Favorites />} />
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<Settings />} />
                 </Route>
@@ -138,6 +142,7 @@ const App = () => (
             <PWAInstallPrompt />
           </BrowserRouter>
         </TooltipProvider>
+        </FavoritesProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>

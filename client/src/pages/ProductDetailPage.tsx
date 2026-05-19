@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { productsApi, productWatchApi } from "@/lib/api";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,14 +68,12 @@ function isVariantActive(x: any): boolean {
   return true;
 }
 
-/** Tính tổng tiền thuê: ngày đầu = basePrice, mỗi ngày thêm +10.000 */
-function calcRentalPrice(basePrice: number, days: number): number {
-  if (days <= 0) return 0;
-  return basePrice + (days - 1) * 10_000;
-}
+import { calcItemRentalPrice, isAccessorySlug } from "@/utils/pricing";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ProductDetailPage() {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const MIN_RENTAL_DAYS = 1;
 
   const { id } = useParams<{ id: string }>();
@@ -91,7 +90,8 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const { addItem, items: cartItems } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { refresh: refreshFavorites } = useFavorites();
 
   const {
     data: product,
@@ -191,12 +191,14 @@ export default function ProductDetailPage() {
     return `${base} (${selectedSize}${selectedColor ? `, ${selectedColor}` : ""})`;
   }, [product, selectedSize, selectedColor]);
 
+  const categorySlug: string = (product as any)?.category?.slug ?? "";
+
   const totalPrice = useMemo(() => {
     const pricePerDay = Number(
       (product as any)?.rentPricePerDay ?? (product as any)?.pricePerDay ?? 0
     );
-    return calcRentalPrice(pricePerDay, rentalDays);
-  }, [product, rentalDays]);
+    return calcItemRentalPrice(pricePerDay, rentalDays, categorySlug);
+  }, [product, rentalDays, categorySlug]);
 
   const mainImage = useMemo(() => {
     return (
@@ -249,6 +251,7 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
+    if (user?.role === "ADMIN") return;
     if (!ensureValid()) return;
 
     const stock = selectedVariant!.stock ?? 1;
@@ -284,6 +287,7 @@ export default function ProductDetailPage() {
         startDate,
         endDate,
         days: rentalDays,
+        categorySlug,
       },
       1
     );
@@ -293,6 +297,7 @@ export default function ProductDetailPage() {
 
   const handleRentNow = () => {
     if (!isAuthenticated) { navigate("/login", { state: { from: `/products/${id}` } }); return; }
+    if (user?.role === "ADMIN") return;
     if (!ensureValid()) return;
 
     navigate("/checkout", {
@@ -344,8 +349,24 @@ export default function ProductDetailPage() {
         await productWatchApi.watch(productIdNum);
         setNotifyRegistered(true);
       }
+      refreshFavorites();
     } catch {} finally {
       setNotifyLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const productName = (product as any)?.name ?? "";
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: productName, url });
+      } catch {
+        // user cancelled — do nothing
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: t("productDetail.actions.linkCopied") });
     }
   };
 
@@ -453,13 +474,16 @@ export default function ProductDetailPage() {
                   variant="icon"
                   size="icon"
                   aria-label={t("productDetail.actions.favorite")}
+                  onClick={handleNotify}
+                  disabled={notifyLoading}
                 >
-                  <Heart className="w-5 h-5" />
+                  <Heart className={`w-5 h-5 transition-colors ${notifyRegistered ? "fill-red-500 text-red-500" : ""}`} />
                 </Button>
                 <Button
                   variant="icon"
                   size="icon"
                   aria-label={t("productDetail.actions.share")}
+                  onClick={handleShare}
                 >
                   <Share2 className="w-5 h-5" />
                 </Button>
@@ -797,15 +821,9 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Features */}
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Truck className="w-5 h-5 text-accent" />
-                <span>{t("productDetail.features.freeShipping")}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Shield className="w-5 h-5 text-accent" />
-                <span>{t("productDetail.features.damageProtection")}</span>
-              </div>
+            <div className="mt-8 flex items-center gap-3 text-sm">
+              <Truck className="w-5 h-5 text-accent" />
+              <span>{t("productDetail.features.freeShipping")}</span>
             </div>
 
             {/* Shopee Affiliate Link */}

@@ -18,12 +18,32 @@ const mapStatus = (s: string): ProductStatus => {
 export const mapBECategoryToMock = (c: BECategory): Category => ({
   id: String(c.id),
   name: c.name,
+  nameEn: c.nameEn ?? null,
+  nameJa: c.nameJa ?? null,
   slug: c.slug,
   description: c.description ?? undefined,
   image: undefined,
   vtonCategory: (c as any).vtonCategory,
   isActive: (c as any).isActive,
 });
+
+export const getLocalizedCategoryName = (
+  cat: { name: string; nameEn?: string | null; nameJa?: string | null },
+  lang: string
+): string => {
+  if (lang === "en" && cat.nameEn) return cat.nameEn;
+  if (lang === "ja" && cat.nameJa) return cat.nameJa;
+  return cat.name;
+};
+
+export const getLocalizedColor = (
+  product: { color?: string; colorEn?: string | null; colorJa?: string | null },
+  lang: string
+): string => {
+  if (lang === "en" && product.colorEn) return product.colorEn;
+  if (lang === "ja" && product.colorJa) return product.colorJa;
+  return product.color ?? "";
+};
 
 const SIZE_ORDER: Record<string, number> = { XS: 0, S: 1, M: 2, L: 3, XL: 4 };
 
@@ -89,8 +109,11 @@ export const mapBEProductToMock = (p: BEProduct): Product => {
     sizes,
     colors,
     color: p.color ?? "unknown",
+    colorEn: (p as any).colorEn ?? null,
+    colorJa: (p as any).colorJa ?? null,
     variants,
     occasion: String((p as any).occasion ?? ""),
+    costPrice: Number(p.costPrice ?? 0),
     pricePerDay: Number(p.rentPricePerDay ?? 0),
     deposit: Number(p.deposit ?? 0),
     quantity,

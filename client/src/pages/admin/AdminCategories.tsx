@@ -34,12 +34,13 @@ import {
 } from "@/components/ui/select";
 
 import { useTranslation } from "react-i18next";
+import { getLocalizedCategoryName } from "@/lib/mappers";
 
 type Mode = "create" | "edit";
 
 export default function AdminCategories() {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,8 @@ export default function AdminCategories() {
 
   // form
   const [name, setName] = useState("");
+  const [nameEn, setNameEn] = useState("");
+  const [nameJa, setNameJa] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [vtonCategory, setVtonCategory] = useState<VtonCategory | "">("");
@@ -64,6 +67,8 @@ export default function AdminCategories() {
 
   const resetForm = () => {
     setName("");
+    setNameEn("");
+    setNameJa("");
     setSlug("");
     setDescription("");
     setVtonCategory("");
@@ -102,6 +107,8 @@ export default function AdminCategories() {
     setEditing(c);
 
     setName((c as any).name ?? "");
+    setNameEn((c as any).nameEn ?? "");
+    setNameJa((c as any).nameJa ?? "");
     setSlug((c as any).slug ?? "");
     setDescription((c as any).description ?? "");
     setVtonCategory(((c as any).vtonCategory ?? "") as VtonCategory | "");
@@ -128,8 +135,10 @@ export default function AdminCategories() {
         return;
       }
 
-      const payload: Partial<Category> = {
+      const payload: Partial<Category> & { nameEn?: string | null; nameJa?: string | null } = {
         name: name.trim(),
+        nameEn: nameEn.trim() || null,
+        nameJa: nameJa.trim() || null,
         slug: slug.trim(),
         description: description.trim() || undefined,
         vtonCategory: vtonCategory || undefined,
@@ -216,6 +225,17 @@ export default function AdminCategories() {
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
 
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-2">
+                <Label>{t("adminCategories.form.nameEn")}</Label>
+                <Input value={nameEn} onChange={(e) => setNameEn(e.target.value)} placeholder="e.g. Dresses" />
+              </div>
+              <div className="grid gap-2">
+                <Label>{t("adminCategories.form.nameJa")}</Label>
+                <Input value={nameJa} onChange={(e) => setNameJa(e.target.value)} placeholder="例：ドレス" />
+              </div>
+            </div>
+
             {/* slug required in BE */}
             <div className="grid gap-2">
               <Label>{t("adminCategories.form.slug")}</Label>
@@ -284,20 +304,10 @@ export default function AdminCategories() {
               className="flex items-center justify-between rounded-lg border border-border bg-background p-4"
             >
               <div className="min-w-0">
-                <div className="flex items-center gap-3">
-                  <div className="font-medium truncate">{(c as any).name}</div>
-                  {(c as any).slug ? (
-                    <div className="text-xs text-muted-foreground">
-                      /{(c as any).slug}
-                    </div>
-                  ) : null}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">#{(c as any).id}</span>
+                  <span className="font-medium truncate">{getLocalizedCategoryName(c as any, i18n.language)}</span>
                 </div>
-
-                {(c as any).vtonCategory ? (
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {t("adminCategories.list.vton")}: {(c as any).vtonCategory}
-                  </div>
-                ) : null}
 
                 {(c as any).description ? (
                   <div className="text-sm text-muted-foreground mt-1">

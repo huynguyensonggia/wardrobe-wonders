@@ -43,6 +43,13 @@ export class ProductController {
     };
   }
 
+  // GET /products/watchlist — danh sách sản phẩm yêu thích của user
+  @Get("watchlist")
+  @UseGuards(JwtAuthGuard)
+  getWatchlist(@Request() req: any) {
+    return this.watchlistService.findByUser(req.user.userId);
+  }
+
   // GET /products/:id
   @Get(":id")
   getOne(@Param("id") id: string) {

@@ -31,6 +31,7 @@ import { PaymentStatus } from "../payments/enums/payment-status.enum";
 import { MailService } from "../mail/mail.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { NotificationType } from "../notifications/enums/notification-type.enum";
+import { Role } from "../../common/enums/role.enum";
 
 function daysBetweenInclusive(start: Date, end: Date) {
   const s = new Date(start);
@@ -47,6 +48,12 @@ function daysBetweenInclusive(start: Date, end: Date) {
 function calcRentalPrice(basePrice: number, days: number): number {
   if (days <= 0) return 0;
   return basePrice + (days - 1) * 10_000;
+}
+
+// Phụ kiện tính phí cố định / lần thuê (không nhân theo ngày)
+const ACCESSORY_SLUGS = ["bags", "jewelry", "hats", "accessories"];
+function isAccessory(product: any): boolean {
+  return ACCESSORY_SLUGS.includes(product?.category?.slug ?? "");
 }
 
 function normalizePhone(input: any) {
@@ -163,7 +170,7 @@ export class RentalsService {
 
     const variants = await this.variantsRepo.find({
       where: { id: In(variantIds) },
-      relations: { product: true },
+      relations: { product: { category: true } },
     });
 
     if (variants.length !== variantIds.length) {
@@ -219,7 +226,9 @@ export class RentalsService {
       }
 
       const days = totalDays;
-      const subtotal = calcRentalPrice(rentPricePerDay, days) * quantity;
+      const subtotal = isAccessory(product)
+        ? rentPricePerDay * quantity
+        : calcRentalPrice(rentPricePerDay, days) * quantity;
       const depositAmt = (product as any).deposit ?? 0;
 
       return { product, variant, rentPricePerDay, quantity, days, subtotal, deposit: depositAmt };
@@ -338,6 +347,18 @@ export class RentalsService {
         `Đơn #${finalRental.id} đã được đặt từ ${new Date(finalRental.startDate).toLocaleDateString("vi-VN")} đến ${new Date(finalRental.endDate).toLocaleDateString("vi-VN")}. Chúng tôi sẽ xác nhận sớm.`,
         NotificationType.RENTAL_CREATED,
       ).catch(() => {});
+
+      // Gửi thông báo cho tất cả admin
+      this.usersRepo.find({ where: { role: Role.ADMIN } }).then((admins) => {
+        for (const admin of admins) {
+          this.notificationsService.create(
+            admin.id,
+            `Đơn thuê mới #${finalRental.id}`,
+            `${user.name || user.email} vừa đặt thuê từ ${new Date(finalRental.startDate).toLocaleDateString("vi-VN")} đến ${new Date(finalRental.endDate).toLocaleDateString("vi-VN")}. Tổng: ${finalRental.totalPrice.toLocaleString("vi-VN")}đ`,
+            NotificationType.RENTAL_CREATED,
+          ).catch(() => {});
+        }
+      }).catch(() => {});
     }
 
     return finalRental;
@@ -372,7 +393,7 @@ export class RentalsService {
 
     const [data, total] = await this.rentalsRepo.findAndCount({
       where: status ? { status } : undefined,
-      relations: ["user", "items", "items.product", "items.variant", "payments"],
+      relations: ["user", "items", "items.product", "items.variant", "payments", "surcharges"],
       order: { createdAt: "DESC" as any },
       take,
       skip,
@@ -706,7 +727,7 @@ export class RentalsService {
   async extendMine(userId: number, id: number, newEndDate: string) {
     const rental = await this.rentalsRepo.findOne({
       where: { id, user: { id: userId } as any },
-      relations: ["items", "items.product"],
+      relations: ["items", "items.product", "items.product.category"],
     });
     if (!rental) throw new NotFoundException("Rental not found");
 
@@ -728,6 +749,7 @@ export class RentalsService {
     );
 
     const extraPrice = rental.items.reduce((sum, it) => {
+      if (isAccessory(it.product)) return sum + (it.rentPricePerDay ?? 0) * it.quantity;
       return sum + calcRentalPrice(it.rentPricePerDay ?? 0, extraDays) * it.quantity;
     }, 0);
 

@@ -43,6 +43,7 @@
     "hats": "帽子",
     "aiTryOn": "AI試着",
     "styleAdvisor": "スタイル診断",
+    "favorites": "お気に入り",
     "cart": "カート",
     "myRentals": "レンタル履歴",
     "adminDashboard": "管理ダッシュボード",
@@ -103,7 +104,8 @@
     "galleryImage": "ギャラリー画像 {{index}}",
     "actions": {
       "favorite": "お気に入りに追加",
-      "share": "共有"
+      "share": "共有",
+      "linkCopied": "リンクをコピーしました"
     },
     "tooltips": {
       "variantInactive": "バリアント無効",
@@ -113,8 +115,7 @@
     },
     "selectedVariant": "• 在庫: {{stock}}",
     "features": {
-      "freeShipping": "400.000đ以上で送料無料",
-      "damageProtection": "破損補償込み"
+      "freeShipping": "ダナンエリア内送料無料"
     },
     "shopee": {
       "title": "購入したいですか？",
@@ -156,7 +157,7 @@
       },
       "delivery": {
         "title": "送料無料",
-        "desc": "400.000đ以上の注文で送料無料"
+        "desc": "ダナンエリア内は送料無料"
       },
       "insured": {
         "title": "補償付き",
@@ -391,6 +392,7 @@
     "size": "サイズ:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "日",
+    "perRental": "回",
     "lineTotal": "小計",
     "remove": "削除",
     "qty": {
@@ -571,7 +573,31 @@
     },
     "retry": "再試行",
     "browseCollection": "コレクションを見る",
-    "product": "商品"
+    "product": "商品",
+    "profile2": {
+      "title": "マイプロフィール",
+      "form": {
+        "fullName": "氏名",
+        "fullNamePlaceholder": "氏名を入力してください",
+        "email": "メールアドレス",
+        "phone": "電話番号",
+        "phonePlaceholder": "電話番号を入力してください"
+      },
+      "button": {
+        "save": "変更を保存",
+        "saving": "保存中..."
+      },
+      "toast": {
+        "success": {
+          "title": "更新しました",
+          "desc": "プロフィールが更新されました。"
+        },
+        "error": {
+          "title": "更新に失敗しました",
+          "desc": "エラーが発生しました。もう一度お試しください。"
+        }
+      }
+    }
   },
   "rentals": {
     "current": {
@@ -761,12 +787,15 @@
       "selectCategory": "カテゴリを選択",
       "occasion": "シーン",
       "selectOccasion": "シーンを選択",
+      "costPrice": "仕入れ価格",
       "rentPerDay": "日額レンタル",
       "deposit": "デポジット",
       "variants": "バリアント（サイズ + 在庫）",
       "size": "サイズ",
       "stock": "在庫",
-      "color": "色"
+      "color": "色（ベトナム語）",
+      "colorEn": "色（英語）",
+      "colorJa": "色（日本語）"
     },
     "occasions": {
       "party": "パーティー",
@@ -870,7 +899,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "名前",
+      "name": "名前（ベトナム語）",
+      "nameEn": "名前（英語）",
+      "nameJa": "名前（日本語）",
       "slug": "スラッグ",
       "slugPlaceholder": "例: dresses",
       "slugHint": "バックエンドDTOではslugが必須のため、空にできません。",
@@ -1083,12 +1114,19 @@
       "aria": "ダッシュボードのナビゲーション",
       "myRentals": "現在のレンタル",
       "rentalHistory": "レンタル履歴",
+      "favorites": "お気に入り",
       "profile": "プロフィール",
       "settings": "設定"
     },
     "fallback": {
       "firstName": "こちら"
     }
+  },
+  "favorites": {
+    "title": "お気に入り商品",
+    "empty": "お気に入り商品はまだありません",
+    "browse": "商品を探す",
+    "remove": "お気に入りから削除"
   },
   "tryOnSuggest": {
     "header": {
@@ -1172,7 +1210,7 @@
           "ウェブサイトで多様なコレクションを閲覧",
           "衣装とレンタル期間を選択",
           "注文金額の30-50%を保証金として支払い",
-          "SMS/Eメールで注文確認を受信"
+          "Eメールで注文確認を受信"
         ]
       },
       "sizing": {
@@ -1201,8 +1239,7 @@
         "details": [
           "衣装保険ポリシー",
           "衛生・ケア規制",
-          "遅延料金と特別ケース",
-          "VIP顧客向け特典プログラム"
+          "遅延料金と特別ケース"
         ]
       }
     },
@@ -1291,7 +1328,7 @@
       "steps": {
         "confirm": {
           "title": "注文確認",
-          "desc": "SMS/Eメールで確認を受信"
+          "desc": "Eメールで確認を受信"
         },
         "prepare": {
           "title": "アイテム準備",
@@ -1312,7 +1349,7 @@
       "danang": {
         "zone": "ダナンエリア",
         "time": "2-4時間",
-        "fee": "無料 (< 5km) / 30,000đ (> 5km)",
+        "fee": "無料",
         "areas": "ダナン市内全区"
       }
     },
@@ -1322,7 +1359,7 @@
         "配送員は配送の15-30分前に電話します",
         "お客様は支払い前にアイテムをチェックできます",
         "現金または銀行振込での支払い",
-        "400,000đ以上の注文で送料無料（ダナンエリア）",
+        "ダナンエリア内送料無料",
         "週末・祝日を含む週7日配送"
       ]
     },
@@ -1443,7 +1480,7 @@
         "questions": {
           "deliveryArea": {
             "question": "どのエリアに配送しますか？",
-            "answer": "ダナンエリア内に配送します。5km未満の距離は送料無料、5km超の距離は30,000đ。400,000đ以上の注文は送料無料。"
+            "answer": "ダナンエリア全域に無料配送いたします。"
           },
           "deliveryTime": {
             "question": "配送時間はどのくらいですか？",
@@ -1614,7 +1651,7 @@
         "danang": {
           "name": "ダナンエリア",
           "time": "2-4時間",
-          "fee": "無料 (< 5km) / 30,000đ (> 5km)",
+          "fee": "無料",
           "areas": "ダナン市内全区域"
         }
       },
@@ -1623,7 +1660,7 @@
         "note1": "配送業者は配送の15-30分前にお電話いたします",
         "note2": "お客様は支払い前に商品を確認できます",
         "note3": "現金または銀行振込でお支払い",
-        "note4": "400,000đ以上のご注文で配送無料（ダナンエリア）"
+        "note4": "ダナンエリア内送料無料"
       }
     },
     "returns": {

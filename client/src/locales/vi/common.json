@@ -43,6 +43,7 @@
     "hats": "Mũ",
     "aiTryOn": "AI Thử đồ",
     "styleAdvisor": "Tư vấn phong cách",
+    "favorites": "Yêu thích",
     "cart": "Giỏ hàng",
     "myRentals": "Đơn thuê của tôi",
     "adminDashboard": "Bảng điều khiển Admin",
@@ -103,7 +104,8 @@
     "galleryImage": "Ảnh thư viện {{index}}",
     "actions": {
       "favorite": "Thêm vào yêu thích",
-      "share": "Chia sẻ"
+      "share": "Chia sẻ",
+      "linkCopied": "Đã copy link sản phẩm"
     },
     "tooltips": {
       "variantInactive": "Biến thể đang tắt",
@@ -112,8 +114,7 @@
       "stockRemaining": "{{stock}} còn"
     },
     "features": {
-      "freeShipping": "Miễn phí vận chuyển trên 400.000đ",
-      "damageProtection": "Bảo hiểm hư hỏng kèm theo"
+      "freeShipping": "Miễn phí vận chuyển trong khu vực Đà Nẵng"
     },
     "shopee": {
       "title": "Muốn sở hữu luôn?",
@@ -155,7 +156,7 @@
       },
       "delivery": {
         "title": "Giao hàng miễn phí",
-        "desc": "Miễn phí ship cho đơn hàng từ 400.000đ"
+        "desc": "Miễn phí ship trong khu vực Đà Nẵng"
       },
       "insured": {
         "title": "Bảo hiểm đầy đủ",
@@ -389,6 +390,7 @@
     "size": "Size:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "ngày",
+    "perRental": "lần thuê",
     "lineTotal": "Tổng dòng",
     "remove": "Xoá",
     "qty": {
@@ -569,7 +571,31 @@
     },
     "retry": "Thử lại",
     "browseCollection": "Xem sản phẩm",
-    "product": "Sản phẩm"
+    "product": "Sản phẩm",
+    "profile2": {
+      "title": "Hồ sơ cá nhân",
+      "form": {
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại"
+      },
+      "button": {
+        "save": "Lưu thay đổi",
+        "saving": "Đang lưu..."
+      },
+      "toast": {
+        "success": {
+          "title": "Cập nhật thành công",
+          "desc": "Hồ sơ của bạn đã được cập nhật."
+        },
+        "error": {
+          "title": "Cập nhật thất bại",
+          "desc": "Đã có lỗi xảy ra. Vui lòng thử lại."
+        }
+      }
+    }
   },
   "rentals": {
     "current": {
@@ -759,12 +785,15 @@
       "selectCategory": "Chọn danh mục",
       "occasion": "Dịp sử dụng",
       "selectOccasion": "Chọn dịp",
+      "costPrice": "Giá nhập",
       "rentPerDay": "Giá thuê / ngày",
       "deposit": "Tiền cọc",
       "variants": "Biến thể (Size + Tồn kho)",
       "size": "Size",
       "stock": "Tồn kho",
-      "color": "Màu"
+      "color": "Màu (Tiếng Việt)",
+      "colorEn": "Màu (English)",
+      "colorJa": "Màu (日本語)"
     },
     "occasions": {
       "party": "Tiệc",
@@ -868,7 +897,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "Tên",
+      "name": "Tên (Tiếng Việt)",
+      "nameEn": "Tên (English)",
+      "nameJa": "Tên (日本語)",
       "slug": "Slug",
       "slugPlaceholder": "vd: dresses",
       "slugHint": "DTO backend đang require slug, nên không được để trống.",
@@ -1081,12 +1112,19 @@
       "aria": "Điều hướng bảng điều khiển",
       "myRentals": "Đơn thuê của tôi",
       "rentalHistory": "Lịch sử thuê",
+      "favorites": "Yêu thích",
       "profile": "Hồ sơ",
       "settings": "Cài đặt"
     },
     "fallback": {
       "firstName": "bạn"
     }
+  },
+  "favorites": {
+    "title": "Sản phẩm yêu thích",
+    "empty": "Bạn chưa có sản phẩm yêu thích nào",
+    "browse": "Khám phá sản phẩm",
+    "remove": "Bỏ yêu thích"
   },
   "tryOnSuggest": {
     "header": {
@@ -1169,7 +1207,7 @@
           "Duyệt bộ sưu tập đa dạng trên website",
           "Chọn trang phục và thời gian thuê",
           "Đặt cọc 30-50% giá trị đơn hàng",
-          "Nhận xác nhận đơn hàng qua SMS/Email"
+          "Nhận xác nhận đơn hàng qua Email"
         ]
       },
       "sizing": {
@@ -1198,8 +1236,7 @@
         "details": [
           "Chính sách bảo hiểm trang phục",
           "Quy định về vệ sinh và bảo quản",
-          "Phí phạt và các trường hợp đặc biệt",
-          "Chương trình ưu đãi cho khách VIP"
+          "Phí phạt và các trường hợp đặc biệt"
         ]
       }
     },
@@ -1288,7 +1325,7 @@
       "steps": {
         "confirm": {
           "title": "Xác nhận đơn",
-          "desc": "Nhận xác nhận qua SMS/Email"
+          "desc": "Nhận xác nhận qua Email"
         },
         "prepare": {
           "title": "Chuẩn bị hàng",
@@ -1309,7 +1346,7 @@
       "danang": {
         "zone": "Khu vực Đà Nẵng",
         "time": "2-4 giờ",
-        "fee": "Miễn phí (< 5km) / 30.000đ (> 5km)",
+        "fee": "Miễn phí",
         "areas": "Tất cả các quận huyện trong thành phố Đà Nẵng"
       }
     },
@@ -1319,7 +1356,7 @@
         "Shipper sẽ gọi điện trước khi giao hàng 15-30 phút",
         "Khách hàng có thể kiểm tra hàng trước khi thanh toán",
         "Thanh toán bằng tiền mặt hoặc chuyển khoản",
-        "Miễn phí giao hàng cho đơn từ 400.000đ (khu vực Đà Nẵng)",
+        "Miễn phí giao hàng trong khu vực Đà Nẵng",
         "Giao hàng 7 ngày/tuần, kể cả cuối tuần và lễ tết"
       ]
     },
@@ -1440,7 +1477,7 @@
         "questions": {
           "deliveryArea": {
             "question": "Khu vực nào được giao hàng?",
-            "answer": "Chúng tôi giao hàng trong khu vực Đà Nẵng. Miễn phí ship cho khoảng cách dưới 5km, 30.000đ cho khoảng cách trên 5km. Miễn phí ship cho đơn từ 400.000đ."
+            "answer": "Chúng tôi giao hàng miễn phí trong toàn bộ khu vực Đà Nẵng."
           },
           "deliveryTime": {
             "question": "Thời gian giao hàng là bao lâu?",
@@ -1611,7 +1648,7 @@
         "danang": {
           "name": "Khu vực Đà Nẵng",
           "time": "2-4 giờ",
-          "fee": "Miễn phí (< 5km) / 30.000đ (> 5km)",
+          "fee": "Miễn phí",
           "areas": "Tất cả các quận huyện trong thành phố Đà Nẵng"
         }
       },
@@ -1620,7 +1657,7 @@
         "note1": "Shipper sẽ gọi điện trước khi giao hàng 15-30 phút",
         "note2": "Khách hàng có thể kiểm tra hàng trước khi thanh toán",
         "note3": "Thanh toán bằng tiền mặt hoặc chuyển khoản",
-        "note4": "Miễn phí giao hàng cho đơn từ 400.000đ (khu vực Đà Nẵng)"
+        "note4": "Miễn phí giao hàng trong khu vực Đà Nẵng"
       }
     },
     "returns": {

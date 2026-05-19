@@ -42,8 +42,8 @@ export class AuditLog {
   adminId: number;
 
   /** Email của admin (snapshot tại thời điểm log, không bị ảnh hưởng nếu email đổi sau) */
-  @Column({ name: "admin_email", type: "varchar", length: 255 })
-  adminEmail: string;
+  @Column({ name: "admin_email", type: "varchar", length: 255, nullable: true })
+  adminEmail: string | null;
 
   /** Loại hành động */
   @Index()

@@ -420,6 +420,7 @@ export const notificationsApi = {
 // Product Watchlist API
 // =============================
 export const productWatchApi = {
+  list: () => fetchApi<any[]>(`/products/watchlist`),
   check: (productId: number) => fetchApi<{ watching: boolean }>(`/products/${productId}/watch`),
   watch: (productId: number) =>
     fetchApi<{ watching: boolean }>(`/products/${productId}/watch`, { method: "POST" }),

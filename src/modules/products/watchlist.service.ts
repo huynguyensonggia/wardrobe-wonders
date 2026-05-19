@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ProductWatchlist } from "./entities/product-watchlist.entity";
+import { Product } from "./entities/product.entity";
 import { NotificationsService } from "../notifications/notifications.service";
 import { NotificationType } from "../notifications/enums/notification-type.enum";
 
@@ -29,6 +30,15 @@ export class WatchlistService {
   async isWatching(userId: number, productId: number): Promise<boolean> {
     const count = await this.repo.count({ where: { userId, productId } });
     return count > 0;
+  }
+
+  async findByUser(userId: number): Promise<Product[]> {
+    const entries = await this.repo.find({
+      where: { userId },
+      relations: { product: { variants: true, category: true } },
+      order: { createdAt: "DESC" },
+    });
+    return entries.map((e) => e.product);
   }
 
   // Gọi khi sản phẩm có hàng trở lại — notify tất cả user đang watch

@@ -345,11 +345,11 @@ export default function AdminRentals() {
             </div>
 
             {/* CHI TIẾT THANH TOÁN */}
-            {(selected as any).payments?.length > 0 && (
+            {((selected as any).payments?.length > 0 || (selected as any).surcharges?.length > 0) && (
               <div className="border-t pt-4 space-y-2">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide">{t("adminRentals.detail.payments")}</div>
                 <div className="space-y-1.5">
-                  {(selected as any).payments.map((p: any) => {
+                  {(selected as any).payments?.map((p: any) => {
                     const isRent = p.transactionCode?.startsWith("RENT-");
                     const isDeposit = p.transactionCode?.startsWith("DEP-");
                     const isExtend = p.transactionCode?.startsWith("EXT-");
@@ -364,6 +364,15 @@ export default function AdminRentals() {
                       </div>
                     );
                   })}
+                  {(selected as any).surcharges?.map((s: any) => (
+                    <div key={`s-${s.id}`} className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">
+                        {t("adminRentals.detail.surcharges")}: {t(`adminRentals.surcharge.types.${s.type}`)}
+                        {s.note ? ` (${s.note})` : ""}
+                      </span>
+                      <span className="font-medium text-orange-600">+{vnd(s.amount)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -461,7 +470,7 @@ export default function AdminRentals() {
                   ))}
                 </div>
               )}
-              {(selected.status === RentalStatus.ACTIVE || selected.status === RentalStatus.COMPLETED) && (
+              {selected.status === RentalStatus.COMPLETED && (
                 <AddSurchargeForm rentalId={String(selected.id)} onDone={() => qc.invalidateQueries({ queryKey: ["admin-rentals"] })} t={t} />
               )}
             </div>

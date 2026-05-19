@@ -4,12 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getLocalizedProductName } from "@/utils/i18n";
 import { useToast } from "@/components/ui/use-toast";
-
-/** Công thức đồng bộ với ProductDetailPage: ngày đầu = basePrice, mỗi ngày thêm +10.000đ */
-function calcRentalPrice(basePrice: number, days: number): number {
-  if (days <= 0) return 0;
-  return basePrice + (days - 1) * 10_000;
-}
+import { calcItemRentalPrice, isAccessorySlug } from "@/utils/pricing";
 
 export default function CartPage() {
   const { t, i18n } = useTranslation();
@@ -32,7 +27,7 @@ export default function CartPage() {
 
   // tổng tiền = sum(subtotal từng item) theo đúng công thức nghiệp vụ
   const total = items.reduce(
-    (sum, it) => sum + it.quantity * calcRentalPrice(it.rentPricePerDay, it.days),
+    (sum, it) => sum + it.quantity * calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug),
     0
   );
 
@@ -59,7 +54,7 @@ export default function CartPage() {
 
       <div className="space-y-3">
         {items.map((it) => {
-          const lineTotal = it.quantity * calcRentalPrice(it.rentPricePerDay, it.days);
+          const lineTotal = it.quantity * calcItemRentalPrice(it.rentPricePerDay, it.days, it.categorySlug);
 
           const key = `${it.productId}_${it.variantId}_${it.startDate}_${it.endDate}`;
 
@@ -101,7 +96,7 @@ export default function CartPage() {
 
                     <div className="text-sm text-muted-foreground">
                       {Number(it.rentPricePerDay).toLocaleString("vi-VN")}đ/
-                      {t("cart.perDay")}
+                      {isAccessorySlug(it.categorySlug) ? t("cart.perRental") : t("cart.perDay")}
                     </div>
 
                     <div className="text-sm font-medium mt-1">

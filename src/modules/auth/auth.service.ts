@@ -53,8 +53,9 @@ export class AuthService {
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException("Invalid credentials");
 
-    if (!user.password) throw new UnauthorizedException("Invalid credentials");
-    const isMatch = await bcrypt.compare(dto.password, user.password);
+    const isMatch = user.password
+      ? await bcrypt.compare(dto.password, user.password)
+      : false;
     if (!isMatch) throw new UnauthorizedException("Invalid credentials");
 
     return this.signToken(user);
@@ -64,6 +65,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       role: user.role,
+      email: user.email,
     };
 
     return {

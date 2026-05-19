@@ -43,6 +43,7 @@
     "hats": "Hats",
     "aiTryOn": "AI Try-On",
     "styleAdvisor": "Style Advisor",
+    "favorites": "Favorites",
     "cart": "Cart",
     "myRentals": "My Rentals",
     "adminDashboard": "Admin Dashboard",
@@ -103,7 +104,8 @@
     "galleryImage": "Gallery image {{index}}",
     "actions": {
       "favorite": "Add to favorites",
-      "share": "Share"
+      "share": "Share",
+      "linkCopied": "Product link copied"
     },
     "tooltips": {
       "variantInactive": "Variant inactive",
@@ -113,8 +115,7 @@
     },
     "selectedVariant": "• Stock: {{stock}}",
     "features": {
-      "freeShipping": "Free shipping over 400.000đ",
-      "damageProtection": "Damage protection included"
+      "freeShipping": "Free shipping within Da Nang area"
     },
     "shopee": {
       "title": "Want to own it?",
@@ -156,7 +157,7 @@
       },
       "delivery": {
         "title": "Free Delivery",
-        "desc": "Complimentary shipping on orders over 400.000đ"
+        "desc": "Free shipping within Da Nang area"
       },
       "insured": {
         "title": "Fully Insured",
@@ -390,6 +391,7 @@
     "size": "Size:",
     "variantFallback": "Variant#{{id}}",
     "perDay": "day",
+    "perRental": "rental",
     "lineTotal": "Line total",
     "remove": "Remove",
     "qty": {
@@ -570,7 +572,31 @@
     },
     "retry": "Retry",
     "browseCollection": "Browse Collection",
-    "product": "Product"
+    "product": "Product",
+    "profile2": {
+      "title": "My Profile",
+      "form": {
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Enter your full name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "phonePlaceholder": "Enter your phone number"
+      },
+      "button": {
+        "save": "Save Changes",
+        "saving": "Saving..."
+      },
+      "toast": {
+        "success": {
+          "title": "Updated successfully",
+          "desc": "Your profile has been updated."
+        },
+        "error": {
+          "title": "Update failed",
+          "desc": "An error occurred. Please try again."
+        }
+      }
+    }
   },
   "rentals": {
     "current": {
@@ -760,12 +786,15 @@
       "selectCategory": "Select category",
       "occasion": "Occasion",
       "selectOccasion": "Select occasion",
+      "costPrice": "Cost Price",
       "rentPerDay": "Rent / Day",
       "deposit": "Deposit",
       "variants": "Variants (Size + Stock)",
       "size": "Size",
       "stock": "Stock",
-      "color": "Color"
+      "color": "Color (Vietnamese)",
+      "colorEn": "Color (English)",
+      "colorJa": "Color (日本語)"
     },
     "occasions": {
       "party": "Party",
@@ -869,7 +898,9 @@
       "vton": "VTON"
     },
     "form": {
-      "name": "Name",
+      "name": "Name (Vietnamese)",
+      "nameEn": "Name (English)",
+      "nameJa": "Name (日本語)",
       "slug": "Slug",
       "slugPlaceholder": "e.g. dresses",
       "slugHint": "Backend DTO requires slug, so it cannot be empty.",
@@ -1064,12 +1095,19 @@
       "aria": "Dashboard navigation",
       "myRentals": "My Rentals",
       "rentalHistory": "Rental History",
+      "favorites": "Favorites",
       "profile": "Profile",
       "settings": "Settings"
     },
     "fallback": {
       "firstName": "there"
     }
+  },
+  "favorites": {
+    "title": "Favorite Products",
+    "empty": "You have no favorite products yet",
+    "browse": "Browse Products",
+    "remove": "Remove from favorites"
   },
   "tryOnSuggest": {
     "header": {
@@ -1152,7 +1190,7 @@
           "Browse diverse collection on website",
           "Select outfit and rental period",
           "Pay 30-50% deposit of order value",
-          "Receive order confirmation via SMS/Email"
+          "Receive order confirmation via Email"
         ]
       },
       "sizing": {
@@ -1181,8 +1219,7 @@
         "details": [
           "Garment insurance policy",
           "Hygiene and care regulations",
-          "Late fees and special cases",
-          "VIP customer rewards program"
+          "Late fees and special cases"
         ]
       }
     },
@@ -1271,7 +1308,7 @@
       "steps": {
         "confirm": {
           "title": "Order Confirmation",
-          "desc": "Receive confirmation via SMS/Email"
+          "desc": "Receive confirmation via Email"
         },
         "prepare": {
           "title": "Prepare Items",
@@ -1292,7 +1329,7 @@
       "danang": {
         "zone": "Da Nang Area",
         "time": "2-4 hours",
-        "fee": "Free (< 5km) / 30,000đ (> 5km)",
+        "fee": "Free",
         "areas": "All districts in Da Nang city"
       }
     },
@@ -1302,7 +1339,7 @@
         "Shipper will call 15-30 minutes before delivery",
         "Customers can check items before payment",
         "Payment by cash or bank transfer",
-        "Free shipping for orders over 400,000đ (Da Nang area)",
+        "Free shipping within Da Nang area",
         "Delivery 7 days/week, including weekends and holidays"
       ]
     },
@@ -1423,7 +1460,7 @@
         "questions": {
           "deliveryArea": {
             "question": "Which areas do you deliver to?",
-            "answer": "We deliver within Da Nang area. Free shipping for distances under 5km, 30,000đ for distances over 5km. Free shipping for orders over 400,000đ."
+            "answer": "We offer free shipping across the entire Da Nang area."
           },
           "deliveryTime": {
             "question": "How long is delivery time?",
@@ -1594,7 +1631,7 @@
         "danang": {
           "name": "Da Nang Area",
           "time": "2-4 hours",
-          "fee": "Free (< 5km) / 30,000đ (> 5km)",
+          "fee": "Free",
           "areas": "All districts in Da Nang city"
         }
       },
@@ -1603,7 +1640,7 @@
         "note1": "Shipper will call 15-30 minutes before delivery",
         "note2": "Customers can inspect items before payment",
         "note3": "Payment by cash or bank transfer",
-        "note4": "Free shipping for orders from 400,000đ (Da Nang area)"
+        "note4": "Free shipping within Da Nang area"
       }
     },
     "returns": {

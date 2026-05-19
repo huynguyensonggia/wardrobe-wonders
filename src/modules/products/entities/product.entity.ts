@@ -58,6 +58,9 @@ export class Product {
   })
   occasion: ProductOccasion;
 
+  @Column({ name: "cost_price", type: "int", default: 0 })
+  costPrice: number;
+
   @Column({ name: "rent_price_per_day", type: "int" })
   rentPricePerDay: number;
 
@@ -66,6 +69,12 @@ export class Product {
 
   @Column({ name: "color", length: 30, default: "unknown" })
   color: string;
+
+  @Column({ name: "color_en", type: "varchar", length: 50, nullable: true })
+  colorEn: string | null;
+
+  @Column({ name: "color_ja", type: "varchar", length: 50, nullable: true })
+  colorJa: string | null;
 
   // ===== MEDIA =====
   @Column({
