@@ -100,8 +100,7 @@ export function ChatWidget() {
   };
 
   return (
-    // Đặt phía trên FloatingSupportButton (bottom-24 = 6rem + 56px icon)
-    <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-40 right-6 z-50 flex flex-col items-end gap-3">
       {/* Chat window — mở lên phía trên nút */}
       {open && (
         <div
