@@ -146,7 +146,8 @@ export class ChatService {
         : [];
 
       return { message, products: suggestedProducts };
-    } catch {
+    } catch (err) {
+      console.error("[ChatService] error:", err);
       return { message: this.fallbackMessage(lang), products: [] };
     }
   }
@@ -188,25 +189,31 @@ RESPONSE FORMAT:
   ): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    const contents = [
-      { role: "user", parts: [{ text: systemPrompt }] },
-      { role: "model", parts: [{ text: "Understood. I'm ready to help customers of Wardrobe Wonders." }] },
-      ...messages.map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      })),
-    ];
+    const contents = messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    // Gemini yêu cầu bắt đầu bằng user turn
+    if (!contents.length || contents[0].role !== "user") {
+      contents.unshift({ role: "user", parts: [{ text: "Xin chào" }] });
+    }
 
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
         generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
       }),
     });
 
-    if (!res.ok) throw new Error(`Gemini error: ${res.status}`);
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("[ChatService] Gemini API error:", res.status, body);
+      throw new Error(`Gemini error: ${res.status}`);
+    }
     const data = await res.json() as any;
     return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   }
