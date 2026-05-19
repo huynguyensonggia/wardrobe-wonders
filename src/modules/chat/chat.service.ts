@@ -8,21 +8,21 @@ import { ChatDto } from "./dto/chat.dto";
 const FAQ: Record<string, string> = {
   vi: `Quy trình thuê đồ Wardrobe Wonders:
 - Khách hàng tự chọn sản phẩm, size và ngày thuê trực tiếp trên website.
-- Đặt đơn xong, admin xác nhận và giao hàng trong khu vực Đà Nẵng (miễn phí ship).
+- Đặt đơn xong, admin xác nhận và giao hàng trong khu vực Đà Nẵng (miễn phí ship, thường trong vòng 2-3 tiếng).
 - Thanh toán tiền thuê và tiền cọc trực tiếp khi giao/nhận hàng (tiền mặt).
 - Tiền cọc hoàn trả sau khi trả hàng, hàng không hư hỏng.
 - Trả trễ: chỉ tính phí theo ngày, không liên quan đến tiền cọc.
 - Hỗ trợ: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
   en: `Wardrobe Wonders rental process:
 - Customers self-select products, size and rental dates directly on the website.
-- After placing the order, admin confirms and delivers within Da Nang area (free shipping).
+- After placing the order, admin confirms and delivers within Da Nang area (free shipping, usually within 2-3 hours).
 - Payment (rental fee + deposit) is made in cash upon delivery/pickup.
 - Deposit refunded after on-time return in good condition.
 - Late return: daily fee applies. Items must be undamaged.
 - Support: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
   ja: `Wardrobe Wondersレンタルの流れ:
 - お客様はウェブサイトで直接商品・サイズ・レンタル日を選択できます。
-- 注文後、管理者が確認してダナンエリア内に配送します（送料無料）。
+- 注文後、管理者が確認してダナンエリア内に配送します（送料無料、通常2〜3時間以内）。
 - 支払い（レンタル料＋デポジット）は配送時に現金払い。
 - デポジットは期日通り良好な状態で返却後に返金。
 - 延滞: 1日ごと追加料金。商品は破損・汚損なしで返却。
