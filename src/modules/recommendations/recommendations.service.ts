@@ -163,7 +163,7 @@ Return ONLY valid JSON, no markdown:
   }
 
   private async callGemini(apiKey: string, prompt: string): Promise<string> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
