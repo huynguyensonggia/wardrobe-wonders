@@ -63,7 +63,8 @@ export class ChatService {
     const products = await this.productsRepo.find({
       where: { status: ProductStatus.AVAILABLE },
       relations: ["category", "variants"],
-      take: 25,
+      order: { id: "DESC" },
+      take: 40,
     });
 
     const productSummary = products.map((p) => ({
