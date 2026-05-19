@@ -84,7 +84,9 @@ export function ChatWidget() {
     setLoading(true);
 
     try {
-      const history = next.map((m) => ({ role: m.role, content: m.content }));
+      // slice(1) bỏ welcome message (fake, không phải Gemini response)
+      // tránh 2 lượt "model" liên tiếp gây lỗi Gemini API
+      const history = next.slice(1).map((m) => ({ role: m.role, content: m.content }));
       const res = await chatApi.send(history, lang);
       setMessages([...next, { role: "assistant", content: res.message, products: res.products }]);
     } catch {
