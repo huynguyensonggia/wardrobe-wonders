@@ -51,6 +51,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cloudinary": "^2.8.0",
+    "exceljs": "^4.4.0",
     "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
     "i18next": "^25.8.4",
@@ -64,8 +65,7 @@
     "resend": "^6.12.3",
     "rxjs": "^7.8.1",
     "sharp": "^0.34.5",
-    "typeorm": "^0.3.24",
-    "xlsx": "^0.18.5"
+    "typeorm": "^0.3.24"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

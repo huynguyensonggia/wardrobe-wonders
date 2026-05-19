@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, Repository } from "typeorm";
-import * as XLSX from "xlsx";
+import * as ExcelJS from "exceljs";
 
 import { Product } from "./entities/product.entity";
 import { ProductVariant } from "./entities/product-variant.entity";
@@ -491,14 +491,29 @@ export class ProductService {
       await this.clearAllProducts();
     }
 
-    const wb = XLSX.read(file.buffer, { type: "buffer" });
-    const sheetName = wb.SheetNames[0];
-    if (!sheetName) throw new BadRequestException("Excel has no sheets");
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(file.buffer);
+    const ws = wb.worksheets[0];
+    if (!ws) throw new BadRequestException("Excel has no sheets");
 
-    const ws = wb.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json<Record<string, any>>(ws, {
-      defval: null,
+    // Build header map from first row
+    const headerRow = ws.getRow(1);
+    const headers: string[] = [];
+    headerRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      headers[colNumber] = cell.value ? String(cell.value).trim() : "";
     });
+
+    const rows: Record<string, any>[] = [];
+    ws.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+      if (rowNumber === 1) return;
+      const r: Record<string, any> = {};
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        const header = headers[colNumber];
+        if (header) r[header] = cell.value ?? null;
+      });
+      rows.push(r);
+    });
+
     if (!rows.length) throw new BadRequestException("Excel is empty");
 
     // preload categories
