@@ -794,7 +794,14 @@
       "stock": "Stock",
       "color": "Color (Vietnamese)",
       "colorEn": "Color (English)",
-      "colorJa": "Color (日本語)"
+      "colorJa": "Color (日本語)",
+      "multilingualSection": "🌐 Multilingual Name & Description",
+      "nameEn": "Name (English)",
+      "nameJa": "Name (Japanese)",
+      "descEn": "Description (English)",
+      "descJa": "Description (Japanese)",
+      "shopeeSection": "🛍️ Shopee Affiliate Link",
+      "shopeeHint": "If filled, customers will see a buy button on the product page."
     },
     "occasions": {
       "party": "Party",
@@ -876,16 +883,6 @@
       "title": "Delete all products?",
       "desc": "This will delete all existing products, variants and inventory, then reimport from the Excel file.",
       "confirm": "Confirm delete & reimport"
-    },
-    "form": {
-      "multilingualSection": "🌐 Multilingual Name & Description",
-      "optional": "(optional)",
-      "nameEn": "Name (English)",
-      "nameJa": "Name (Japanese)",
-      "descEn": "Description (English)",
-      "descJa": "Description (Japanese)",
-      "shopeeSection": "🛍️ Shopee Affiliate Link",
-      "shopeeHint": "If filled, customers will see a buy button on the product page."
     }
   },
   "adminCategories": {

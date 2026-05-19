@@ -795,7 +795,14 @@
       "stock": "在庫",
       "color": "色（ベトナム語）",
       "colorEn": "色（英語）",
-      "colorJa": "色（日本語）"
+      "colorJa": "色（日本語）",
+      "multilingualSection": "🌐 多言語の名前・説明",
+      "nameEn": "名前（英語）",
+      "nameJa": "名前（日本語）",
+      "descEn": "説明（英語）",
+      "descJa": "説明（日本語）",
+      "shopeeSection": "🛍️ Shopeeアフィリエイトリンク",
+      "shopeeHint": "リンクを入力すると、商品ページに購入ボタンが表示されます。"
     },
     "occasions": {
       "party": "パーティー",
@@ -877,16 +884,6 @@
       "title": "全商品を削除しますか？",
       "desc": "この操作により、既存の全商品・バリアント・在庫が削除され、Excelファイルから再インポートされます。",
       "confirm": "削除して再インポートする"
-    },
-    "form": {
-      "multilingualSection": "🌐 多言語の名前・説明",
-      "optional": "(任意)",
-      "nameEn": "名前（英語）",
-      "nameJa": "名前（日本語）",
-      "descEn": "説明（英語）",
-      "descJa": "説明（日本語）",
-      "shopeeSection": "🛍️ Shopeeアフィリエイトリンク",
-      "shopeeHint": "リンクを入力すると、商品ページに購入ボタンが表示されます。"
     }
   },
   "adminCategories": {

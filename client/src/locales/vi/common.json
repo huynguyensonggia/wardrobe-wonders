@@ -793,7 +793,14 @@
       "stock": "Tồn kho",
       "color": "Màu (Tiếng Việt)",
       "colorEn": "Màu (English)",
-      "colorJa": "Màu (日本語)"
+      "colorJa": "Màu (日本語)",
+      "multilingualSection": "🌐 Tên & Mô tả đa ngôn ngữ",
+      "nameEn": "Tên (English)",
+      "nameJa": "Tên (日本語)",
+      "descEn": "Mô tả (English)",
+      "descJa": "Mô tả (日本語)",
+      "shopeeSection": "🛍️ Link Shopee Affiliate",
+      "shopeeHint": "Nếu điền link, khách hàng sẽ thấy nút mua hàng trên trang sản phẩm."
     },
     "occasions": {
       "party": "Tiệc",
@@ -875,16 +882,6 @@
       "title": "Xóa toàn bộ sản phẩm?",
       "desc": "Hành động này sẽ xóa tất cả sản phẩm, variants và inventory hiện có, sau đó import lại từ file Excel.",
       "confirm": "Xác nhận xóa & import lại"
-    },
-    "form": {
-      "multilingualSection": "🌐 Tên & Mô tả đa ngôn ngữ",
-      "optional": "(không bắt buộc)",
-      "nameEn": "Tên (English)",
-      "nameJa": "Tên (日本語)",
-      "descEn": "Mô tả (English)",
-      "descJa": "Mô tả (日本語)",
-      "shopeeSection": "🛍️ Link Shopee Affiliate",
-      "shopeeHint": "Nếu điền link, khách hàng sẽ thấy nút mua hàng trên trang sản phẩm."
     }
   },
   "adminCategories": {
