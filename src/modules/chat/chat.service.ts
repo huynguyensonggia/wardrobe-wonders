@@ -1,132 +1,83 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Product } from "../products/entities/product.entity";
 import { ProductStatus } from "../products/enums/product-status.enum";
 import { ChatDto } from "./dto/chat.dto";
 
-const FAQ = {
-  vi: `
-## Chính sách thuê đồ – Wardrobe Wonders
+// Concise FAQ — shorter = fewer tokens per request
+const FAQ: Record<string, string> = {
+  vi: `Chính sách thuê đồ Wardrobe Wonders:
+- Đặt cọc: hoàn trả sau khi trả hàng đúng hạn, nguyên vẹn.
+- Giao hàng TP.HCM, 1–2 ngày làm việc, phí ship theo quãng cách.
+- Trả trễ: tính phí theo ngày. Hàng phải không rách/bẩn nặng.
+- Thanh toán: chuyển khoản TPBank qua QR. SePay tự động xác nhận.
+- Đổi size: liên hệ admin trước khi giao.
+- Hỗ trợ: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
 
-**Đặt cọc:**
-- Mỗi sản phẩm có mức đặt cọc riêng (hiển thị trên trang sản phẩm).
-- Đặt cọc được hoàn trả sau khi trả hàng đúng hạn và nguyên vẹn.
+  en: `Wardrobe Wonders rental policy:
+- Deposit refunded after on-time return in good condition.
+- Delivery in HCMC, 1–2 business days, distance-based fee.
+- Late return: daily fee. Items must be undamaged.
+- Payment: TPBank QR transfer. SePay auto-confirmation.
+- Size swap: contact admin before delivery.
+- Support: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
 
-**Giao & nhận hàng:**
-- Giao hàng trong TP.HCM, phí ship tính theo quãng cách.
-- Thời gian giao: 1–2 ngày làm việc sau khi xác nhận đơn.
-- Khách nhận hàng, kiểm tra ngay — nếu không ưng có thể từ chối nhận (hàng sẽ được đánh dấu "Trả về khi giao").
-
-**Trả hàng:**
-- Trả đúng hạn ghi trong đơn thuê.
-- Hàng phải còn nguyên vẹn, không rách/bẩn nặng.
-- Trả trễ: tính thêm phí theo ngày.
-
-**Thanh toán:**
-- Chuyển khoản ngân hàng (TPBank) qua mã QR khi checkout.
-- Hỗ trợ SePay tự động xác nhận.
-
-**Đổi size:**
-- Liên hệ admin trước khi giao để đổi size nếu còn hàng.
-
-**Liên hệ hỗ trợ:**
-- Facebook: https://web.facebook.com/share/18n4kf3A4A/
-`,
-  en: `
-## Rental Policy – Wardrobe Wonders
-
-**Deposit:**
-- Each product has its own deposit amount (shown on the product page).
-- Deposit is refunded after on-time return in good condition.
-
-**Delivery:**
-- Delivery within Ho Chi Minh City, shipping fee based on distance.
-- Delivery time: 1–2 business days after order confirmation.
-- Inspect items upon receipt — you may refuse if unsatisfied (marked as "Returned on delivery").
-
-**Returns:**
-- Return by the due date shown on your rental order.
-- Items must be intact, not torn or heavily soiled.
-- Late returns: additional daily fee applies.
-
-**Payment:**
-- Bank transfer (TPBank) via QR code at checkout.
-- SePay auto-confirmation supported.
-
-**Size exchange:**
-- Contact admin before delivery to swap sizes if available.
-
-**Support:**
-- Facebook: https://web.facebook.com/share/18n4kf3A4A/
-`,
-  ja: `
-## レンタルポリシー – Wardrobe Wonders
-
-**デポジット:**
-- 商品ごとにデポジット金額が異なります（商品ページに表示）。
-- 期日通りに返却し、状態が良好であればデポジットは返金されます。
-
-**配送:**
-- ホーチミン市内配送。送料は距離により異なります。
-- 注文確認後、1〜2営業日以内に配送。
-- 受け取り時に商品を確認し、不満があれば受け取り拒否可能（「配送時返品」として記録）。
-
-**返却:**
-- レンタル注文に記載された期日までに返却。
-- 商品は破損・汚損なく元の状態で返却。
-- 延滞：1日ごとに追加料金が発生。
-
-**お支払い:**
-- チェックアウト時にQRコードで銀行振込（TPBank）。
-- SePay自動確認対応。
-
-**サイズ交換:**
-- 配送前に在庫があればサイズ交換可能。管理者にご連絡ください。
-
-**サポート:**
-- Facebook: https://web.facebook.com/share/18n4kf3A4A/
-`,
+  ja: `Wardrobe Wondersレンタルポリシー:
+- デポジット: 期日通り良好な状態で返却後に返金。
+- ホーチミン市内配送、1〜2営業日、距離に応じた送料。
+- 延滞: 1日ごと追加料金。商品は破損・汚損なしで返却。
+- 支払い: TPBank QR振込。SePay自動確認対応。
+- サイズ交換: 配送前に管理者に連絡。
+- サポート: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
 };
 
 @Injectable()
 export class ChatService {
+  private readonly logger = new Logger(ChatService.name);
+
   constructor(
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
-  ) {}
+  ) {
+    // Log at startup so Render logs show key status immediately
+    if (!process.env.GEMINI_API_KEY) {
+      this.logger.warn("⚠️  GEMINI_API_KEY is NOT set — all chat requests will return fallback");
+    } else {
+      this.logger.log("✅ GEMINI_API_KEY is configured");
+    }
+  }
 
   async chat(dto: ChatDto) {
-    const lang = dto.language ?? "vi";
+    const lang = (["vi", "en", "ja"].includes(dto.language ?? "") ? dto.language : "vi") as string;
     const geminiKey = process.env.GEMINI_API_KEY;
+
+    if (!geminiKey) {
+      this.logger.warn("[chat] GEMINI_API_KEY missing — returning fallback");
+      return { message: this.fallbackMessage(lang), products: [] };
+    }
 
     const products = await this.productsRepo.find({
       where: { status: ProductStatus.AVAILABLE },
       relations: ["category", "variants"],
-      take: 60,
+      take: 25, // reduced from 60 to cut token usage
     });
 
+    // Slim product shape — only fields AI needs for recommendations
     const productSummary = products.map((p) => ({
       id: p.id,
       name: p.name,
-      nameEn: (p as any).nameEn ?? null,
-      nameJa: (p as any).nameJa ?? null,
       category: p.category?.name ?? "",
-      occasion: p.occasion,
-      color: p.color,
+      occasion: p.occasion ?? "",
+      color: p.color ?? "",
       rentPricePerDay: p.rentPricePerDay,
-      deposit: p.deposit,
       sizes: p.variants?.filter((v) => v.stock > 0).map((v) => v.size) ?? [],
     }));
 
     const systemPrompt = this.buildSystemPrompt(lang, productSummary);
 
-    if (!geminiKey) {
-      return { message: this.fallbackMessage(lang), products: [] };
-    }
-
     try {
-      const reply = await this.callGemini(geminiKey, systemPrompt, dto.messages);
+      const reply = await this.callGeminiWithRetry(geminiKey, systemPrompt, dto.messages, lang);
       const { message, suggestedIds } = this.parseReply(reply);
 
       const suggestedProducts = suggestedIds.length > 0
@@ -146,46 +97,42 @@ export class ChatService {
         : [];
 
       return { message, products: suggestedProducts };
-    } catch (err) {
-      console.error("[ChatService] error:", err);
+    } catch (err: any) {
+      this.logger.error(`[chat] Final error after retries: ${err?.message ?? err}`);
       return { message: this.fallbackMessage(lang), products: [] };
     }
   }
 
   private buildSystemPrompt(lang: string, products: any[]): string {
-    const langMap: Record<string, string> = {
-      vi: "Respond ONLY in Vietnamese.",
-      en: "Respond ONLY in English.",
-      ja: "Respond ONLY in Japanese.",
+    const langInstruction: Record<string, string> = {
+      vi: "Trả lời CHỈ bằng tiếng Việt.",
+      en: "Reply ONLY in English.",
+      ja: "日本語のみで返答してください。",
     };
 
     return `You are a friendly fashion consultant for Wardrobe Wonders, a Vietnamese clothing rental platform.
-${langMap[lang] ?? langMap.vi}
+${langInstruction[lang] ?? langInstruction.vi}
+Keep replies to 2–4 sentences.
 
-Your role:
-1. Help users find suitable clothing from the catalog based on their needs (occasion, body type, style, budget).
-2. Answer questions about rental policies, delivery, returns, deposits, and payments.
-3. Be warm, helpful, and concise (2–4 sentences per reply max).
-
-RENTAL POLICY KNOWLEDGE:
-${FAQ[lang as keyof typeof FAQ] ?? FAQ.vi}
+RENTAL POLICY:
+${FAQ[lang] ?? FAQ.vi}
 
 AVAILABLE PRODUCTS (JSON):
 ${JSON.stringify(products)}
 
-RESPONSE FORMAT:
-- For outfit recommendations: include product suggestions by ending your message with a JSON block on its own line:
-  PRODUCTS:[1,2,3]
-  (use actual product IDs from the catalog above)
-- For FAQ/policy questions: just answer in plain text, no PRODUCTS block needed.
-- Never make up products that aren't in the catalog.
-- If asked about a specific product not in catalog, say it's not currently available.`;
+When recommending outfits, end your message with:
+PRODUCTS:[id1,id2,id3]
+For FAQ questions, just answer in plain text — no PRODUCTS block.
+Never invent products not in the list above.`;
   }
 
-  private async callGemini(
+  /** Calls Gemini, retries once after delay on 429 rate-limit. */
+  private async callGeminiWithRetry(
     apiKey: string,
     systemPrompt: string,
     messages: { role: string; content: string }[],
+    lang: string,
+    attempt = 0,
   ): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -194,9 +141,20 @@ RESPONSE FORMAT:
       parts: [{ text: m.content }],
     }));
 
-    // Gemini yêu cầu bắt đầu bằng user turn
+    // Gemini requires contents to start with a user turn
     if (!contents.length || contents[0].role !== "user") {
       contents.unshift({ role: "user", parts: [{ text: "Xin chào" }] });
+    }
+
+    // Ensure alternating turns: if two consecutive same roles, remove duplicates
+    const deduped: typeof contents = [];
+    for (const turn of contents) {
+      if (deduped.length > 0 && deduped[deduped.length - 1].role === turn.role) {
+        // Merge content into previous turn instead of creating consecutive same-role turns
+        deduped[deduped.length - 1].parts[0].text += "\n" + turn.parts[0].text;
+      } else {
+        deduped.push(turn);
+      }
     }
 
     const res = await fetch(url, {
@@ -204,18 +162,33 @@ RESPONSE FORMAT:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
+        contents: deduped,
         generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
       }),
     });
 
     if (!res.ok) {
       const body = await res.text();
-      console.error("[ChatService] Gemini API error:", res.status, body);
-      throw new Error(`Gemini error: ${res.status}`);
+      this.logger.error(`[callGemini] attempt=${attempt} HTTP ${res.status}: ${body.slice(0, 300)}`);
+
+      // Retry once on rate limit
+      if (res.status === 429 && attempt === 0) {
+        this.logger.warn("[callGemini] Rate limited (429) — retrying after 3s");
+        await new Promise((r) => setTimeout(r, 3000));
+        return this.callGeminiWithRetry(apiKey, systemPrompt, messages, lang, 1);
+      }
+
+      throw new Error(`Gemini HTTP ${res.status}`);
     }
+
     const data = await res.json() as any;
-    return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+
+    if (!text) {
+      this.logger.warn(`[callGemini] Empty response from Gemini. Full response: ${JSON.stringify(data).slice(0, 400)}`);
+    }
+
+    return text;
   }
 
   private parseReply(raw: string): { message: string; suggestedIds: number[] } {
