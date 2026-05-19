@@ -7,7 +7,7 @@ export function FloatingSupportButton() {
     "https://web.facebook.com/share/18n4kf3A4A/?mibextid=wwXIfr&_rdc=1&_rdr";
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-3">
+    <div className="fixed bottom-24 right-6 z-50 flex flex-col items-center gap-3">
       {/* Sub buttons */}
       <div
         className={`flex flex-col items-center gap-3 transition-all duration-300 ${

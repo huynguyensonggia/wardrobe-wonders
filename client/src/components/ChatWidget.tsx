@@ -100,7 +100,7 @@ export function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-40 right-6 z-50 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 right-6 z-[49] flex flex-col items-end gap-3">
       {/* Chat window — mở lên phía trên nút */}
       {open && (
         <div
@@ -127,70 +127,78 @@ export function ChatWidget() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 bg-gray-50">
-            {!isAuthenticated ? (
-              <div className="text-center text-sm text-muted-foreground mt-8 px-2">
-                {LOGIN_MSG[lang]}
+            <>
+              {/* Welcome + login notice nếu chưa đăng nhập */}
+              <div className="flex justify-start">
+                <div className="max-w-[85%] rounded-2xl rounded-bl-sm px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap bg-white text-gray-800 shadow-sm border border-gray-100">
+                  {WELCOME[lang]}
+                  {!isAuthenticated && (
+                    <p className="mt-2 text-xs text-amber-600 font-medium">
+                      {LOGIN_MSG[lang]}
+                    </p>
+                  )}
+                </div>
               </div>
-            ) : (
-              <>
-                {messages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap
-                      ${msg.role === "user"
-                        ? "bg-[#1a3a8f] text-white rounded-br-sm"
-                        : "bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm"
-                      }`}>
-                      {msg.content}
 
-                      {/* Product suggestions */}
-                      {msg.products && msg.products.length > 0 && (
-                        <div className="mt-2 space-y-2">
-                          {msg.products.map((p) => (
-                            <Link
-                              key={p.id}
-                              to={`/products/${p.id}`}
-                              onClick={() => setOpen(false)}
-                              className="flex items-center gap-2 bg-gray-50 rounded-xl p-2 hover:bg-gray-100 transition border border-gray-200"
-                            >
-                              {p.imageUrl ? (
-                                <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-cover rounded-lg flex-shrink-0" />
-                              ) : (
-                                <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                  <ShoppingBag className="w-4 h-4 text-gray-400" />
-                                </div>
-                              )}
-                              <div className="min-w-0">
-                                <p className="text-xs font-medium text-gray-800 truncate">
-                                  {getLocalizedProductName(p, lang, p.name)}
-                                </p>
-                                <p className="text-xs text-[#1a3a8f]">
-                                  {p.rentPricePerDay?.toLocaleString("vi-VN")}đ/ngày
-                                </p>
+              {/* Tin nhắn tiếp theo (chỉ có khi đã đăng nhập) */}
+              {messages.slice(1).map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed whitespace-pre-wrap
+                    ${msg.role === "user"
+                      ? "bg-[#1a3a8f] text-white rounded-br-sm"
+                      : "bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm"
+                    }`}>
+                    {msg.content}
+
+                    {/* Product suggestions */}
+                    {msg.products && msg.products.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {msg.products.map((p) => (
+                          <Link
+                            key={p.id}
+                            to={`/products/${p.id}`}
+                            onClick={() => setOpen(false)}
+                            className="flex items-center gap-2 bg-gray-50 rounded-xl p-2 hover:bg-gray-100 transition border border-gray-200"
+                          >
+                            {p.imageUrl ? (
+                              <img src={p.imageUrl} alt={p.name} className="w-10 h-10 object-cover rounded-lg flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <ShoppingBag className="w-4 h-4 text-gray-400" />
                               </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-medium text-gray-800 truncate">
+                                {getLocalizedProductName(p, lang, p.name)}
+                              </p>
+                              <p className="text-xs text-[#1a3a8f]">
+                                {p.rentPricePerDay?.toLocaleString("vi-VN")}đ/ngày
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
+              ))}
 
-                {/* Quick suggestion chips — chỉ hiện khi chưa có tin nhắn */}
-                {isFirstMessage && !loading && (
-                  <div className="flex flex-col gap-2 pt-1">
-                    {(SUGGESTIONS[lang] ?? SUGGESTIONS.vi).map((s) => (
-                      <button
-                        key={s.label}
-                        onClick={() => sendText(s.prompt)}
-                        className="text-left text-xs px-3 py-2 rounded-xl border border-[#1a3a8f]/30 text-[#1a3a8f] bg-white hover:bg-[#1a3a8f]/5 transition"
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+              {/* Quick suggestion chips — hiện khi chưa có tin nhắn */}
+              {isFirstMessage && !loading && (
+                <div className="flex flex-col gap-2 pt-1">
+                  {(SUGGESTIONS[lang] ?? SUGGESTIONS.vi).map((s) => (
+                    <button
+                      key={s.label}
+                      onClick={() => isAuthenticated ? sendText(s.prompt) : undefined}
+                      className={`text-left text-xs px-3 py-2 rounded-xl border border-[#1a3a8f]/30 text-[#1a3a8f] bg-white transition
+                        ${isAuthenticated ? "hover:bg-[#1a3a8f]/5 cursor-pointer" : "opacity-50 cursor-not-allowed"}`}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
 
             {loading && (
               <div className="flex justify-start">
