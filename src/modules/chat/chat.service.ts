@@ -218,15 +218,17 @@ ${FAQ[lang] ?? FAQ.vi}
 AVAILABLE PRODUCTS (JSON):
 ${JSON.stringify(products)}
 
-When recommending outfits, end your message with:
+When recommending outfits, you MUST end your message with EXACTLY this format (no spaces, no variations):
 PRODUCTS:[id1,id2,id3]
+Example: PRODUCTS:[422,425,428]
 For FAQ questions, just answer in plain text — no PRODUCTS block.
 Never invent products not in the list above.
-IMPORTANT: Never mention product IDs, numbers, or any technical identifiers (like "ID: 442" or "#442") in your message text. Only use the PRODUCTS:[...] block at the end.`;
+IMPORTANT: Never mention product IDs, numbers, or any technical identifiers (like "ID: 442", "#442", "PRODUCTS: 422, 425") in your message text. The PRODUCTS:[...] line is hidden from users — only product cards will be shown.`;
   }
 
   private parseReply(raw: string): { message: string; suggestedIds: number[] } {
-    const match = raw.match(/PRODUCTS:\[([^\]]*)\]/);
+    // Match both PRODUCTS:[1,2,3] and PRODUCTS: 1, 2, 3 variants
+    const match = raw.match(/PRODUCTS:\s*\[?([0-9, ]+)\]?/i);
     if (!match) return { message: raw.trim(), suggestedIds: [] };
 
     const ids = match[1]
@@ -234,7 +236,8 @@ IMPORTANT: Never mention product IDs, numbers, or any technical identifiers (lik
       .map((s) => parseInt(s.trim(), 10))
       .filter((n) => !isNaN(n));
 
-    return { message: raw.replace(/PRODUCTS:\[[^\]]*\]/, "").trim(), suggestedIds: ids };
+    const cleaned = raw.replace(/PRODUCTS:\s*\[?[0-9, ]+\]?/i, "").trim();
+    return { message: cleaned, suggestedIds: ids };
   }
 
   private fallbackMessage(lang: string): string {
