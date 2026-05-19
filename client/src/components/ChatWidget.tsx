@@ -71,6 +71,11 @@ export function ChatWidget() {
   }, [lang]);
 
   useEffect(() => {
+    setMessages([{ role: "assistant", content: WELCOME[lang] }]);
+    setOpen(false);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
 
