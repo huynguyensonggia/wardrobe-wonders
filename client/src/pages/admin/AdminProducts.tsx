@@ -426,13 +426,13 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       {/* Header + Create + Import */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-display text-2xl font-semibold">{t("adminProducts.header.title")}</h2>
           <p className="text-muted-foreground">{t("adminProducts.header.subtitle")}</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {/* Import thêm (giữ nguyên sản phẩm cũ) */}
           <input
             ref={importInputRef}
