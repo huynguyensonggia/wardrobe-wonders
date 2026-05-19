@@ -7,12 +7,13 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { productsApi, categoriesApi } from "@/lib/api";
 import { LoadingState, ErrorState } from "@/components/common";
 import { useTranslation } from "react-i18next";
+import { getLocalizedProductName } from "@/utils/i18n";
 
 const ACCESSORY_SLUGS = ["bags", "jewelry", "hats"];
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const isAllAccessories = slug === "accessories";
 
@@ -106,7 +107,9 @@ export default function CategoryPage() {
 
   const categoryName = isAllAccessories
     ? t("navbar.accessories")
-    : category?.name ?? slug ?? "";
+    : category
+      ? getLocalizedProductName(category, i18n.language, category.name ?? slug ?? "")
+      : slug ?? "";
 
   if (isLoading) {
     return (
