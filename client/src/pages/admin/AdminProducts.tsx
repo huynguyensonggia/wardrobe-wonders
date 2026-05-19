@@ -553,7 +553,7 @@ export default function AdminProducts() {
                     <SelectContent>
                       {categories.map((c) => (
                         <SelectItem key={c.id} value={String(c.id)}>
-                          {c.name}
+                          {getLocalizedProductName(c, i18n.language, c.name)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -685,22 +685,22 @@ export default function AdminProducts() {
 
               {/* Multilingual fields */}
               <div className="border rounded-lg p-4 space-y-3">
-                <p className="text-sm font-medium">🌐 Tên & Mô tả đa ngôn ngữ <span className="text-muted-foreground font-normal">(không bắt buộc)</span></p>
+                <p className="text-sm font-medium">{t("adminProducts.form.multilingualSection")} <span className="text-muted-foreground font-normal">{t("adminProducts.form.optional")}</span></p>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1">
-                    <Label className="text-xs">Tên (English)</Label>
+                    <Label className="text-xs">{t("adminProducts.form.nameEn")}</Label>
                     <Input placeholder="Product name in English" value={nameEn} onChange={(e) => setNameEn(e.target.value)} />
                   </div>
                   <div className="grid gap-1">
-                    <Label className="text-xs">Tên (日本語)</Label>
+                    <Label className="text-xs">{t("adminProducts.form.nameJa")}</Label>
                     <Input placeholder="日本語の商品名" value={nameJa} onChange={(e) => setNameJa(e.target.value)} />
                   </div>
                   <div className="grid gap-1">
-                    <Label className="text-xs">Mô tả (English)</Label>
+                    <Label className="text-xs">{t("adminProducts.form.descEn")}</Label>
                     <Input placeholder="Description in English" value={descriptionEn} onChange={(e) => setDescriptionEn(e.target.value)} />
                   </div>
                   <div className="grid gap-1">
-                    <Label className="text-xs">Mô tả (日本語)</Label>
+                    <Label className="text-xs">{t("adminProducts.form.descJa")}</Label>
                     <Input placeholder="日本語の説明" value={descriptionJa} onChange={(e) => setDescriptionJa(e.target.value)} />
                   </div>
                 </div>
@@ -709,9 +709,8 @@ export default function AdminProducts() {
               {/* Shopee Affiliate */}
               <div className="border border-orange-200 rounded-lg p-4 space-y-2 bg-orange-50/50">
                 <p className="text-sm font-medium flex items-center gap-2">
-                  <span className="text-base">🛍️</span>
-                  Link Shopee Affiliate
-                  <span className="text-muted-foreground font-normal text-xs">(không bắt buộc)</span>
+                  {t("adminProducts.form.shopeeSection")}
+                  <span className="text-muted-foreground font-normal text-xs">{t("adminProducts.form.optional")}</span>
                 </p>
                 <Input
                   placeholder="https://shope.ee/..."
@@ -720,7 +719,7 @@ export default function AdminProducts() {
                   className="bg-white"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Nếu điền link, khách hàng sẽ thấy nút mua hàng trên trang sản phẩm.
+                  {t("adminProducts.form.shopeeHint")}
                 </p>
               </div>
 
