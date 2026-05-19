@@ -5,7 +5,6 @@ import { Product } from "../products/entities/product.entity";
 import { ProductStatus } from "../products/enums/product-status.enum";
 import { ChatDto } from "./dto/chat.dto";
 
-// Concise FAQ — shorter = fewer tokens per request
 const FAQ: Record<string, string> = {
   vi: `Chính sách thuê đồ Wardrobe Wonders:
 - Đặt cọc: hoàn trả sau khi trả hàng đúng hạn, nguyên vẹn.
@@ -14,7 +13,6 @@ const FAQ: Record<string, string> = {
 - Thanh toán: chuyển khoản TPBank qua QR. SePay tự động xác nhận.
 - Đổi size: liên hệ admin trước khi giao.
 - Hỗ trợ: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
-
   en: `Wardrobe Wonders rental policy:
 - Deposit refunded after on-time return in good condition.
 - Delivery in HCMC, 1–2 business days, distance-based fee.
@@ -22,7 +20,6 @@ const FAQ: Record<string, string> = {
 - Payment: TPBank QR transfer. SePay auto-confirmation.
 - Size swap: contact admin before delivery.
 - Support: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
-
   ja: `Wardrobe Wondersレンタルポリシー:
 - デポジット: 期日通り良好な状態で返却後に返金。
 - ホーチミン市内配送、1〜2営業日、距離に応じた送料。
@@ -35,36 +32,40 @@ const FAQ: Record<string, string> = {
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);
-  // Override via GEMINI_MODEL env var on Render if needed
-  private readonly model = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-lite";
+  private readonly geminiModel = process.env.GEMINI_MODEL ?? "gemini-2.0-flash-lite";
 
   constructor(
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
   ) {
-    if (!process.env.GEMINI_API_KEY) {
-      this.logger.warn("⚠️  GEMINI_API_KEY is NOT set — all chat requests will return fallback");
+    const groqKey = process.env.GROQ_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
+
+    if (groqKey) {
+      this.logger.log("✅ Provider: Groq (GROQ_API_KEY configured)");
+    } else if (geminiKey) {
+      this.logger.log(`✅ Provider: Gemini (model=${this.geminiModel})`);
     } else {
-      this.logger.log(`✅ GEMINI_API_KEY configured, model=${this.model}`);
+      this.logger.warn("⚠️  No AI key set (GROQ_API_KEY or GEMINI_API_KEY) — chat will return fallback");
     }
   }
 
   async chat(dto: ChatDto) {
     const lang = (["vi", "en", "ja"].includes(dto.language ?? "") ? dto.language : "vi") as string;
+    const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
-    if (!geminiKey) {
-      this.logger.warn("[chat] GEMINI_API_KEY missing — returning fallback");
+    if (!groqKey && !geminiKey) {
+      this.logger.warn("[chat] No AI provider configured");
       return { message: this.fallbackMessage(lang), products: [] };
     }
 
     const products = await this.productsRepo.find({
       where: { status: ProductStatus.AVAILABLE },
       relations: ["category", "variants"],
-      take: 25, // reduced from 60 to cut token usage
+      take: 25,
     });
 
-    // Slim product shape — only fields AI needs for recommendations
     const productSummary = products.map((p) => ({
       id: p.id,
       name: p.name,
@@ -78,7 +79,10 @@ export class ChatService {
     const systemPrompt = this.buildSystemPrompt(lang, productSummary);
 
     try {
-      const reply = await this.callGeminiWithRetry(geminiKey, systemPrompt, dto.messages, lang);
+      const reply = groqKey
+        ? await this.callGroq(groqKey, systemPrompt, dto.messages)
+        : await this.callGeminiWithRetry(geminiKey!, systemPrompt, dto.messages, 0);
+
       const { message, suggestedIds } = this.parseReply(reply);
 
       const suggestedProducts = suggestedIds.length > 0
@@ -99,9 +103,102 @@ export class ChatService {
 
       return { message, products: suggestedProducts };
     } catch (err: any) {
-      this.logger.error(`[chat] Final error after retries: ${err?.message ?? err}`);
+      this.logger.error(`[chat] Failed: ${err?.message ?? err}`);
       return { message: this.fallbackMessage(lang), products: [] };
     }
+  }
+
+  // ─── Groq (primary — OpenAI-compatible, generous free tier) ─────────────────
+  private async callGroq(
+    apiKey: string,
+    systemPrompt: string,
+    messages: { role: string; content: string }[],
+  ): Promise<string> {
+    const url = "https://api.groq.com/openai/v1/chat/completions";
+
+    const body = {
+      model: process.env.GROQ_MODEL ?? "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((m) => ({
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content,
+        })),
+      ],
+      temperature: 0.6,
+      max_tokens: 512,
+    };
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      this.logger.error(`[callGroq] HTTP ${res.status}: ${err.slice(0, 300)}`);
+      throw new Error(`Groq HTTP ${res.status}`);
+    }
+
+    const data = await res.json() as any;
+    return data?.choices?.[0]?.message?.content ?? "";
+  }
+
+  // ─── Gemini (fallback — kept for when GROQ_API_KEY not available) ─────────────
+  private async callGeminiWithRetry(
+    apiKey: string,
+    systemPrompt: string,
+    messages: { role: string; content: string }[],
+    attempt: number,
+  ): Promise<string> {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiModel}:generateContent?key=${apiKey}`;
+
+    const contents = messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    if (!contents.length || contents[0].role !== "user") {
+      contents.unshift({ role: "user", parts: [{ text: "Xin chào" }] });
+    }
+
+    // Merge consecutive same-role turns to prevent Gemini 400 errors
+    const deduped: typeof contents = [];
+    for (const turn of contents) {
+      if (deduped.length > 0 && deduped[deduped.length - 1].role === turn.role) {
+        deduped[deduped.length - 1].parts[0].text += "\n" + turn.parts[0].text;
+      } else {
+        deduped.push(turn);
+      }
+    }
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: deduped,
+        generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      this.logger.error(`[callGemini] attempt=${attempt} HTTP ${res.status}: ${body.slice(0, 300)}`);
+      if (res.status === 429 && attempt === 0) {
+        this.logger.warn("[callGemini] Rate limited — retrying after 3s");
+        await new Promise((r) => setTimeout(r, 3000));
+        return this.callGeminiWithRetry(apiKey, systemPrompt, messages, 1);
+      }
+      throw new Error(`Gemini HTTP ${res.status}`);
+    }
+
+    const data = await res.json() as any;
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
   }
 
   private buildSystemPrompt(lang: string, products: any[]): string {
@@ -127,71 +224,6 @@ For FAQ questions, just answer in plain text — no PRODUCTS block.
 Never invent products not in the list above.`;
   }
 
-  /** Calls Gemini, retries once after delay on 429 rate-limit. */
-  private async callGeminiWithRetry(
-    apiKey: string,
-    systemPrompt: string,
-    messages: { role: string; content: string }[],
-    lang: string,
-    attempt = 0,
-  ): Promise<string> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${apiKey}`;
-
-    const contents = messages.map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-    // Gemini requires contents to start with a user turn
-    if (!contents.length || contents[0].role !== "user") {
-      contents.unshift({ role: "user", parts: [{ text: "Xin chào" }] });
-    }
-
-    // Ensure alternating turns: if two consecutive same roles, remove duplicates
-    const deduped: typeof contents = [];
-    for (const turn of contents) {
-      if (deduped.length > 0 && deduped[deduped.length - 1].role === turn.role) {
-        // Merge content into previous turn instead of creating consecutive same-role turns
-        deduped[deduped.length - 1].parts[0].text += "\n" + turn.parts[0].text;
-      } else {
-        deduped.push(turn);
-      }
-    }
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: deduped,
-        generationConfig: { temperature: 0.6, maxOutputTokens: 512 },
-      }),
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-      this.logger.error(`[callGemini] attempt=${attempt} HTTP ${res.status}: ${body.slice(0, 300)}`);
-
-      // Retry once on rate limit
-      if (res.status === 429 && attempt === 0) {
-        this.logger.warn("[callGemini] Rate limited (429) — retrying after 3s");
-        await new Promise((r) => setTimeout(r, 3000));
-        return this.callGeminiWithRetry(apiKey, systemPrompt, messages, lang, 1);
-      }
-
-      throw new Error(`Gemini HTTP ${res.status}`);
-    }
-
-    const data = await res.json() as any;
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
-    if (!text) {
-      this.logger.warn(`[callGemini] Empty response from Gemini. Full response: ${JSON.stringify(data).slice(0, 400)}`);
-    }
-
-    return text;
-  }
-
   private parseReply(raw: string): { message: string; suggestedIds: number[] } {
     const match = raw.match(/PRODUCTS:\[([^\]]*)\]/);
     if (!match) return { message: raw.trim(), suggestedIds: [] };
@@ -201,8 +233,7 @@ Never invent products not in the list above.`;
       .map((s) => parseInt(s.trim(), 10))
       .filter((n) => !isNaN(n));
 
-    const message = raw.replace(/PRODUCTS:\[[^\]]*\]/, "").trim();
-    return { message, suggestedIds: ids };
+    return { message: raw.replace(/PRODUCTS:\[[^\]]*\]/, "").trim(), suggestedIds: ids };
   }
 
   private fallbackMessage(lang: string): string {
