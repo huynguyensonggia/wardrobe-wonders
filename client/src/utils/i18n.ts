@@ -69,3 +69,18 @@ export function getLocalizedProductDescription(
 ): string {
   return getLocalizedText(product, "description", language, fallback);
 }
+
+/** Parse condition percentage from a note string like "90% - Bình thường" */
+export function parsePct(note?: string): number {
+  if (!note) return 100;
+  const m = note.match(/^(\d+)%/);
+  return m ? Number(m[1]) : 100;
+}
+
+/** Returns the i18n key for a condition percentage level */
+export function conditionLevelKey(pct: number): string {
+  if (pct >= 90) return "adminInventory.condition.good";
+  if (pct >= 70) return "adminInventory.condition.normal";
+  if (pct >= 50) return "adminInventory.condition.old";
+  return "adminInventory.condition.damaged";
+}

@@ -35,7 +35,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { Pencil, Trash2, Upload } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
-import { getLocalizedProductName } from "@/utils/i18n";
+import { getLocalizedProductName, parsePct, conditionLevelKey } from "@/utils/i18n";
 
 /* ===== ENUM MIRROR FROM BE ===== */
 type ProductOccasion = "party" | "wedding" | "casual";
@@ -886,7 +886,11 @@ export default function AdminProducts() {
                           <div key={item.id} className="flex items-center justify-between bg-muted/40 rounded px-3 py-2 text-xs">
                             <div>
                               <span className="font-mono font-medium">{item.barcode}</span>
-                              {item.conditionNote && <span className="text-muted-foreground ml-2">• {item.conditionNote}</span>}
+                              {item.conditionNote && (
+                                <span className="text-muted-foreground ml-2">
+                                  • {parsePct(item.conditionNote)}% – {t(conditionLevelKey(parsePct(item.conditionNote)))}
+                                </span>
+                              )}
                             </div>
                             <span className={`px-2 py-0.5 rounded-full font-medium ${statusCls}`}>
                               {statusLabel}

@@ -5,7 +5,7 @@ import { productsApi } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
-import { getLocalizedProductName } from "@/utils/i18n";
+import { getLocalizedProductName, parsePct, conditionLevelKey } from "@/utils/i18n";
 
 type ConditionStatus =
   | "available" | "shipping" | "rented"
@@ -46,18 +46,7 @@ function ConditionNoteButton({ item, onSave }: { item: InventoryItem; onSave: (n
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
-  // Parse % từ conditionNote hiện tại nếu có (VD: "90% - Tốt")
-  const parsePct = (note?: string) => {
-    if (!note) return 100;
-    const m = note.match(/^(\d+)%/);
-    return m ? Number(m[1]) : 100;
-  };
-
-  const getLabel = (p: number) =>
-    p >= 90 ? t("adminInventory.condition.good")
-    : p >= 70 ? t("adminInventory.condition.normal")
-    : p >= 50 ? t("adminInventory.condition.old")
-    : t("adminInventory.condition.damaged");
+  const getLabel = (p: number) => t(conditionLevelKey(p));
 
   const [pct, setPct] = useState(() => parsePct(item.conditionNote));
   const [note, setNote] = useState(() => {
@@ -327,7 +316,7 @@ export default function AdminInventory() {
                 <div className="text-xs text-muted-foreground mt-1">
                   {item.variant?.product ? getLocalizedProductName(item.variant.product, i18n.language, item.variant.product.name) : ""} • {t("adminInventory.form.size")} {item.variant?.size} •{" "}
                   {t("adminInventory.rentedCount", { count: item.totalRentals, max: item.maxRentals })}
-                  {item.conditionNote && ` • ${item.conditionNote}`}
+                  {item.conditionNote && ` • ${parsePct(item.conditionNote)}% – ${t(conditionLevelKey(parsePct(item.conditionNote)))}`}
                 </div>
               </div>
 
