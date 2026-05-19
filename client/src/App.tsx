@@ -8,6 +8,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { FloatingSupportButton } from "@/components/FloatingSupportButton";
+import { ChatWidget } from "@/components/ChatWidget";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 // Pages
@@ -139,6 +140,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <FloatingSupportButton />
+            <ChatWidget />
             <PWAInstallPrompt />
           </BrowserRouter>
         </TooltipProvider>

@@ -17,6 +17,7 @@ import { PaymentsModule } from "./modules/payments/payments.module";
 import { AuditModule } from "./modules/audit/audit.module";
 import { NotificationsModule } from "./modules/notifications/notifications.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { ChatModule } from "./modules/chat/chat.module";
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     AuditModule,
     NotificationsModule,
     ScheduleModule.forRoot(),
+    ChatModule,
   ],
   controllers: [],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

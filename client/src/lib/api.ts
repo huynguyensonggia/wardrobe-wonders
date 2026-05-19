@@ -417,6 +417,16 @@ export const notificationsApi = {
 };
 
 // =============================
+// Chat API
+// =============================
+export const chatApi = {
+  send: (messages: { role: "user" | "assistant"; content: string }[], language: string) =>
+    fetchApi<{ message: string; products: any[] }>(`/chat`, {
+      method: "POST",
+      body: JSON.stringify({ messages, language }),
+    }),
+};
+
 // Product Watchlist API
 // =============================
 export const productWatchApi = {
