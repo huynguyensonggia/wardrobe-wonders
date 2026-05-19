@@ -10,8 +10,8 @@ const FAQ: Record<string, string> = {
 - Khách hàng tự chọn sản phẩm, size và ngày thuê trực tiếp trên website.
 - Đặt đơn xong, admin xác nhận và giao hàng trong khu vực Đà Nẵng (miễn phí ship).
 - Thanh toán tiền thuê và tiền cọc trực tiếp khi giao/nhận hàng (tiền mặt).
-- Tiền cọc hoàn trả sau khi trả hàng đúng hạn, không hư hỏng.
-- Trả trễ: tính phí theo ngày. Hàng phải không rách/bẩn nặng.
+- Tiền cọc hoàn trả sau khi trả hàng, hàng không hư hỏng.
+- Trả trễ: chỉ tính phí theo ngày, không liên quan đến tiền cọc.
 - Hỗ trợ: Facebook https://web.facebook.com/share/18n4kf3A4A/`,
   en: `Wardrobe Wonders rental process:
 - Customers self-select products, size and rental dates directly on the website.
