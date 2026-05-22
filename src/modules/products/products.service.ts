@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -476,6 +477,41 @@ export class ProductService {
 
   async remove(id: number) {
     await this.findOne(id);
+
+    const [{ activeCount }] = await this.dataSource.query(
+      `SELECT COUNT(*) as activeCount
+       FROM rental_items ri
+       JOIN rentals r ON r.id = ri.rental_id
+       WHERE ri.product_id = ?
+       AND r.status IN ('pending', 'shipping', 'active')`,
+      [id],
+    );
+    if (Number(activeCount) > 0) {
+      throw new ConflictException(
+        "Không thể xóa sản phẩm này vì đang có đơn thuê chưa hoàn thành.",
+      );
+    }
+
+    const [{ busyCount }] = await this.dataSource.query(
+      `SELECT COUNT(*) as busyCount
+       FROM inventory_items ii
+       JOIN product_variants pv ON pv.id = ii.variant_id
+       WHERE pv.product_id = ?
+       AND ii.condition_status NOT IN ('available', 'retired')`,
+      [id],
+    );
+    if (Number(busyCount) > 0) {
+      throw new ConflictException(
+        "Không thể xóa sản phẩm này vì vẫn còn vật phẩm trong kho chưa sẵn sàng (đang giặt/sửa/cho thuê).",
+      );
+    }
+
+    // Xóa rental_items lịch sử (đơn đã hoàn thành) để giải phóng FK trước khi xóa sản phẩm
+    await this.dataSource.query(
+      "DELETE FROM rental_items WHERE product_id = ?",
+      [id],
+    );
+
     await this.productRepo.delete({ id });
     return { message: `Product with ID ${id} deleted successfully` };
   }
